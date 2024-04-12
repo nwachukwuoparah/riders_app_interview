@@ -70,6 +70,7 @@ export interface RadioButnProps {
 
 export interface phoneInputProps {
 	style?: StyleProp<ViewStyle>;
+	label: string;
 	defaultValue?: string;
 	countryCode?: any;
 	onChange: (value: {

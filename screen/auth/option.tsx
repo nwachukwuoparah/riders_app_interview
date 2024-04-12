@@ -13,7 +13,7 @@ import CustButton from "../../components/button";
 export default function Option({ navigation }: any) {
 	return (
 		<Container>
-			<InnerWrapper sx={{ alignItems: "center", gap: 40 }}>
+			<InnerWrapper sx={{ alignItems: "center", gap: 20 }}>
 				<View style={styles.title}>
 					<Typography type="text24" sx={{ textAlign: "center" }}>
 						Become a{" "}
@@ -29,7 +29,7 @@ export default function Option({ navigation }: any) {
 				</View>
 				<Rider width={wp("100%")} height={hp("50%")} />
 				<View style={styles.button_contain}>
-					<CustButton type="rounded">
+					<CustButton type="rounded" onPress={() => navigation.navigate("signUp")}>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Sign up as a new rider
 						</Typography>
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
 		width: "70%",
 		justifyContent: "center",
 		marginTop: "10%",
-		marginBottom: "10%",
+		// marginBottom: "10%",
 		alignItems: "center",
 	},
 	button_contain: {

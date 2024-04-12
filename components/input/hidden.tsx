@@ -51,7 +51,7 @@ const HiddenInput = ({
 	});
 
 	return (
-		<>
+		<View style={{ gap: 5 }}>
 			{label && <Typography type="text16">{label}</Typography>}
 			<View style={styles.inputWrapper}>
 				{children}
@@ -86,7 +86,7 @@ const HiddenInput = ({
 					)}
 				</TouchableOpacity>
 			</View>
-		</>
+		</View>
 	);
 };
 

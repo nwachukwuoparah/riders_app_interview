@@ -1,15 +1,17 @@
 import { phoneInputProps } from "../../types";
 import PhoneInput from "react-native-phone-number-input";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import colors from "../../constant/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useEffect, useRef } from "react";
+import Typography from "../typography";
 
 const CustPhoneInput = ({
 	style,
 	onChange,
 	defaultValue,
 	countryCode,
+	label,
 }: phoneInputProps) => {
 	const phoneNumInput = useRef<PhoneInput>();
 
@@ -24,12 +26,12 @@ const CustPhoneInput = ({
 	const styles = StyleSheet.create({
 		phoneNumberView: {
 			width: "100%",
-			paddingVertical: "3.7%",
-			borderRadius: 10,
-			borderColor: colors.grey_d,
+			backgroundColor: colors.grey_a,
+			borderRadius: 30,
 			borderWidth: 1,
-			backgroundColor: colors.white,
+			borderColor: colors.yellow,
 			fontSize: hp("3%"),
+			overflow: "hidden",
 			...(style as object),
 		},
 	});
@@ -45,18 +47,24 @@ const CustPhoneInput = ({
 	};
 
 	return (
-		<PhoneInput
-			defaultCode={"NG"}
-			layout="first"
-			placeholder=" "
-			ref={phoneNumInput as React.MutableRefObject<PhoneInput>}
-			containerStyle={styles.phoneNumberView}
-			textContainerStyle={{ paddingVertical: 0, backgroundColor: colors.white }}
-			textInputStyle={{ color: colors.grey_d }}
-			codeTextStyle={{ color: colors.grey_d }}
-			defaultValue={(countryCode || "") + defaultValue}
-			onChangeFormattedText={onInput}
-		/>
+		<View style={{ gap: 15 }}>
+			{label && <Typography type="text16">{label}</Typography>}
+			<PhoneInput
+				defaultCode={"NG"}
+				layout="first"
+				placeholder=""
+				ref={phoneNumInput as React.MutableRefObject<PhoneInput>}
+				containerStyle={styles.phoneNumberView}
+				textContainerStyle={{
+					paddingVertical: "4.1%",
+					backgroundColor: colors.grey_a,
+				}}
+				textInputStyle={{ color: colors.grey_d }}
+				codeTextStyle={{ color: colors.grey_d }}
+				defaultValue={(countryCode || "+44") + defaultValue}
+				onChangeFormattedText={onInput}
+			/>
+		</View>
 	);
 };
 

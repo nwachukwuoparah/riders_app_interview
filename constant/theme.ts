@@ -11,6 +11,7 @@ const colors = {
   grey_b: "#B4B4B4",
   grey_c: "#F0F0F0",
   grey_d: "#D7D7D7",
+  tint: "#FFEFD6"
 }
 
 export default colors

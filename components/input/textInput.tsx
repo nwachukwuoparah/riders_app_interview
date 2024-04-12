@@ -41,14 +41,13 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 		const styles = StyleSheet.create({
 			inputWrapper: {
 				width: "100%",
-				hegiht: "50%",
 				flexDirection: "row",
 				justifyContent: "space-around",
 				alignItems: "center",
 				backgroundColor: colors.grey_a,
 				borderRadius: 30,
 				borderWidth: 1,
-				borderColor: colors.yellow,
+				borderColor: !false ? colors.grey_a : colors.yellow,
 				paddingHorizontal: "3%",
 				marginTop: 10,
 				...(wrapperStyle as object),
@@ -66,7 +65,7 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 		});
 
 		return (
-			<>
+			<View style={{ gap: 5 }}>
 				{label && <Typography type="text16">{label}</Typography>}
 				<View style={styles.inputWrapper}>
 					{children}
@@ -85,7 +84,7 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 						secureTextEntry={hidden}
 					/>
 				</View>
-			</>
+			</View>
 		);
 	}
 );
