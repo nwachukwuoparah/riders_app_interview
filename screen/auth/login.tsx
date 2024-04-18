@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -9,7 +9,7 @@ import colors from "../../constant/theme";
 export default function Login({ navigation }: any) {
 	return (
 		<Container>
-			<InnerWrapper sx={{ gap: 50 }}>
+			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<View style={styles.title}>
 					<Typography type="text24">Welcome back!</Typography>
 					<Typography type="text16">Login to continue</Typography>
@@ -26,25 +26,22 @@ export default function Login({ navigation }: any) {
 						onChange={() => {}}
 					/>
 				</View>
-				<View style={styles.buttonCont}>
-					<CustButton
-						type="rounded"
-						onPress={() => navigation.navigate("login")}
-					>
-						<Typography type="text16" sx={{ color: colors.black }}>
-							Log in
-						</Typography>
-					</CustButton>
-					<CustButton onPress={() => navigation.navigate("signUp")}>
-						<Typography type="text16">
-							Are you a new rider?{" "}
-							<Typography type="text16" sx={{ color: colors.yellow }}>
-								Register here
-							</Typography>
-						</Typography>
-					</CustButton>
-				</View>
 			</InnerWrapper>
+			<View style={styles.buttonCont}>
+				<CustButton type="rounded" 	onPress={() => navigation.navigate("UserStack")}>
+					<Typography type="text16" sx={{ color: colors.black }}>
+						Log in
+					</Typography>
+				</CustButton>
+				<CustButton onPress={() => navigation.navigate("signUp")}>
+					<Typography type="text16">
+						Are you a new rider?{" "}
+						<Typography type="text16" sx={{ color: colors.yellow }}>
+							Register here
+						</Typography>
+					</Typography>
+				</CustButton>
+			</View>
 		</Container>
 	);
 }
@@ -59,7 +56,21 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	buttonCont: {
+		width: "100%",
 		alignItems: "center",
 		justifyContent: "center",
+		backgroundColor: colors.black_1,
+		paddingTop: 15,
+		...Platform.select({
+			ios: {
+				shadowOpacity: 0.1,
+				shadowRadius: 0.5,
+				shadowColor: "#6C6C6C",
+				shadowOffset: { height: -2, width: 0 },
+			},
+			android: {
+				elevation: 1,
+			},
+		}),
 	},
 });

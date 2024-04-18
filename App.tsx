@@ -10,7 +10,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import Show from "./components/show";
 import Splash from "./components/splashScreen";
-import { StatusBar } from "react-native";
+import { StatusBar, View } from "react-native";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,15 +33,21 @@ export default function App() {
 	}, []);
 
 	return (
-		<Show>
-			<Show.When isTrue={splash}>
-				<Splash />
-			</Show.When>
-			<Show.Else>
-				<NavigationContainer>
-					<MainStack />
-				</NavigationContainer>
-			</Show.Else>
-		</Show>
+		<View style={{ flex: 1 }}>
+			<Show>
+				<Show.When isTrue={splash}>
+					<Splash />
+				</Show.When>
+				<Show.Else>
+					<GestureHandlerRootView style={{ flex: 1 }}>
+						<NavigationContainer>
+							<BottomSheetModalProvider>
+								<MainStack />
+							</BottomSheetModalProvider>
+						</NavigationContainer>
+					</GestureHandlerRootView>
+				</Show.Else>
+			</Show>
+		</View>
 	);
 }

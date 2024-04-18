@@ -28,7 +28,7 @@ const CustPhoneInput = ({
 			width: "100%",
 			backgroundColor: colors.grey_a,
 			borderRadius: 30,
-			borderWidth: 1,
+			// borderWidth: 1,
 			borderColor: colors.yellow,
 			fontSize: hp("3%"),
 			overflow: "hidden",
@@ -50,13 +50,13 @@ const CustPhoneInput = ({
 		<View style={{ gap: 15 }}>
 			{label && <Typography type="text16">{label}</Typography>}
 			<PhoneInput
-				defaultCode={"NG"}
+				defaultCode={"GB"}
 				layout="first"
 				placeholder=""
 				ref={phoneNumInput as React.MutableRefObject<PhoneInput>}
 				containerStyle={styles.phoneNumberView}
 				textContainerStyle={{
-					paddingVertical: "4.1%",
+					paddingVertical: "4%",
 					backgroundColor: colors.grey_a,
 				}}
 				textInputStyle={{ color: colors.grey_d }}

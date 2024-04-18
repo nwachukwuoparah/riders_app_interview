@@ -28,8 +28,6 @@ export default Splash;
 const styles = StyleSheet.create({
 	video: {
 		width: wp("100%"),
-		height: hp("100%"),
-		position: "absolute",
-		zIndex: 50,
+		flex:1
 	},
 });

@@ -4,6 +4,7 @@ import CustButton from "../../components/button";
 import {
 	Container,
 	InnerWrapper,
+	KeyboardView,
 	ScrollContainer,
 } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -13,72 +14,101 @@ import {
 	heightPercentageToDP as hp,
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import LottieView from "lottie-react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export default function VerifyVehicle({ navigation }: any) {
-
-
 	return (
 		<Container>
-			<InnerWrapper sx={{ width: "100%" }}>
-				<View style={styles.title}>
-					<Typography type="text24">Let’s verify your vehicle</Typography>
-					<Typography type="text16">We need some details to do this</Typography>
-					<View style={{ flexDirection: "row", width: "100%", gap: 5 }}>
-						{[1, 2, 3, 4, 5].map((i, index) => (
-							<View
-								key={index}
-								style={{
-									flex: 1,
-									backgroundColor:
-										index < 1 || index < 2 ? colors.tint : colors.grey_a,
-									height: 7,
-									borderRadius: 5,
-								}}
-							></View>
-						))}
+			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
+				<KeyboardView sx={{ width: "100%", flex: 1 }}>
+					<View style={styles.title}>
+						<CustButton
+							type="back"
+							color={colors.white}
+							onPress={() => navigation.goBack()}
+						/>
+						<Typography type="text24">Let’s verify your vehicle</Typography>
+						<Typography type="text16">
+							We need some details to do this
+						</Typography>
+						<View style={{ flexDirection: "row", width: "100%", gap: 5 }}>
+							{[1, 2, 3, 4, 5].map((i, index) => (
+								<View
+									key={index}
+									style={{
+										flex: 1,
+										backgroundColor: index < 2 ? colors.tint : colors.grey_a,
+										height: 7,
+										borderRadius: 5,
+									}}
+								></View>
+							))}
+						</View>
 					</View>
-				</View>
-				<ScrollContainer>
-					<View style={{ ...styles.inputContain }}>
-						<InputComponent
-							// label="What is your vehicle type?"
-							type="dropdown"
-							onChange={() => {}}
-							data={[]}
-						/>
-
-						<InputComponent
-							label="Your email address"
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your email"
-						/>
-						<InputComponent
-							label="Create your password"
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your password"
-						/>
-					</View>
-				</ScrollContainer>
+					<ScrollContainer innerStyles={{paddingBottom:30}}>
+						<View style={{ ...styles.inputContain }}>
+							<InputComponent
+								label="Select vehicle type"
+								type="dropdown"
+								onChange={() => {}}
+								data={[
+									{ label: "Car", value: "Car" },
+									{ label: "Car", value: "Car" },
+									{ label: "Car", value: "Car" },
+								]}
+								placeholder="Select vehicle type"
+							/>
+							<View style={styles.image_wrap}>
+								<Typography type="text16" sx={{ color: colors.white_1 }}>
+									Upload your drivers license
+								</Typography>
+								<View style={styles.image_placeholder}>
+									<LottieView
+										autoPlay
+										style={{
+											width: 100,
+											height: 50,
+										}}
+										source={require("../../assets/lottile/imageFile.json")}
+									/>
+									<Typography type="text14" sx={{ color: colors.black_1 }}>
+										Tap here to upload document
+									</Typography>
+									<Typography type="text14" sx={{ color: colors.grey }}>
+										Max 10mb file allowed
+									</Typography>
+								</View>
+							</View>
+							<InputComponent
+								label="What brand is your vehicle?"
+								type="text"
+								onChange={() => {}}
+								placeholder="e.g. Toyota"
+							/>
+							<InputComponent
+								label="What is your vehicle plate number?"
+								type="text"
+								onChange={() => {}}
+								placeholder="Enter * digit"
+							/>
+						</View>
+					</ScrollContainer>
+				</KeyboardView>
 				<View style={styles.buttonCont}>
 					<CustButton
 						type="rounded"
-						onPress={() => navigation.navigate("login")}
+						onPress={() => navigation.navigate("verifyAddress")}
 					>
 						<Typography type="text16" sx={{ color: colors.black }}>
-							Sign up
+							Continue
 						</Typography>
 					</CustButton>
 					<CustButton
-						sx={{ height: hp("3.5%") }}
-						onPress={() => navigation.navigate("login")}
+					// onPress={() => navigation.navigate("login")}
 					>
 						<Typography type="text16">
-							Are you already a rider here?{" "}
-							<Typography type="text16" sx={{ color: colors.yellow }}>
-								Log in
-							</Typography>
+							I want continue my registration later
 						</Typography>
 					</CustButton>
 				</View>
@@ -98,7 +128,26 @@ const styles = StyleSheet.create({
 		gap: 35,
 		marginHorizontal: "5%",
 		marginBottom: 20,
+		paddingTop: 20,
 	},
+	image_wrap: {
+		gap: 15,
+	},
+	image_placeholder: {
+		alignItems: "center",
+		justifyContent: "center",
+		borderWidth: 1,
+		borderColor: colors.yellow,
+		borderRadius: 30,
+		paddingVertical: "5%",
+		gap: 10,
+		backgroundColor: colors.tint,
+		...Platform.select({
+			ios: {},
+			android: {},
+		}),
+	},
+	// 4500-2001+2024
 	buttonCont: {
 		alignItems: "center",
 		justifyContent: "center",

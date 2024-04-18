@@ -49,7 +49,6 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 				borderWidth: 1,
 				borderColor: !false ? colors.grey_a : colors.yellow,
 				paddingHorizontal: "3%",
-				marginTop: 10,
 				...(wrapperStyle as object),
 			},
 
@@ -65,7 +64,7 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 		});
 
 		return (
-			<View style={{ gap: 5 }}>
+			<View style={{ gap: 10 }}>
 				{label && <Typography type="text16">{label}</Typography>}
 				<View style={styles.inputWrapper}>
 					{children}

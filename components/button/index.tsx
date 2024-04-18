@@ -1,4 +1,4 @@
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { ReactNode } from "react";
 import {
 	GestureResponderEvent,
@@ -13,7 +13,7 @@ import colors from "../../constant/theme";
 
 interface propType {
 	children?: ReactNode;
-	type?: "close" | "default" | "rounded" | "back" | "forward";
+	type?: "close" | "default" | "rounded" | "back" | "forward" | "bell";
 	sx?: any;
 	color?: string;
 	onPress?: (e: GestureResponderEvent) => void;
@@ -29,8 +29,8 @@ const CustButton = ({ children, type, sx, onPress, color }: propType) => {
 			justifyContent: "center",
 			alignContent: "center",
 			alignItems: "center",
-			width: wp("90%"),
-			height: hp("7%"),
+			width: "90%",
+			paddingVertical: "5.5%",
 			backgroundColor: colors.yellow,
 			borderRadius: 50,
 		},
@@ -38,13 +38,19 @@ const CustButton = ({ children, type, sx, onPress, color }: propType) => {
 			justifyContent: "center",
 			alignContent: "center",
 			alignItems: "center",
-			width: wp("90%"),
-			height: hp("7%"),
+			width: "100%",
+			paddingVertical: "6%",
 			borderRadius: 50,
 		},
 	});
 
 	switch (type) {
+		case "bell":
+			return (
+				<TouchableOpacity onPress={onPress}>
+					<Feather name="bell" size={hp(3)} color={color} />
+				</TouchableOpacity>
+			);
 		case "forward":
 			return (
 				<TouchableOpacity onPress={onPress}>
@@ -68,7 +74,7 @@ const CustButton = ({ children, type, sx, onPress, color }: propType) => {
 					<Ionicons
 						name="ios-close-outline"
 						style={{ ...styles.closeButn, ...sx }}
-						size={hp(3.5)}
+						size={40}
 						color={color}
 					/>
 				</TouchableOpacity>

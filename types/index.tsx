@@ -17,7 +17,7 @@ export type textType = {
 
 export interface textInputPropType {
 	type?: "text" | "hidden";
-	label: string;
+	label?: string;
 	children?: React.ReactNode;
 	wrapperStyle?: StyleProp<ViewStyle>;
 	style?: StyleProp<TextStyle>;
@@ -39,6 +39,7 @@ export interface textInputMethodType {
 
 export interface dateInputPropType {
 	onChange: (value: Date | undefined) => void;
+	label: string;
 	placeholder?: string;
 	mode: "date" | "time";
 	wrapperStyle?: StyleProp<ViewStyle>;
@@ -82,6 +83,7 @@ export interface phoneInputProps {
 
 export interface DropdownInputProps {
 	type?: "dropdown";
+	label: string;
 	style?: StyleProp<ViewStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 	placeholderStyle?: StyleProp<TextStyle>;

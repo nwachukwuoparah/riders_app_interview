@@ -4,6 +4,7 @@ import CustButton from "../../components/button";
 import {
 	Container,
 	InnerWrapper,
+	KeyboardView,
 	ScrollContainer,
 } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -17,59 +18,63 @@ import {
 export default function SignUp({ navigation }: any) {
 	return (
 		<Container>
-			<InnerWrapper sx={{ width: "100%" }}>
-				<View style={styles.title}>
-					<Typography type="text24">Let’s get you started</Typography>
-					<Typography type="text16">
-						We need some personal info to create your account
-					</Typography>
-					<View style={{ flexDirection: "row", width: "100%", gap: 5 }}>
-						{[1, 2, 3, 4, 5].map((i, index) => (
-							<View
-								key={index}
-								style={{
-									flex: 1,
-									backgroundColor: index < 1 ? colors.tint : colors.grey_a,
-									height: 7,
-									borderRadius: 5,
-								}}
-							></View>
-						))}
-					</View>
-				</View>
-				<ScrollContainer>
-					<View style={{ ...styles.inputContain }}>
-						<InputComponent
-							label="Your first name"
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your first name"
-						/>
-						<InputComponent
-							label="Your last name "
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your last name"
-						/>
-						<InputComponent
-							label="Your phone number"
-							type="phone"
-							onChange={() => {}}
-						/>
-						<InputComponent
-							label="Your email address"
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your email"
-						/>
-						<InputComponent
-							label="Create your password"
-							type="text"
-							onChange={() => {}}
-							placeholder="enter your password"
-						/>
-					</View>
-				</ScrollContainer>
+			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
+				<KeyboardView sx={{ width: "100%", flex: 1 }}>
+					<>
+						<View style={styles.title}>
+							<Typography type="text24">Let’s get you started</Typography>
+							<Typography type="text16">
+								We need some personal info to create your account
+							</Typography>
+							<View style={{ flexDirection: "row", width: "100%", gap: 5 }}>
+								{[1, 2, 3, 4, 5].map((i, index) => (
+									<View
+										key={index}
+										style={{
+											flex: 1,
+											backgroundColor: index < 1 ? colors.tint : colors.grey_a,
+											height: 7,
+											borderRadius: 5,
+										}}
+									></View>
+								))}
+							</View>
+						</View>
+						<ScrollContainer innerStyles={{paddingBottom:30}}>
+							<View style={{ ...styles.inputContain }}>
+								<InputComponent
+									label="Your first name"
+									type="text"
+									onChange={() => {}}
+									placeholder="enter your first name"
+								/>
+								<InputComponent
+									label="Your last name "
+									type="text"
+									onChange={() => {}}
+									placeholder="enter your last name"
+								/>
+								<InputComponent
+									label="Your phone number"
+									type="phone"
+									onChange={() => {}}
+								/>
+								<InputComponent
+									label="Your email address"
+									type="text"
+									onChange={() => {}}
+									placeholder="enter your email"
+								/>
+								<InputComponent
+									label="Create your password"
+									type="text"
+									onChange={() => {}}
+									placeholder="enter your password"
+								/>
+							</View>
+						</ScrollContainer>
+					</>
+				</KeyboardView>
 				<View style={styles.buttonCont}>
 					<CustButton
 						type="rounded"
@@ -79,10 +84,7 @@ export default function SignUp({ navigation }: any) {
 							Sign up
 						</Typography>
 					</CustButton>
-					<CustButton
-						sx={{ height: hp("3.5%") }}
-						onPress={() => navigation.navigate("login")}
-					>
+					<CustButton onPress={() => navigation.navigate("login")}>
 						<Typography type="text16">
 							Are you already a rider here?{" "}
 							<Typography type="text16" sx={{ color: colors.yellow }}>
@@ -107,6 +109,7 @@ const styles = StyleSheet.create({
 		gap: 35,
 		marginHorizontal: "5%",
 		marginBottom: 20,
+		width: wp("90%"),
 	},
 	buttonCont: {
 		alignItems: "center",

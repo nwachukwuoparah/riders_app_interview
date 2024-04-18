@@ -1,0 +1,130 @@
+import React from "react";
+import BottomModal from "./index";
+import { Platform, StyleSheet, View } from "react-native";
+import Typography from "../components/typography";
+import colors from "../constant/theme";
+import { Container, InnerWrapper } from "../components/container";
+import CustButton from "../components/button";
+import {
+	heightPercentageToDP as hp,
+	widthPercentageToDP as wp,
+} from "react-native-responsive-screen";
+import { InputComponent } from "../components/input";
+
+export default function WalletModal({ cancelRef, close, modalOpen }: any) {
+	return (
+		<BottomModal
+			bottomSheetModalRef={cancelRef}
+			open={modalOpen}
+			handleClose={close}
+			snapMin="25%"
+			snapMax="100%"
+		>
+			<InnerWrapper
+				sx={{
+					width: "100%",
+					paddingHorizontal: "5%",
+					gap: 50,
+				}}
+			>
+				<View style={styles.top}>
+					<CustButton type="back" color={colors.white} onPress={close}/>
+					<Typography type="text24" sx={{ color: colors.white }}>
+						Enter amount to withdraw
+					</Typography>
+				</View>
+				<View
+					style={{
+						flexDirection: "row",
+						width: "100%",
+						height: "8%",
+						borderRadius: 30,
+						overflow: "hidden",
+						borderWidth: 1,
+						borderColor: colors.yellow,
+						backgroundColor: colors.grey_a,
+						justifyContent: "space-between",
+					}}
+				>
+					<View
+						style={{
+							width: "15%",
+							alignItems: "center",
+							justifyContent: "center",
+							backgroundColor: colors.grey,
+						}}
+					>
+						<Typography sx={{ color: colors.white }} type="text24">
+							£
+						</Typography>
+					</View>
+					<InputComponent
+						wrapperStyle={{
+							width: "85%",
+							height: "100%",
+							// paddingHorizontal: "10%",
+							borderRadius: 0,
+							borderBottomWidth: 0,
+						}}
+						style={{
+							textAlign: "center",
+							fontSize: hp("2.2%"),
+							top: 0,
+						}}
+						onChange={() => {}}
+						// control={control}
+						// name="amount"
+						type="text"
+						// placeholder="Enter amount"
+						// keyboardType="numeric"
+						// errors={errors}
+					/>
+				</View>
+				<Typography sx={{ color: colors.white }} type="text14">
+					Balance: £ 0
+				</Typography>
+			</InnerWrapper>
+			<View style={styles.buttonCont}>
+				<CustButton type="rounded" onPress={() => {}}>
+					<Typography type="text16" sx={{ color: colors.black }}>
+						Log in
+					</Typography>
+				</CustButton>
+				<CustButton>
+					<Typography type="text16">
+						Are you a new rider?{" "}
+						<Typography type="text16" sx={{ color: colors.yellow }}>
+							Register here
+						</Typography>
+					</Typography>
+				</CustButton>
+			</View>
+		</BottomModal>
+	);
+}
+
+const styles = StyleSheet.create({
+	top: {
+		width: "100%",
+		backgroundColor: colors.grey_a,
+		marginTop:20,
+		gap:5
+	},
+	buttonCont: {
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: colors.black_1,
+		paddingTop: 15,
+		...Platform.select({
+			ios: {
+				shadowOpacity: 0.1,
+				shadowRadius: 0.5,
+				shadowColor: "#6C6C6C",
+				shadowOffset: { height: -2, width: 0 },
+			},
+			android: {
+				elevation: 1,
+			},
+		}),
+	},
+});

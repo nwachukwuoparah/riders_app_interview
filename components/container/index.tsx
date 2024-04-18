@@ -18,7 +18,7 @@ export const Container = ({ children, sx }: any) => {
 	const styles = StyleSheet.create({
 		container: {
 			width: wp("100%"),
-			height: hp("100%"),
+			flex: 1,
 			backgroundColor: colors.black_1,
 			alignItems: "center",
 		},
@@ -35,8 +35,7 @@ export const InnerWrapper = ({ children, sx }: any) => {
 	const styles = StyleSheet.create({
 		innerWrapper: {
 			width: "90%",
-			height: "100%",
-			paddingTop: "10%",
+			paddingTop: "5%",
 		},
 	});
 
@@ -47,7 +46,7 @@ export const KeyboardView = ({ children, sx }: any) => {
 	const styles = StyleSheet.create({
 		wrapper: {
 			width: "100%",
-			height: "100%",
+			// height: "100%",
 			alignItems: "center",
 		},
 	});
@@ -58,7 +57,7 @@ export const KeyboardView = ({ children, sx }: any) => {
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				{children}
+				<>{children}</>
 			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
 	);
@@ -84,7 +83,7 @@ export const ScrollContainer = ({
 		<ScrollView
 			keyboardShouldPersistTaps={keyboardShouldPersistTaps}
 			refreshControl={refreshControl}
-			contentContainerStyle={innerStyles}
+			contentContainerStyle={{ ...innerStyles }}
 			showsVerticalScrollIndicator={false}
 			style={styles.wraper}
 			horizontal={horizontal}

@@ -1,8 +1,3 @@
-import { useEffect } from "react";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { StyleSheet, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import colors from "../../constant/theme";
 import CustTextInput from "./textInput";
 import DatePicker from "./dateInput";
 import CustCheckBox from "./checkBox";

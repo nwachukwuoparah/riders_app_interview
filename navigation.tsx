@@ -5,10 +5,8 @@ import MainStack from "./navigation/mainStack";
 export default function RootNavigation() {
 	return (
 		<>
+			<MainStack />
 			<StatusBar style="light" />
-			<NavigationContainer>
-				<MainStack />
-			</NavigationContainer>
 		</>
 	);
 }

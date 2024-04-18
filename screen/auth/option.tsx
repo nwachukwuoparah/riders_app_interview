@@ -29,7 +29,10 @@ export default function Option({ navigation }: any) {
 				</View>
 				<Rider width={wp("100%")} height={hp("50%")} />
 				<View style={styles.button_contain}>
-					<CustButton type="rounded" onPress={() => navigation.navigate("signUp")}>
+					<CustButton
+						type="rounded"
+						onPress={() => navigation.navigate("signUp")}
+					>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Sign up as a new rider
 						</Typography>
@@ -48,10 +51,10 @@ const styles = StyleSheet.create({
 		width: "70%",
 		justifyContent: "center",
 		marginTop: "10%",
-		// marginBottom: "10%",
 		alignItems: "center",
 	},
 	button_contain: {
+		width: "100%",
 		height: hp("20%"),
 		alignItems: "center",
 		justifyContent: "center",
