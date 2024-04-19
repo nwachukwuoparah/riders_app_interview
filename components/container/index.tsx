@@ -26,7 +26,9 @@ export const Container = ({ children, sx }: any) => {
 
 	return (
 		<SafeAreaView style={{ ...styles.container, ...sx }}>
-			{children}
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+				<>{children}</>
+			</TouchableWithoutFeedback>
 		</SafeAreaView>
 	);
 };
@@ -56,9 +58,7 @@ export const KeyboardView = ({ children, sx }: any) => {
 			style={{ ...styles.wrapper, ...sx }}
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<>{children}</>
-			</TouchableWithoutFeedback>
+			{children}
 		</KeyboardAvoidingView>
 	);
 };

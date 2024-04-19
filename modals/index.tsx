@@ -2,6 +2,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import colors from "../constant/theme";
 
 const BottomModal = ({
 	handleClose,
@@ -40,13 +41,7 @@ const BottomModal = ({
 	return (
 		<Pressable
 			onPress={handleOverlayPress}
-			style={{
-				width: "100%",
-				height: hp("100%"),
-				backgroundColor: "rgba(0, 0, 0, 0.3)",
-				position: "absolute",
-				display: open ? "flex" : "none",
-			}}
+			style={{ ...styles.overlay, display: open ? "flex" : "none" }}
 		>
 			<BottomSheetModal
 				ref={bottomSheetModalRef}
@@ -54,8 +49,7 @@ const BottomModal = ({
 				stackBehavior="replace"
 				snapPoints={snapPoints}
 				onChange={handleSheetChanges}
-			
-				style={styles.bottomSheet}
+				backgroundStyle={styles.bottomSheet}
 			>
 				{children}
 			</BottomSheetModal>
@@ -63,19 +57,14 @@ const BottomModal = ({
 	);
 };
 
-
 const styles = StyleSheet.create({
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darken the overlay
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bottomSheet: {
-    backgroundColor: "#1a1a1a", // Dark background color
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
+	overlay: {
+		width: "100%",
+		height: hp("100%"),
+		backgroundColor: "rgba(0, 0, 0, 0.3)",
+		position: "absolute",
+	},
+	bottomSheet: { backgroundColor: colors.grey_a },
 });
-
 
 export default BottomModal;

@@ -74,7 +74,7 @@ export default function Profile_Details({ navigation }: any) {
 									placeholder="enter your email"
 								/>
 								<InputComponent
-									label="Bate of birth"
+									label="Date of birth"
 									type="date"
 									mode="date"
 									onChange={() => {}}

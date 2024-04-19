@@ -3,7 +3,7 @@ import BottomModal from "./index";
 import { Platform, StyleSheet, View } from "react-native";
 import Typography from "../components/typography";
 import colors from "../constant/theme";
-import { Container, InnerWrapper } from "../components/container";
+import { Container, InnerWrapper, KeyboardView } from "../components/container";
 import CustButton from "../components/button";
 import {
 	heightPercentageToDP as hp,
@@ -20,82 +20,82 @@ export default function WalletModal({ cancelRef, close, modalOpen }: any) {
 			snapMin="25%"
 			snapMax="100%"
 		>
-			<InnerWrapper
-				sx={{
-					width: "100%",
-					paddingHorizontal: "5%",
-					gap: 50,
-				}}
-			>
-				<View style={styles.top}>
-					<CustButton type="back" color={colors.white} onPress={close}/>
-					<Typography type="text24" sx={{ color: colors.white }}>
-						Enter amount to withdraw
-					</Typography>
-				</View>
-				<View
-					style={{
-						flexDirection: "row",
+				<InnerWrapper
+					sx={{
+						flex: 1,
 						width: "100%",
-						height: "8%",
-						borderRadius: 30,
-						overflow: "hidden",
-						borderWidth: 1,
-						borderColor: colors.yellow,
-						backgroundColor: colors.grey_a,
-						justifyContent: "space-between",
+						paddingHorizontal: "5%",
+						gap: 10,
+						alignItems: "center",
 					}}
 				>
-					<View
-						style={{
-							width: "15%",
-							alignItems: "center",
-							justifyContent: "center",
-							backgroundColor: colors.grey,
-						}}
-					>
-						<Typography sx={{ color: colors.white }} type="text24">
-							£
+					<View style={styles.top}>
+						<CustButton type="back" color={colors.white} onPress={close} />
+						<Typography type="text24" sx={{ color: colors.white }}>
+							Enter amount to withdraw
 						</Typography>
 					</View>
-					<InputComponent
-						wrapperStyle={{
-							width: "85%",
-							height: "100%",
-							// paddingHorizontal: "10%",
-							borderRadius: 0,
-							borderBottomWidth: 0,
-						}}
+					<View
 						style={{
-							textAlign: "center",
-							fontSize: hp("2.2%"),
-							top: 0,
+							flexDirection: "row",
+							width: "100%",
+							height: "8%",
+							borderRadius: 30,
+							overflow: "hidden",
+							borderWidth: 1,
+							borderColor: colors.yellow,
+							backgroundColor: colors.grey_a,
+							justifyContent: "space-between",
 						}}
-						onChange={() => {}}
-						// control={control}
-						// name="amount"
-						type="text"
-						// placeholder="Enter amount"
-						// keyboardType="numeric"
-						// errors={errors}
-					/>
-				</View>
-				<Typography sx={{ color: colors.white }} type="text14">
-					Balance: £ 0
-				</Typography>
-			</InnerWrapper>
+					>
+						<View
+							style={{
+								width: "15%",
+								alignItems: "center",
+								justifyContent: "center",
+								backgroundColor: colors.grey,
+							}}
+						>
+							<Typography sx={{ color: colors.white }} type="text24">
+								£
+							</Typography>
+						</View>
+						<InputComponent
+							wrapperStyle={{
+								width: "85%",
+								height: "100%",
+								// paddingHorizontal: "10%",
+								borderRadius: 0,
+								borderBottomWidth: 0,
+							}}
+							style={{
+								textAlign: "center",
+								fontSize: hp("2.2%"),
+								top: 0,
+							}}
+							onChange={() => {}}
+							// control={control}
+							// name="amount"
+							type="text"
+							// placeholder="Enter amount"
+							// keyboardType="numeric"
+							// errors={errors}
+						/>
+					</View>
+					<Typography sx={{ color: colors.white }} type="text14">
+						Wallet Balance: £1800
+					</Typography>
+				</InnerWrapper>
+
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={() => {}}>
 					<Typography type="text16" sx={{ color: colors.black }}>
-						Log in
+						Withdraw
 					</Typography>
 				</CustButton>
-				<CustButton>
+				<CustButton sx={{ paddingTop: "3%" }}>
 					<Typography type="text16">
-						Are you a new rider?{" "}
-						<Typography type="text16" sx={{ color: colors.yellow }}>
-							Register here
-						</Typography>
+						Withdrawal usually takes 1-2 working days
 					</Typography>
 				</CustButton>
 			</View>
@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
 	top: {
 		width: "100%",
 		backgroundColor: colors.grey_a,
-		marginTop:20,
-		gap:5
+		marginTop: 20,
+		gap: 5,
 	},
 	buttonCont: {
 		alignItems: "center",

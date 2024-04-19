@@ -7,6 +7,7 @@ import {
 	ImageStyle,
 } from "react-native";
 import { Ref } from "react";
+import { UseFormStateReturn } from "react-hook-form";
 
 export type textType = {
 	children: any;
@@ -110,4 +111,13 @@ export interface CustSearchBarProps {
 	propertyToQuery: string[];
 	clearAutoComplete?: () => void;
 	returnFunc?: (result: any[]) => any;
+}
+
+export interface otpProps {
+	style?: StyleProp<ViewStyle>;
+	label?: string;
+	defaultValue?: string;
+	countryCode?: any;
+	control?: any;
+	errors?: UseFormStateReturn<any>["errors"];
 }

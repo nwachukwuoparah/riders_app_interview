@@ -30,7 +30,7 @@ const CustButton = ({ children, type, sx, onPress, color }: propType) => {
 			alignContent: "center",
 			alignItems: "center",
 			width: "90%",
-			paddingVertical: "5.5%",
+			paddingVertical: "4.5%",
 			backgroundColor: colors.yellow,
 			borderRadius: 50,
 		},

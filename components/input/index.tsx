@@ -15,7 +15,9 @@ import {
 	phoneInputProps,
 	DropdownInputProps,
 	CustSearchBarProps,
+	otpProps,
 } from "../../types";
+import { OtpInput } from "./otp";
 
 export function InputComponent(
 	params: { type?: "text" } & textInputMethodType & textInputPropType
@@ -41,11 +43,14 @@ export function InputComponent(
 export function InputComponent(
 	params: { type?: "dropdown" } & DropdownInputProps
 ): JSX.Element;
+export function InputComponent(
+	params: { type?: "otp" } & otpProps
+): JSX.Element;
 
 export function InputComponent({ type, ...props }: any) {
 	switch (type) {
 		case "dropdown":
-			return <DropdownInput{...props} />;
+			return <DropdownInput {...props} />;
 		case "checkbox":
 			return <CustCheckBox {...props} />;
 		case "radio":
@@ -56,6 +61,8 @@ export function InputComponent({ type, ...props }: any) {
 			return <CustPhoneInput {...props} />;
 		case "hidden":
 			return <HiddenInput {...props} />;
+		case "otp":
+			return <OtpInput {...props} />;
 		default:
 			return <CustTextInput {...props} />;
 	}
