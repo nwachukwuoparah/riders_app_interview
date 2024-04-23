@@ -14,7 +14,6 @@ import {
 	RadioButnProps,
 	phoneInputProps,
 	DropdownInputProps,
-	CustSearchBarProps,
 	otpProps,
 } from "../../types";
 import { OtpInput } from "./otp";

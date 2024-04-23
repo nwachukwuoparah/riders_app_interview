@@ -1,12 +1,47 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
+import { useForm } from "react-hook-form";
+import { logInTypes } from "../../types";
+import { useFocusEffect } from "@react-navigation/native";
+import { getCachedAuthData } from "../../utilities/storage";
 
 export default function Login({ navigation }: any) {
+	const {
+		control,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<logInTypes>();
+	// resolver: yupResolver(loginSchems),
+
+	useFocusEffect(
+		useCallback(() => {
+			(async () => {
+				try {
+					const step = await getCachedAuthData("step");
+					if (step === 1) {
+						navigation.navigate("verifyVehicle");
+					} else if (step === 2) {
+						navigation.navigate("option");
+					}
+					else if (step === 3) {
+						navigation.navigate("option");
+					}
+					else if (step === 4) {
+						navigation.navigate("option");
+					}
+				} catch (err) {
+					return null;
+				}
+			})();
+		}, [])
+	);
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -18,17 +53,24 @@ export default function Login({ navigation }: any) {
 					<InputComponent
 						label="Enter your email address"
 						type="text"
-						onChange={() => {}}
+						control={control}
+						errors={errors}
+						name="email"
 					/>
 					<InputComponent
 						label="Enter your password"
 						type="hidden"
-						onChange={() => {}}
+						control={control}
+						errors={errors}
+						name="password"
 					/>
 				</View>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>
-				<CustButton type="rounded" 	onPress={() => navigation.navigate("UserStack")}>
+				<CustButton
+					type="rounded"
+					onPress={() => navigation.navigate("UserStack")}
+				>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Log in
 					</Typography>

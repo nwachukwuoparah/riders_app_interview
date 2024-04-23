@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -14,11 +14,46 @@ import {
 	heightPercentageToDP as hp,
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import { useForm } from "react-hook-form";
+import { signUpTypes } from "../../types";
+import { useMutation } from "@tanstack/react-query";
+import { createUser } from "../../helpers/mutate";
+import LoadingComponent from "../../components/loading";
+import { cacheAuthData } from "../../utilities/storage";
 
 export default function SignUp({ navigation }: any) {
+	const {
+		control,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<signUpTypes>();
+	// resolver: yupResolver(loginSchems),
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: createUser,
+		onSuccess: async (data) => {
+			await cacheAuthData("user-data", { token: data?.data?.data?.token });
+			cacheAuthData("step", 1);
+			navigation.navigate("verifyVehicle");
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
+	const onSubmit = (data: signUpTypes) => {
+		mutate(data);
+	};
+
+	useEffect(() => {
+		// console.warn(isPending);
+	}, [isPending]);
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
+				<LoadingComponent display={isPending} />
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<>
 						<View style={styles.title}>
@@ -40,53 +75,60 @@ export default function SignUp({ navigation }: any) {
 								))}
 							</View>
 						</View>
-						<ScrollContainer innerStyles={{paddingBottom:30}}>
+						<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 							<View style={{ ...styles.inputContain }}>
 								<InputComponent
 									label="Your first name"
 									type="text"
-									onChange={() => {}}
 									placeholder="enter your first name"
+									control={control}
+									errors={errors}
+									name="firstName"
 								/>
 								<InputComponent
 									label="Your last name "
 									type="text"
-									onChange={() => {}}
 									placeholder="enter your last name"
+									control={control}
+									errors={errors}
+									name="lastName"
 								/>
 								<InputComponent
 									label="Your phone number"
 									type="phone"
-									onChange={() => {}}
+									name="phone"
+									control={control}
+									errors={errors}
 								/>
 								<InputComponent
 									label="Your email address"
 									type="text"
-									onChange={() => {}}
 									placeholder="enter your email"
+									control={control}
+									errors={errors}
+									name="email"
 								/>
 								<InputComponent
 									label="Create your password"
-									type="text"
-									onChange={() => {}}
+									type="hidden"
 									placeholder="enter your password"
+									control={control}
+									errors={errors}
+									name="password"
 								/>
 							</View>
 						</ScrollContainer>
 					</>
 				</KeyboardView>
 				<View style={styles.buttonCont}>
-					<CustButton
-						type="rounded"
-						onPress={() => navigation.navigate("verifyVehicle")}
-					>
+					<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Sign up
 						</Typography>
 					</CustButton>
 					<CustButton onPress={() => navigation.navigate("login")}>
 						<Typography type="text16">
-							Are you already a rider here?{" "}
+							Are you already a rider here?
 							<Typography type="text16" sx={{ color: colors.yellow }}>
 								Log in
 							</Typography>

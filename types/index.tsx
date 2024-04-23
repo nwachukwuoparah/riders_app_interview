@@ -30,8 +30,9 @@ export interface textInputPropType {
 	multiLine?: boolean;
 	ref?: Ref<TextInput> | undefined;
 	keyboardType?: KeyboardTypeOptions;
-	onChange: (text: string) => void;
-	onFocus?: () => void;
+	control: any;
+	errors: UseFormStateReturn<any>["errors"];
+	name: string;
 }
 
 export interface textInputMethodType {
@@ -75,11 +76,9 @@ export interface phoneInputProps {
 	label: string;
 	defaultValue?: string;
 	countryCode?: any;
-	onChange: (value: {
-		countryCode: string;
-		countrySymbol: string;
-		number: string;
-	}) => void;
+	control: any;
+	errors: UseFormStateReturn<any>["errors"];
+	name: string;
 }
 
 export interface DropdownInputProps {
@@ -120,4 +119,23 @@ export interface otpProps {
 	countryCode?: any;
 	control?: any;
 	errors?: UseFormStateReturn<any>["errors"];
+}
+
+export interface signUpTypes {
+	firstName: string;
+	lastName: string;
+	email: string;
+	phone: number;
+	password: string;
+}
+
+export interface logInTypes {
+	email: string;
+	password: string;
+}
+
+export interface vehicleTypes {
+	plateNumber: number;
+	vehicleBrand: string;
+	image: { uri: string; name: string; type: string };
 }

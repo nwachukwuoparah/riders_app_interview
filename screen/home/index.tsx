@@ -12,9 +12,19 @@ import {
 import Show from "../../components/show";
 import { font } from "../../utilities/loadFont";
 import RequestCard from "../../components/requestCard";
+import MapView from 'react-native-maps';
+
 function Home() {
 	return (
 		<Container>
+			<MapView
+  initialRegion={{
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  }}
+/>
 			<InnerWrapper sx={{ flex: 1 }}>
 				<View style={styles.search}>
 					<LocationIcon />

@@ -13,6 +13,12 @@ import Splash from "./components/splashScreen";
 import { StatusBar, View } from "react-native";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+	QueryClient,
+	QueryClientProvider,
+} from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,21 +39,23 @@ export default function App() {
 	}, []);
 
 	return (
-		<View style={{ flex: 1 }}>
-			<Show>
-				<Show.When isTrue={splash}>
-					<Splash />
-				</Show.When>
-				<Show.Else>
-					<GestureHandlerRootView style={{ flex: 1 }}>
-						<NavigationContainer>
-							<BottomSheetModalProvider>
-								<MainStack />
-							</BottomSheetModalProvider>
-						</NavigationContainer>
-					</GestureHandlerRootView>
-				</Show.Else>
-			</Show>
-		</View>
+		<QueryClientProvider client={queryClient}>
+			<View style={{ flex: 1 }}>
+				<Show>
+					<Show.When isTrue={splash}>
+						<Splash />
+					</Show.When>
+					<Show.Else>
+						<GestureHandlerRootView style={{ flex: 1 }}>
+							<NavigationContainer>
+								<BottomSheetModalProvider>
+									<MainStack />
+								</BottomSheetModalProvider>
+							</NavigationContainer>
+						</GestureHandlerRootView>
+					</Show.Else>
+				</Show>
+			</View>
+		</QueryClientProvider>
 	);
 }

@@ -10,14 +10,28 @@ import {
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
-import {
-	heightPercentageToDP as hp,
-	widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
 import LottieView from "lottie-react-native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { useForm } from "react-hook-form";
+import PickImage from "../../components/input/imagePicker";
+import { vehicleTypes } from "../../types";
 
 export default function VerifyVehicle({ navigation }: any) {
+	const {
+		control,
+		setValue,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<vehicleTypes>();
+	// resolver: yupResolver(loginSchems),
+	const onSubmit = (data: vehicleTypes) => {
+		// mutate(data);
+		// console.warn(data);
+		console.log(data);
+		
+		// () => navigation.navigate("verifyAddress")
+	};
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
@@ -46,60 +60,52 @@ export default function VerifyVehicle({ navigation }: any) {
 							))}
 						</View>
 					</View>
-					<ScrollContainer innerStyles={{paddingBottom:30}}>
+					<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 						<View style={{ ...styles.inputContain }}>
-							<InputComponent
-								label="Select vehicle type"
-								type="dropdown"
-								onChange={() => {}}
-								data={[
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
-								]}
-								placeholder="Select vehicle type"
-							/>
-							<View style={styles.image_wrap}>
-								<Typography type="text16" sx={{ color: colors.white_1 }}>
-									Upload your drivers license
-								</Typography>
-								<View style={styles.image_placeholder}>
-									<LottieView
-										autoPlay
-										style={{
-											width: 100,
-											height: 50,
-										}}
-										source={require("../../assets/lottile/imageFile.json")}
-									/>
-									<Typography type="text14" sx={{ color: colors.black_1 }}>
-										Tap here to upload document
-									</Typography>
-									<Typography type="text14" sx={{ color: colors.grey }}>
-										Max 10mb file allowed
-									</Typography>
-								</View>
-							</View>
 							<InputComponent
 								label="What brand is your vehicle?"
 								type="text"
-								onChange={() => {}}
+								control={control}
+								errors={errors}
+								name="vehicleBrand"
 								placeholder="e.g. Toyota"
 							/>
 							<InputComponent
 								label="What is your vehicle plate number?"
 								type="text"
-								onChange={() => {}}
 								placeholder="Enter * digit"
+								control={control}
+								errors={errors}
+								name="plateNumber"
 							/>
+							<PickImage name="image" setValue={setValue}>
+								<View style={styles.image_wrap}>
+									<Typography type="text16" sx={{ color: colors.white_1 }}>
+										Upload your drivers license
+									</Typography>
+									<View style={styles.image_placeholder}>
+										<LottieView
+											autoPlay
+											style={{
+												width: 100,
+												height: 50,
+											}}
+											source={require("../../assets/lottile/imageFile.json")}
+										/>
+										<Typography type="text14" sx={{ color: colors.black_1 }}>
+											Tap here to upload document
+										</Typography>
+										<Typography type="text14" sx={{ color: colors.grey }}>
+											Max 10mb file allowed
+										</Typography>
+									</View>
+								</View>
+							</PickImage>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
 				<View style={styles.buttonCont}>
-					<CustButton
-						type="rounded"
-						onPress={() => navigation.navigate("verifyAddress")}
-					>
+					<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Continue
 						</Typography>

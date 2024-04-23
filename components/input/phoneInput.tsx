@@ -5,13 +5,16 @@ import colors from "../../constant/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useEffect, useRef } from "react";
 import Typography from "../typography";
+import { Controller } from "react-hook-form";
 
 const CustPhoneInput = ({
 	style,
-	onChange,
 	defaultValue,
 	countryCode,
 	label,
+	control,
+	errors,
+	name,
 }: phoneInputProps) => {
 	const phoneNumInput = useRef<PhoneInput>();
 
@@ -36,33 +39,46 @@ const CustPhoneInput = ({
 		},
 	});
 
-	const onInput = (number: string) => {
-		const countryCode = phoneNumInput.current?.getCallingCode();
-		const countrySymbol = phoneNumInput.current?.getCountryCode();
-		onChange({
-			countryCode: countryCode as string,
-			countrySymbol: countrySymbol as string,
-			number: number.replace(`+${countryCode}`, ""),
-		});
-	};
-
+	// const onInput = (number: string) => {
+	// 	const countryCode = phoneNumInput.current?.getCallingCode();
+	// 	const countrySymbol = phoneNumInput.current?.getCountryCode();
+	// 	onChange({
+	// 		countryCode: countryCode as string,
+	// 		countrySymbol: countrySymbol as string,
+	// 		number: number.replace(`+${countryCode}`, ""),
+	// 	});
+	// };
+	// {
+	// 	 onChangeFormattedText={(formattedText) => {
+	// 						onChange(formattedText);
+	// 					}}
+	// }
 	return (
 		<View style={{ gap: 15 }}>
 			{label && <Typography type="text16">{label}</Typography>}
-			<PhoneInput
-				defaultCode={"GB"}
-				layout="first"
-				placeholder=""
-				ref={phoneNumInput as React.MutableRefObject<PhoneInput>}
-				containerStyle={styles.phoneNumberView}
-				textContainerStyle={{
-					paddingVertical: "4%",
-					backgroundColor: colors.grey_a,
-				}}
-				textInputStyle={{ color: colors.grey_d }}
-				codeTextStyle={{ color: colors.grey_d }}
-				defaultValue={(countryCode || "+44") + defaultValue}
-				onChangeFormattedText={onInput}
+			<Controller
+				control={control}
+				name={name}
+				render={({ field: { onChange, onBlur, value } }) => (
+					<PhoneInput
+						defaultCode={"GB"}
+						layout="first"
+						placeholder=""
+						ref={phoneNumInput as React.MutableRefObject<PhoneInput>}
+						containerStyle={styles.phoneNumberView}
+						textContainerStyle={{
+							paddingVertical: "4%",
+							backgroundColor: colors.grey_a,
+						}}
+						textInputStyle={{ color: colors.white }}
+						codeTextStyle={{ color: colors.grey_d }}
+						defaultValue={(countryCode || "+44") + defaultValue}
+						onChangeFormattedText={(formattedText) => {
+							onChange(formattedText);
+						}}
+						value={value}
+					/>
+				)}
 			/>
 		</View>
 	);

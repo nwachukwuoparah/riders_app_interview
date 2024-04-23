@@ -5,6 +5,7 @@ import colors from "../../constant/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { font } from "../../utilities/loadFont";
 import Typography from "../typography";
+import { Controller } from "react-hook-form";
 
 const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 	(
@@ -17,11 +18,12 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 			defaultValue,
 			maxLength,
 			hidden,
-			onChange,
-			onFocus,
 			multiLine,
 			keyboardType,
 			label,
+			control,
+			errors,
+			name,
 		}: textInputPropType,
 		ref
 	) => {
@@ -68,19 +70,29 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 				{label && <Typography type="text16">{label}</Typography>}
 				<View style={styles.inputWrapper}>
 					{children}
-					<TextInput
-						ref={textInputRef}
-						multiline={multiLine}
-						maxLength={maxLength}
-						onFocus={onFocus}
-						keyboardType={keyboardType}
-						defaultValue={defaultValue}
-						onChange={(e) => onChange(e.nativeEvent.text)}
-						style={styles.textInput}
-						placeholder={placeholder}
-						placeholderTextColor={colors.white}
-						editable={editable}
-						secureTextEntry={hidden}
+					<Controller
+						control={control}
+						name={name}
+						render={({ field: { onChange, onBlur, value } }) => (
+							<TextInput
+							autoCapitalize="none"
+								ref={textInputRef}
+								multiline={multiLine}
+								maxLength={maxLength}
+								onFocus={()=>{
+									
+								}}
+								keyboardType={keyboardType}
+								defaultValue={defaultValue}
+								onChangeText={onChange}
+								value={value}
+								style={styles.textInput}
+								placeholder={placeholder}
+								placeholderTextColor={colors.white}
+								editable={editable}
+								secureTextEntry={hidden}
+							/>
+						)}
 					/>
 				</View>
 			</View>

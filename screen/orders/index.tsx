@@ -1,4 +1,4 @@
-import React, { Children, ReactNode, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
@@ -16,6 +16,7 @@ import CancelModal from "../../modals/cancelModal";
 import FilterModal from "../../modals/filterModal";
 import ConfirmModal from "../../modals/confirmModal";
 
+
 export default function Order({ navigation }: any) {
 	const [type, setType] = useState("pending");
 	const [cancel, setCancel] = useState(false);
@@ -25,7 +26,6 @@ export default function Order({ navigation }: any) {
 	const filterRef = useRef(null);
 	const confirmRef = useRef(null);
 	
-
 	const cancelOrder = () => {
 		setCancel(!cancel);
 		setFilter(filter);
