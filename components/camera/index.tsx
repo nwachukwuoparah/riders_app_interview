@@ -12,25 +12,18 @@ export default function Camera_() {
 	const [photoUri, setPhotoUri] = useState<string | null>(null);
 
 	useEffect(() => {
-		console.log(photoUri); 
+		askPermission(); // Call askPermission once the component mounts
+	}, []); // Empty dependency array means this effect runs only once, on mount
+
+	useEffect(() => {
+		console.log(photoUri);
 	}, [photoUri]);
 
-	if (!permission) {
-		return (
-			<View style={styles.container}>
-				<Text>Requesting Camera Permission...</Text>
-			</View>
-		);
-	}
-
-	if (!permission.granted) {
-		return (
-			<View style={styles.container}>
-				<Text>Camera Permission Denied.</Text>
-				<Button title="Request Permission" onPress={requestPermission} />
-			</View>
-		);
-	}
+	const askPermission = () => {
+		if (!permission?.granted && !permission) {
+			requestPermission();
+		}
+	};
 
 	function toggleCameraType() {
 		console.log("call");
@@ -39,17 +32,17 @@ export default function Camera_() {
 		);
 	}
 
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      try {
-        const { uri } = await cameraRef.current.takePictureAsync();
-        setPhotoUri(uri);
-        console.log(uri);
-      } catch (error) {
-        console.error('Error taking picture:', error);
-      }
-    }
-  };
+	const takePicture = async () => {
+		if (cameraRef.current) {
+			try {
+				const { uri } = await cameraRef.current.takePictureAsync();
+				setPhotoUri(uri);
+				console.log(uri);
+			} catch (error) {
+				console.error("Error taking picture:", error);
+			}
+		}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -65,7 +58,7 @@ export default function Camera_() {
 					<TouchableOpacity onPress={takePicture}>
 						<MaterialIcons name="camera" size={60} color={colors.white} />
 					</TouchableOpacity>
-					<TouchableOpacity >
+					<TouchableOpacity>
 						<MaterialCommunityIcons
 							name="flash-outline"
 							size={35}

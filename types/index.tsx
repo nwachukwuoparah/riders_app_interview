@@ -93,7 +93,9 @@ export interface DropdownInputProps {
 	placeholder?: string;
 	defualtValue?: dropDownDataType | string;
 	data: dropDownDataType[];
-	onChange: (item: dropDownDataType) => void;
+	control: any;
+	errors: UseFormStateReturn<any>["errors"];
+	name: string;
 }
 
 export type dropDownDataType = {
@@ -136,6 +138,22 @@ export interface logInTypes {
 
 export interface vehicleTypes {
 	plateNumber: number;
+	vehicleType: string;
 	vehicleBrand: string;
 	image: { uri: string; name: string; type: string };
+}
+
+export interface addressTypes {
+	currentAddress: number;
+	// postCode: number;
+	plateNumber: number;
+	image: { uri: string; name: string; type: string };
+}
+
+export interface guarantorTypes {
+	guarantorName: string;
+	guarantorPhone: number;
+	nextOfKin: string;
+	kinPhone: number;
+	kinRelationship: string;
 }

@@ -10,8 +10,39 @@ import {
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { updateUser } from "../../helpers/mutate";
+import { cacheAuthData } from "../../utilities/storage";
+import { guarantorTypes } from "../../types";
 
 export default function GuarantorForm({ navigation }: any) {
+	const {
+		control,
+		setValue,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<guarantorTypes>();
+	// resolver: yupResolver(loginSchems),
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			cacheAuthData("step", 4);
+			navigation.navigate("verifyAddress");
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
+	const onSubmit = (data: guarantorTypes) => {
+		// mutate(data);
+		navigation.navigate("capture");
+		// console.warn(data);
+	};
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
@@ -40,49 +71,56 @@ export default function GuarantorForm({ navigation }: any) {
 							))}
 						</View>
 					</View>
-					<ScrollContainer innerStyles={{paddingBottom:30}}>
+					<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Your guarantor’s full name"
 								type="text"
-								onChange={() => {}}
 								placeholder="e.g John Doe"
+								control={control}
+								errors={errors}
+								name="guarantorName"
 							/>
 							<InputComponent
 								label="Your guarantor’s phone number"
 								type="phone"
-								onChange={() => {}}
+								control={control}
+								errors={errors}
+								name="guarantorPhone"
 							/>
 							<InputComponent
 								label="Your next of kin’s full name"
 								type="text"
-								onChange={() => {}}
 								placeholder="e.g John Doe"
+								control={control}
+								errors={errors}
+								name="nextOfKin"
 							/>
 							<InputComponent
 								label="Your next of kin’s relationship"
 								type="dropdown"
-								onChange={() => {}}
 								data={[
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
+									{ label: "Brother", value: "Brother" },
+									{ label: "Sister", value: "Sister" },
+									{ label: "Mother", value: "Mother" },
 								]}
 								placeholder="Select relationship"
+								control={control}
+								errors={errors}
+								name="kinRelationship"
 							/>
 							<InputComponent
 								label="Your next of kin’s phone number"
 								type="phone"
-								onChange={() => {}}
+								control={control}
+								errors={errors}
+								name="kinPhone"
 							/>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
 				<View style={styles.buttonCont}>
-					<CustButton
-						type="rounded"
-						onPress={() => navigation.navigate("capture")}
-					>
+					<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Go to face capture
 						</Typography>

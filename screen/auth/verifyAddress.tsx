@@ -14,8 +14,41 @@ import LottieView from "lottie-react-native";
 import File from "../../assets/svg/file.svg";
 import Delete from "../../assets/svg/delete.svg";
 import Preview from "../../assets/svg/preview.svg";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { updateUser } from "../../helpers/mutate";
+import { cacheAuthData } from "../../utilities/storage";
+import { addressTypes } from "../../types";
+import PickImage from "../../components/input/imagePicker";
+import Show from "../../components/show";
 
 export default function VerifyAddress({ navigation }: any) {
+	const {
+		control,
+		setValue,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<any>();
+	// resolver: yupResolver(loginSchems),
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			cacheAuthData("step", 3);
+			navigation.navigate("verifyAddress");
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
+	const onSubmit = (data: addressTypes) => {
+		// mutate(data);
+		navigation.navigate("guarantorForm");
+		// console.warn(data)
+	};
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
@@ -49,58 +82,65 @@ export default function VerifyAddress({ navigation }: any) {
 							<InputComponent
 								label="Enter post code"
 								type="text"
-								onChange={() => {}}
 								placeholder="Enter * digit"
+								control={control}
+								errors={errors}
+								// name="postCode"
+								name="currentAddress"
 							/>
 							<View style={styles.image_wrap}>
 								<InputComponent
-									label="Upload your proof of address"
+									label="Your next of kin’s relationship"
 									type="dropdown"
-									onChange={() => {}}
 									data={[
-										{ label: "Car", value: "Car" },
-										{ label: "Car", value: "Car" },
-										{ label: "Car", value: "Car" },
+										{ label: "Utility Bill", value: "Utility Bill" },
+										{ label: "Bank statement", value: "Bank statement" },
 									]}
-									placeholder="Select document type"
+									placeholder="Select relationship"
+									control={control}
+									errors={errors}
+									name="addressDocType"
 								/>
-								<View style={styles.image_placeholder}>
-									<LottieView
-										autoPlay
-										style={{
-											width: 100,
-											height: 40,
-										}}
-										source={require("../../assets/lottile/imageFile.json")}
-									/>
-									<Typography type="text14" sx={{ color: colors.black_1 }}>
-										Tap here to upload document
-									</Typography>
-									<Typography type="text14" sx={{ color: colors.grey }}>
-										Max 10mb file allowed
-									</Typography>
-								</View>
-								<View style={styles.doc_list}>
-									<View style={{ flexDirection: "row", gap: 10 }}>
-										<File />
-										<Typography type="text16" sx={{ color: colors.white }}>
-											My utility bill
+								<PickImage imageName="image" setValue={setValue}>
+									<View style={styles.image_placeholder}>
+										<LottieView
+											autoPlay
+											style={{
+												width: 100,
+												height: 40,
+											}}
+											source={require("../../assets/lottile/imageFile.json")}
+										/>
+										<Typography type="text14" sx={{ color: colors.black_1 }}>
+											Tap here to upload document
+										</Typography>
+										<Typography type="text14" sx={{ color: colors.grey }}>
+											Max 10mb file allowed
 										</Typography>
 									</View>
-									<View style={{ flexDirection: "row", gap: 10 }}>
-										<Preview />
-										<Delete />
-									</View>
-								</View>
+								</PickImage>
+								<Show>
+									<Show.When isTrue={watch("image") !== undefined}>
+										<View style={styles.doc_list}>
+											<View style={{ flexDirection: "row", gap: 10 }}>
+												<File />
+												<Typography type="text16" sx={{ color: colors.white }}>
+													My utility bill
+												</Typography>
+											</View>
+											<View style={{ flexDirection: "row", gap: 10 }}>
+												<Preview />
+												<Delete />
+											</View>
+										</View>
+									</Show.When>
+								</Show>
 							</View>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
 				<View style={styles.buttonCont}>
-					<CustButton
-						type="rounded"
-						onPress={() => navigation.navigate("guarantorForm")}
-					>
+					<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Continue
 						</Typography>

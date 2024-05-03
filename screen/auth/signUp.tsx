@@ -33,22 +33,22 @@ export default function SignUp({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: createUser,
 		onSuccess: async (data) => {
-			await cacheAuthData("user-data", { token: data?.data?.data?.token });
-			cacheAuthData("step", 1);
-			navigation.navigate("verifyVehicle");
+			// await cacheAuthData("user-data", { token: data?.data?.data?.token });
+			console.log({ token: data?.data?.data?.token });
+			// cacheAuthData("step", 1);
+			// navigation.navigate("verifyVehicle");
 		},
 		onError: (err) => {
-			console.error(err);
+			let error = err;
+			console.error(error);
 		},
 	});
 
 	const onSubmit = (data: signUpTypes) => {
 		mutate(data);
 	};
-
-	useEffect(() => {
-		// console.warn(isPending);
-	}, [isPending]);
+	console.log(isPending);
+	
 
 	return (
 		<Container>

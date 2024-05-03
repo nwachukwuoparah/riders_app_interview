@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 
-const PickImage = ({ name, setValue, children, sx }: any) => {
+const PickImage = ({ imageName, setValue, children, sx }: any) => {
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -18,7 +18,7 @@ const PickImage = ({ name, setValue, children, sx }: any) => {
 			let name = uri.split("/").pop() as string;
 			let match = /\.(\w+)$/.exec(name);
 			let type = match ? `image/${match[1]}` : "image";
-			setValue(name, { uri, name, type });
+			setValue(imageName, { uri, name, type });
 		};
 		if (!result.canceled) {
 			prepFileForUpload(result.assets[0]);

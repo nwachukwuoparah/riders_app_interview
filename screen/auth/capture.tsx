@@ -9,7 +9,7 @@ import Camera_ from "../../components/camera";
 export default function Capture({ navigation }: any) {
 	return (
 		<Container>
-			<InnerWrapper sx={{ width: "100%",	flex: 1, }}>
+			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
 				<View style={styles.title}>
 					<CustButton
 						type="back"

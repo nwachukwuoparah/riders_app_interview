@@ -14,6 +14,10 @@ import LottieView from "lottie-react-native";
 import { useForm } from "react-hook-form";
 import PickImage from "../../components/input/imagePicker";
 import { vehicleTypes } from "../../types";
+import { toFormData } from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { updateUser } from "../../helpers/mutate";
+import { cacheAuthData } from "../../utilities/storage";
 
 export default function VerifyVehicle({ navigation }: any) {
 	const {
@@ -24,12 +28,22 @@ export default function VerifyVehicle({ navigation }: any) {
 		formState: { errors },
 	} = useForm<vehicleTypes>();
 	// resolver: yupResolver(loginSchems),
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			cacheAuthData("step", 2);
+			navigation.navigate("verifyAddress");
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
 	const onSubmit = (data: vehicleTypes) => {
 		// mutate(data);
-		// console.warn(data);
-		console.log(data);
-		
-		// () => navigation.navigate("verifyAddress")
+		navigation.navigate("verifyAddress");
+		// console.warn(data)
 	};
 
 	return (
@@ -63,6 +77,19 @@ export default function VerifyVehicle({ navigation }: any) {
 					<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
+								label="What is your vehicle type?"
+								type="dropdown"
+								data={[
+									{ label: "Bike", value: "Bike" },
+									{ label: "Car", value: "Car" },
+									{ label: "Bicycle", value: "Bicycle" },
+								]}
+								placeholder="Select vehicle type"
+								control={control}
+								errors={errors}
+								name="vehicleType"
+							/>
+							<InputComponent
 								label="What brand is your vehicle?"
 								type="text"
 								control={control}
@@ -78,7 +105,8 @@ export default function VerifyVehicle({ navigation }: any) {
 								errors={errors}
 								name="plateNumber"
 							/>
-							<PickImage name="image" setValue={setValue}>
+							{/* vehicleType */}
+							<PickImage imageName="image" setValue={setValue}>
 								<View style={styles.image_wrap}>
 									<Typography type="text16" sx={{ color: colors.white_1 }}>
 										Upload your drivers license
