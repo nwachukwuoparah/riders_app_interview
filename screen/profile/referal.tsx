@@ -4,6 +4,7 @@ import {
 	TouchableOpacity,
 	ImageBackground,
 	FlatList,
+	RefreshControl,
 } from "react-native";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
@@ -17,12 +18,26 @@ import moment from "moment";
 import Share from "../../assets/svg/share.svg";
 import PointStar from "../../assets/svg/pointStar.svg";
 import Show from "../../components/show";
-import { Loading } from "../../components/loading";
 import EmptyState from "../../components/emptyState";
 import ProfileCard from "../../components/profile";
+import { openShareModal } from "../../helpers";
+import { useQuery } from "@tanstack/react-query";
+import { getPointHistory } from "../../helpers/query";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../../components/contex/userContex";
 
 const Referal = ({ navigation }: any) => {
-	const onRefresh = async () => {};
+	const { userData } = useContext(UserContext);
+
+	const { data, isFetching, error, refetch } = useQuery({
+		queryKey: ["get-point-history"],
+		queryFn: getPointHistory,
+		staleTime: 600000,
+	});
+
+	const onRefresh = async () => {
+		refetch();
+	};
 
 	return (
 		<Container>
@@ -88,7 +103,7 @@ const Referal = ({ navigation }: any) => {
 									color: colors.white,
 								}}
 							>
-								900 pts
+								{data?.data?.data?.currentTotalPoint} pts
 							</Typography>
 						</View>
 					</ImageBackground>
@@ -116,12 +131,12 @@ const Referal = ({ navigation }: any) => {
 									color: colors.white,
 								}}
 							>
-								johndoe
+								{userData?.referralCode}
 							</Typography>
 						</View>
 						<TouchableOpacity
 							onPress={() => {
-								// openShareModal(user?.referralCode);
+								openShareModal(userData?.referralCode);
 							}}
 							style={{
 								width: 55,
@@ -150,36 +165,43 @@ const Referal = ({ navigation }: any) => {
 
 					<FlatList
 						style={{ height: "57%", width: "100%" }}
-						data={[1,2,3]}
+						data={data?.data?.data?.pointHistory}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={{ gap: 20, paddingBottom: 150 }}
-						// refreshControl={
-						// 	<RefreshControl
-						// 		refreshing={pointFetching}
-						// 		onRefresh={onRefresh}
-						// 		colors={[colors.yellow]}
-						// 		tintColor={colors.yellow}
-						// 	/>
-						// }
-						renderItem={(item: any) => (
-						<ProfileCard type="wallet"/>
-						)}
-						// keyExtractor={({ _id }) => _id}
+						refreshControl={
+							<RefreshControl
+								refreshing={false}
+								onRefresh={onRefresh}
+								colors={[colors.yellow]}
+								tintColor={colors.yellow}
+							/>
+						}
+						renderItem={(item: any) => <ProfileCard type="wallet" />}
+						keyExtractor={({ _id }) => _id}
 						ListEmptyComponent={() => (
-              <></>
-							// <Show>
-							// 	<Show.When isTrue={!true}>
-							// 		<Loading title="Fetching vendor" />
-							// 	</Show.When>
-							// 	<Show.Else>
-							// 		<EmptyState
-							// 			top="15%"
-							// 			onRefresh={onRefresh}
-							// 			title="You have no points Invite friends and earn "
-							// 			message="swipe down to refresh"
-							// 		/>
-							// 	</Show.Else>
-							// </Show>
+							<Show>
+								<Show.When isTrue={!true}>
+									<>
+										<Typography
+											type="text14"
+											sx={{
+												color: colors.white,
+											}}
+										>
+											loading...
+										</Typography>
+									</>
+									{/* <Load title="Fetching vendor" /> */}
+								</Show.When>
+								<Show.Else>
+									<EmptyState
+										top="15%"
+										onRefresh={onRefresh}
+										title="You have no points Invite friends and earn "
+										message="swipe down to refresh"
+									/>
+								</Show.Else>
+							</Show>
 						)}
 					/>
 				</View>

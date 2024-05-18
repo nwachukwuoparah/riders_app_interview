@@ -19,13 +19,14 @@ const DropdownInput = ({
 	defualtValue,
 	label,
 	name,
+	errors,
 	control,
 }: DropdownInputProps) => {
 	const styles = StyleSheet.create({
 		dropdown: {
 			width: "100%",
 			paddingHorizontal: "5%",
-			paddingVertical: "3.4%",
+			paddingVertical: "2.5%",
 			borderRadius: 30,
 			backgroundColor: colors.grey_a,
 			marginTop: 15,
@@ -92,6 +93,11 @@ const DropdownInput = ({
 					/>
 				)}
 			/>
+			{errors?.[name] && (
+				<Typography type="text14" sx={{ color: colors.red }}>
+					{errors?.[name]?.message}
+				</Typography>
+			)}
 		</View>
 	);
 };

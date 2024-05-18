@@ -24,7 +24,7 @@ const HiddenInput = ({
 	name,
 }: textInputPropType) => {
 	const [hidden, sethidden] = useState<boolean>(true);
-
+	const [active, setActive] = useState(false);
 	const styles = StyleSheet.create({
 		inputWrapper: {
 			width: "100%",
@@ -35,7 +35,7 @@ const HiddenInput = ({
 			backgroundColor: colors.grey_a,
 			borderRadius: 30,
 			borderWidth: 1,
-			borderColor: colors.yellow,
+			borderColor: !active ? colors.grey_a : colors.yellow,
 			paddingHorizontal: "7%",
 			marginTop: 10,
 			...(wrapperStyle as object),
@@ -62,15 +62,14 @@ const HiddenInput = ({
 					name={name}
 					render={({ field: { onChange, onBlur, value } }) => (
 						<TextInput
-						autoCapitalize="none"
+							autoCapitalize="none"
 							multiline={multiLine}
 							maxLength={maxLength}
-							onFocus={()=>{
-
-							}}
 							keyboardType={keyboardType}
 							defaultValue={defaultValue}
 							onChangeText={onChange}
+							onBlur={() => setActive(false)}
+							onFocus={() => setActive(true)}
 							value={value}
 							style={styles.textInput}
 							placeholder={placeholder}
@@ -98,6 +97,11 @@ const HiddenInput = ({
 					)}
 				</TouchableOpacity>
 			</View>
+			{errors?.[name] && (
+					<Typography type="text14" sx={{ color: colors.red }}>
+						{errors?.[name]?.message}
+					</Typography>
+				)}
 		</View>
 	);
 };

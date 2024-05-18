@@ -18,6 +18,11 @@ import { toFormData } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../helpers/mutate";
 import { cacheAuthData } from "../../utilities/storage";
+import { vehicleSchems } from "../../utilities/schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Show from "../../components/show";
+import FilePreview from "../../components/filePreview";
+import LoadingComponent from "../../components/loading";
 
 export default function VerifyVehicle({ navigation }: any) {
 	const {
@@ -25,9 +30,11 @@ export default function VerifyVehicle({ navigation }: any) {
 		setValue,
 		handleSubmit,
 		watch,
+		clearErrors,
 		formState: { errors },
-	} = useForm<vehicleTypes>();
-	// resolver: yupResolver(loginSchems),
+	} = useForm<vehicleTypes>({
+		resolver: yupResolver(vehicleSchems),
+	});
 
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
@@ -36,18 +43,22 @@ export default function VerifyVehicle({ navigation }: any) {
 			navigation.navigate("verifyAddress");
 		},
 		onError: (err) => {
-			console.error(err);
+			console.log(JSON.stringify(err, null, 2));
 		},
 	});
 
 	const onSubmit = (data: vehicleTypes) => {
-		// mutate(data);
-		navigation.navigate("verifyAddress");
-		// console.warn(data)
+		const formData = new FormData();
+		formData.append("image", data?.image as any);
+		formData.append("plateNumber", data?.plateNumber);
+		formData.append("vehicleBrand", data?.vehicleBrand);
+		formData.append("vehicleType", data?.vehicleType);
+		mutate(formData);
 	};
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<View style={styles.title}>
@@ -105,8 +116,13 @@ export default function VerifyVehicle({ navigation }: any) {
 								errors={errors}
 								name="plateNumber"
 							/>
-							{/* vehicleType */}
-							<PickImage imageName="image" setValue={setValue}>
+							<PickImage
+								imageName="image"
+								errors={errors}
+								setValue={setValue}
+								control={control}
+								clearErrors={clearErrors}
+							>
 								<View style={styles.image_wrap}>
 									<Typography type="text16" sx={{ color: colors.white_1 }}>
 										Upload your drivers license
@@ -129,6 +145,17 @@ export default function VerifyVehicle({ navigation }: any) {
 									</View>
 								</View>
 							</PickImage>
+							<Show>
+								<Show.When isTrue={watch("image") !== undefined}>
+									<FilePreview
+										handelDelete={() => {
+											setValue("image", undefined);
+										}}
+										handelPreview={() => {}}
+										type="Drivers liscense"
+									/>
+								</Show.When>
+							</Show>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
@@ -181,7 +208,6 @@ const styles = StyleSheet.create({
 			android: {},
 		}),
 	},
-	// 4500-2001+2024
 	buttonCont: {
 		alignItems: "center",
 		justifyContent: "center",

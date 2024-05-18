@@ -1,14 +1,62 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import { changePasswordSchems } from "../../utilities/schema";
+import { changePassword } from "../../helpers/mutate";
+import { changePasswordWithConfirmType, changePasswordType } from "../../types";
+import LoadingComponent from "../../components/loading";
 
 export default function ChangePassword({ navigation }: any) {
+	const {
+		control,
+		handleSubmit,
+		watch,
+		setError,
+		clearErrors,
+		formState: { errors },
+	} = useForm<changePasswordWithConfirmType>({
+		resolver: yupResolver(changePasswordSchems),
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: changePassword,
+		onSuccess: async (data) => {
+			console.log(data?.data?.data);
+		},
+		onError: (err) => {
+			console.error(JSON.stringify(err, null, 2));
+		},
+	});
+
+	useEffect(() => {
+		(() => {
+			if (watch("confirmPassword") !== watch("newPassword")) {
+				setError("confirmPassword", {
+					type: "manual",
+					message: "Passwords do not match",
+				});
+			} else {
+				clearErrors("confirmPassword");
+			}
+		})();
+	}, [watch("newPassword"), watch("confirmPassword")]);
+
+	const onSubmit = (data: changePasswordWithConfirmType) => {
+		const { confirmPassword, ...others } = data;
+		mutate(others);
+		// console.log(others);
+	};
+
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<View style={styles.title}>
 					<CustButton
@@ -22,22 +70,31 @@ export default function ChangePassword({ navigation }: any) {
 					<InputComponent
 						label="Enter old password"
 						type="hidden"
-						onChange={() => {}}
+						name="oldPassword"
+						control={control}
+						errors={errors}
+						placeholder="Old password"
 					/>
 					<InputComponent
 						label="Enter new password"
 						type="hidden"
-						onChange={() => {}}
+						name="newPassword"
+						control={control}
+						errors={errors}
+						placeholder="New password"
 					/>
 					<InputComponent
-						label="Re-enter new password"
+						label="Confirm new password"
 						type="hidden"
-						onChange={() => {}}
+						name="confirmPassword"
+						control={control}
+						errors={errors}
+						placeholder="Confirm new password"
 					/>
 				</View>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>
-				<CustButton type="rounded" onPress={() => navigation.navigate("login")}>
+				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Reset password
 					</Typography>

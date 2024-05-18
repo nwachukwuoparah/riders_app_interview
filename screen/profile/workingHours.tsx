@@ -1,5 +1,11 @@
-import React, { useRef, useState } from "react";
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+	Alert,
+	Platform,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -9,12 +15,107 @@ import {
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import ProfileCard from "../../components/profile";
+import {
+	QueryFilters,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { workingHours } from "../../helpers/mutate";
+import { periodDataType, workingShiftType } from "../../types";
+import LoadingComponent from "../../components/loading";
+import { getWorkHours } from "../../helpers/query";
+
+const initialData = {
+	morning: {
+		monday: false,
+		tuesday: false,
+		wednesday: false,
+		thursday: false,
+		friday: false,
+		saturday: false,
+		sunday: false,
+	},
+	evening: {
+		monday: false,
+		tuesday: false,
+		wednesday: false,
+		thursday: false,
+		friday: false,
+		saturday: false,
+		sunday: false,
+	},
+};
 
 export default function WorkingHours({ navigation }: any) {
-	const [type, setType] = useState("morning");
+	const queryClient = useQueryClient();
+	const [period, setPeriod] = useState<keyof workingShiftType>("morning");
+	const [isDataChanged, setIsDataChanged] = useState(false);
+	const dataRef = useRef<workingShiftType>(initialData);
+	const [data, setData] = useState<workingShiftType>(initialData);
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: workingHours,
+		onSuccess: async (data) => {
+			console.log(data?.data?.msg);
+			Alert.alert("Message", data?.data?.msg);
+			queryClient.invalidateQueries("get-working-hours" as QueryFilters);
+		},
+		onError: (err) => {
+			console.error(JSON.stringify(err, null, 2));
+		},
+	});
+
+	const {
+		data: working_hours,
+		isFetching,
+		error,
+	} = useQuery({
+		queryKey: ["get-working-hours"],
+		queryFn: getWorkHours,
+		staleTime: 600000,
+	});
+
+	// Handel get request and uptade ui
+	useEffect(() => {
+		if (working_hours) {
+			const { morning, evening } = working_hours?.data.data;
+			dataRef.current = { morning, evening };
+			setData({ morning, evening });
+		}
+		if (error) {
+			console.log(JSON.stringify(error, null, 2));
+		}
+	}, [working_hours, error]);
+
+	// watch for a change and compares both inital and final object
+	useEffect(() => {
+		(() => {
+			let result = JSON.stringify(data) === JSON.stringify(dataRef.current);
+			setIsDataChanged(!result);
+		})();
+	}, [data]);
+
+	//toggle to update working hours
+	const toggleDay = (day: keyof periodDataType) => {
+		setData((prevData) => ({
+			...prevData,
+			[period]: {
+				...prevData[period],
+				[day]: !prevData[period][day],
+			},
+		}));
+	};
+
+	const onSubmit = () => {
+		if (isDataChanged) {
+			mutate(data);
+		}
+	};
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending || isFetching} />
 			<InnerWrapper sx={{ gap: 20, flex: 1 }}>
 				<View
 					style={{
@@ -35,28 +136,28 @@ export default function WorkingHours({ navigation }: any) {
 				<View style={styles.body}>
 					<TouchableOpacity
 						onPress={() => {
-							setType("morning");
+							setPeriod("morning");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
 							backgroundColor:
-								type === "morning" ? colors.grey_a : colors.black_1,
-							borderColor: type === "morning" ? colors.yellow : colors.grey_b,
+								period === "morning" ? colors.grey_a : colors.black_1,
+							borderColor: period === "morning" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">Morning shift</Typography>
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
-							setType("evening");
+							setPeriod("evening");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
 							backgroundColor:
-								type === "evening" ? colors.grey_a : colors.black_1,
-							borderColor: type === "evening" ? colors.yellow : colors.grey_b,
+								period === "evening" ? colors.grey_a : colors.black_1,
+							borderColor: period === "evening" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">Evening shift</Typography>
@@ -66,25 +167,18 @@ export default function WorkingHours({ navigation }: any) {
 					Working hours are between 08:00am - 05:00pm
 				</Typography>
 				<ScrollContainer innerStyles={{ gap: 5 }}>
-					{[
-						{ value: "My account details", route: "profileDetails" },
-						{ value: "Working hours", route: "workingHours" },
-						{ value: "My vehicle details", route: "vehicleDetails" },
-						{ value: "My address", route: "address" },
-						{ value: "My guarantors", route: "guarantorForm" },
-						{ value: "Payment details", route: "payment" },
-						{ value: "Password reset", route: "" },
-					].map((i, index) => (
+					{Object?.keys(data?.[period])?.map((day, index) => (
 						<TouchableOpacity
 							key={index}
 							onPress={() => {
-								navigation.navigate(i?.route);
+								toggleDay(day);
 							}}
 						>
 							<ProfileCard
 								type="workHours"
-								index={index || 0}
-								value={i?.value}
+								label={day}
+								index={index}
+								check={data?.[period]?.[day]}
 								onPress={() => {
 									navigation.navigate("login");
 								}}
@@ -96,7 +190,8 @@ export default function WorkingHours({ navigation }: any) {
 			<View style={styles.buttonCont}>
 				<CustButton
 					type="rounded"
-					onPress={() => navigation.navigate("verifyVehicle")}
+					sx={{ opacity: isDataChanged ? 1 : 0.4 }}
+					onPress={onSubmit}
 				>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Save working hours

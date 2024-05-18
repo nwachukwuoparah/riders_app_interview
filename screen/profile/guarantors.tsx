@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -11,10 +11,51 @@ import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import File from "../../assets/svg/file.svg";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { guarantorTypes } from "../../types";
+import { garantorsSchems } from "../../utilities/schema";
+import { updateUser } from "../../helpers/mutate";
+import { QueryFilters, useMutation, useQueryClient } from "@tanstack/react-query";
+import LoadingComponent from "../../components/loading";
+import { UserContext } from "../../components/contex/userContex";
 
 export default function Guarantors({ navigation }: any) {
+	const { userData } = useContext(UserContext);
+	const queryClient = useQueryClient();
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<guarantorTypes | any>({
+		resolver: yupResolver(garantorsSchems),
+		defaultValues: {
+			guarantorName: userData?.guarantorName,
+			guarantorPhone: userData?.guarantorPhone,
+			nextOfKin: userData?.nextOfKin,
+			kinRelationship: userData?.kinRelationship,
+			kinPhone: userData?.kinPhone,
+		},
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-profile" as QueryFilters);
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
+	const onSubmit = (data: guarantorTypes) => {
+		mutate(data);
+	};
+
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<ScrollContainer innerStyles={{ paddingBottom: 170 }}>
 				<KeyboardView sx={{ gap: 50, flex: 1 }}>
 					<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -41,7 +82,7 @@ export default function Guarantors({ navigation }: any) {
 										paddingVertical: 13,
 									}}
 									type="rounded"
-									onPress={() => navigation.navigate("login")}
+									onPress={handleSubmit(onSubmit)}
 								>
 									<Typography type="text16" sx={{ color: colors.black }}>
 										Edit
@@ -49,40 +90,52 @@ export default function Guarantors({ navigation }: any) {
 								</CustButton>
 							</View>
 						</View>
-
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Your guarantor’s full name"
 								type="text"
-								onChange={() => {}}
+								name="guarantorName"
+								control={control}
+								errors={errors}
 								placeholder="e.g John Doe"
 							/>
 							<InputComponent
 								label="Your guarantor’s phone number"
 								type="phone"
-								onChange={() => {}}
+								name="guarantorPhone"
+								control={control}
+								errors={errors}
+								defaultValue={userData?.guarantorPhone}
 							/>
 							<InputComponent
 								label="Your next of kin’s full name"
 								type="text"
-								onChange={() => {}}
+								name="nextOfKin"
+								control={control}
+								errors={errors}
 								placeholder="e.g John Doe"
 							/>
 							<InputComponent
 								label="Your next of kin’s relationship"
 								type="dropdown"
-								onChange={() => {}}
+								name="kinRelationship"
+								control={control}
+								errors={errors}
 								data={[
 									{ label: "Car", value: "Car" },
 									{ label: "Car", value: "Car" },
 									{ label: "Car", value: "Car" },
 								]}
 								placeholder="Select relationship"
+								defualtValue={userData?.kinRelationship}
 							/>
 							<InputComponent
 								label="Your next of kin’s phone number"
 								type="phone"
-								onChange={() => {}}
+								name="kinPhone"
+								control={control}
+								errors={errors}
+								defaultValue={userData?.kinPhone}
 							/>
 						</View>
 					</InnerWrapper>

@@ -3,7 +3,7 @@ import Typography from "../typography";
 import { Modal, StyleSheet, View } from "react-native";
 import {
 	heightPercentageToDP as hp,
-	widthPercentageToDP as wp,
+	widthPercentageToDP as wp, 
 } from "react-native-responsive-screen";
 import colors from "../../constant/theme";
 
@@ -27,11 +27,11 @@ const LoadingComponent = ({ display }: { display: boolean }) => {
 				{/* <LottieView
 					autoPlay
 					style={{
-						width: 250,
-						height: 250,
+						// width: 250,
+						// height: 250,
 						// backgroundColor: '#eee',
 					}}
-					source={require("../../assets/lottile/loader.json")}
+					source={require("../../assets/loader.json")}
 				/> */}
 			</View>
 		</Modal>

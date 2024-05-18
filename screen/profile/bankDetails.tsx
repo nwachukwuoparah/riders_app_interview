@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
@@ -6,14 +6,21 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import ConfirmModal from "../../modals/confirmModal";
+import { UserContext } from "../../components/contex/userContex";
 
-export default function Payment_details({ navigation }: any) {
+export default function Bank_details({ navigation }: any) {
 	const confirmRef = useRef(null);
 	const [confirm, setConfirm] = useState(false);
+	const { userData } = useContext(UserContext);
 
 	const toogleConfirm = () => {
 		setConfirm(!confirm);
 	};
+
+	useEffect(() => {
+		console.log(userData);
+	}, [userData]);
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -51,10 +58,10 @@ export default function Payment_details({ navigation }: any) {
 				<View style={{ ...styles.card }}>
 					<View style={{ gap: 10 }}>
 						<Typography type="text16" sx={{ color: colors.white }}>
-							Transfer Wise
+							{userData?.bankName}
 						</Typography>
 						<Typography type="text14" sx={{ color: colors.white }}>
-							John Doe
+							{userData?.accountName}
 						</Typography>
 					</View>
 					<View style={styles.delete}>

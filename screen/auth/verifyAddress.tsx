@@ -11,9 +11,6 @@ import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import LottieView from "lottie-react-native";
-import File from "../../assets/svg/file.svg";
-import Delete from "../../assets/svg/delete.svg";
-import Preview from "../../assets/svg/preview.svg";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../helpers/mutate";
@@ -21,22 +18,29 @@ import { cacheAuthData } from "../../utilities/storage";
 import { addressTypes } from "../../types";
 import PickImage from "../../components/input/imagePicker";
 import Show from "../../components/show";
+import FilePreview from "../../components/filePreview";
+import { addressSchems } from "../../utilities/schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LoadingComponent from "../../components/loading";
 
 export default function VerifyAddress({ navigation }: any) {
+	
 	const {
 		control,
 		setValue,
 		handleSubmit,
 		watch,
+		clearErrors,
 		formState: { errors },
-	} = useForm<any>();
-	// resolver: yupResolver(loginSchems),
+	} = useForm<addressTypes>({
+		resolver: yupResolver(addressSchems),
+	});
 
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			cacheAuthData("step", 3);
-			navigation.navigate("verifyAddress");
+			navigation.navigate("guarantorForm");
 		},
 		onError: (err) => {
 			console.error(err);
@@ -44,13 +48,16 @@ export default function VerifyAddress({ navigation }: any) {
 	});
 
 	const onSubmit = (data: addressTypes) => {
-		// mutate(data);
-		navigation.navigate("guarantorForm");
-		// console.warn(data)
+		const formData = new FormData();
+		formData.append("image", data?.image as any);
+		formData.append("currentAddress", data?.currentAddress);
+		formData.append("addressDocType", data?.addressDocType);
+		mutate(formData);
 	};
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<View style={styles.title}>
@@ -85,23 +92,28 @@ export default function VerifyAddress({ navigation }: any) {
 								placeholder="Enter * digit"
 								control={control}
 								errors={errors}
-								// name="postCode"
 								name="currentAddress"
 							/>
 							<View style={styles.image_wrap}>
 								<InputComponent
-									label="Your next of kin’s relationship"
+									label="Upload your proof of address"
 									type="dropdown"
 									data={[
 										{ label: "Utility Bill", value: "Utility Bill" },
 										{ label: "Bank statement", value: "Bank statement" },
 									]}
-									placeholder="Select relationship"
+									placeholder="Select document type"
 									control={control}
 									errors={errors}
 									name="addressDocType"
 								/>
-								<PickImage imageName="image" setValue={setValue}>
+								<PickImage
+									imageName="image"
+									errors={errors}
+									setValue={setValue}
+									control={control}
+									clearErrors={clearErrors}
+								>
 									<View style={styles.image_placeholder}>
 										<LottieView
 											autoPlay
@@ -121,18 +133,13 @@ export default function VerifyAddress({ navigation }: any) {
 								</PickImage>
 								<Show>
 									<Show.When isTrue={watch("image") !== undefined}>
-										<View style={styles.doc_list}>
-											<View style={{ flexDirection: "row", gap: 10 }}>
-												<File />
-												<Typography type="text16" sx={{ color: colors.white }}>
-													My utility bill
-												</Typography>
-											</View>
-											<View style={{ flexDirection: "row", gap: 10 }}>
-												<Preview />
-												<Delete />
-											</View>
-										</View>
+										<FilePreview
+											type={watch("addressDocType")}
+											handelDelete={() => {
+												setValue("image", undefined);
+											}}
+											handelPreview={() => {}}
+										/>
 									</Show.When>
 								</Show>
 							</View>
@@ -205,16 +212,4 @@ const styles = StyleSheet.create({
 			},
 		}),
 	},
-	doc_list: {
-		width: "100%",
-		backgroundColor: colors.grey_a,
-		paddingVertical: 15,
-		paddingHorizontal: 25,
-		borderRadius: 30,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-	},
-	doc_list_left: {},
-	doc_list_right: {},
 });

@@ -15,7 +15,7 @@ export default function RequestCard() {
 			<View style={styles.card_top}>
 				<View style={{ marginLeft: 15 }}>
 					<Typography type="text16" sx={{ color: colors.white_1 }}>
-						Normal delivery
+						{true ? "Normal delivery" : "Schedule delivery"}
 					</Typography>
 					<View style={styles.price_tag}>
 						<Typography type="text24" sx={{ color: colors.white_1 }}>

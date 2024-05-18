@@ -24,7 +24,7 @@ const CustPhoneInput = ({
 		});
 	}, [defaultValue]);
 
-	phoneNumInput.current?.getCallingCode();
+	// phoneNumInput.current?.getCallingCode();
 
 	const styles = StyleSheet.create({
 		phoneNumberView: {
@@ -39,20 +39,6 @@ const CustPhoneInput = ({
 		},
 	});
 
-	// const onInput = (number: string) => {
-	// 	const countryCode = phoneNumInput.current?.getCallingCode();
-	// 	const countrySymbol = phoneNumInput.current?.getCountryCode();
-	// 	onChange({
-	// 		countryCode: countryCode as string,
-	// 		countrySymbol: countrySymbol as string,
-	// 		number: number.replace(`+${countryCode}`, ""),
-	// 	});
-	// };
-	// {
-	// 	 onChangeFormattedText={(formattedText) => {
-	// 						onChange(formattedText);
-	// 					}}
-	// }
 	return (
 		<View style={{ gap: 15 }}>
 			{label && <Typography type="text16">{label}</Typography>}
@@ -70,6 +56,9 @@ const CustPhoneInput = ({
 							paddingVertical: "4%",
 							backgroundColor: colors.grey_a,
 						}}
+						textInputProps={{
+							placeholderTextColor: colors.white,
+						}}
 						textInputStyle={{ color: colors.white }}
 						codeTextStyle={{ color: colors.grey_d }}
 						defaultValue={(countryCode || "+44") + defaultValue}
@@ -80,6 +69,11 @@ const CustPhoneInput = ({
 					/>
 				)}
 			/>
+				{errors?.[name] && (
+					<Typography type="text14" sx={{ color: colors.red }}>
+						{errors?.[name]?.message}
+					</Typography>
+				)}
 		</View>
 	);
 };

@@ -1,5 +1,11 @@
-import React, { useRef, useState } from "react";
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useContext, useRef, useState } from "react";
+import {
+	Alert,
+	Platform,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -11,14 +17,44 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { InputComponent } from "../../components/input";
+import { UserContext } from "../../components/contex/userContex";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import { supportSchems } from "../../utilities/schema";
+import { support } from "../../helpers/mutate";
+import LoadingComponent from "../../components/loading";
 
 export default function Contact({ navigation }: any) {
-	const [type, setType] = useState("morning");
+	const { userData } = useContext(UserContext);
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<any>({
+		resolver: yupResolver(supportSchems),
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: support,
+		onSuccess: async (data) => {
+			Alert.alert("Message", data?.data?.msg);
+		},
+		onError: (err) => {
+			console.error(err);
+		},
+	});
+
+	const onSubmit = (data: any) => {
+		mutate({ ...data, email: userData?.email });
+	};
 
 	return (
-		<KeyboardView>
-			<Container>
-				<InnerWrapper sx={{ gap: 20, flex: 1 }}>
+		<Container>
+			<LoadingComponent display={isPending} />
+			<KeyboardView sx={{ height: "90%" }}>
+				<InnerWrapper sx={{ gap: 30 }}>
 					<View
 						style={{
 							flexDirection: "row",
@@ -35,38 +71,44 @@ export default function Contact({ navigation }: any) {
 							<Typography type="text24">Contact support</Typography>
 						</View>
 					</View>
-					<ScrollContainer innerStyles={{ gap: 5 }}></ScrollContainer>
-				</InnerWrapper>
-				<View style={styles.buttonCont}>
-					<View
-						style={{ width: "95%", flexDirection: "row", alignItems: "center" }}
-					>
+					<ScrollContainer innerStyles={{ gap: 5 }}>
 						<InputComponent
 							wrapperStyle={{
 								backgroundColor: colors.black_1,
 								borderWidth: 0,
 								flexDirection: "row-reverse",
+								height: 150,
 							}}
 							style={{
-								width: "81%",
+								height: "100%",
 								backgroundColor: colors.grey_a,
-								borderRadius: 20,
+								borderRadius: 10,
 								paddingHorizontal: 15,
-								paddingTop:10
+								paddingTop: 15,
 							}}
 							type="text"
-							onChange={() => {}}
 							placeholder="Type your message"
+							name="message"
 							multiLine={true}
-						>
-							<View style={styles.button}>
-								<MaterialCommunityIcons name="send" size={24} color="black" />
-							</View>
-						</InputComponent>
-					</View>
+							control={control}
+							errors={errors}
+						/>
+					</ScrollContainer>
+				</InnerWrapper>
+				<View style={styles.buttonCont}>
+					<View
+						style={{ width: "95%", flexDirection: "row", alignItems: "center" }}
+					></View>
 				</View>
-			</Container>
-		</KeyboardView>
+			</KeyboardView>
+			<View style={styles.buttonCont}>
+				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
+					<Typography type="text16" sx={{ color: colors.black }}>
+						Send
+					</Typography>
+				</CustButton>
+			</View>
+		</Container>
 	);
 }
 

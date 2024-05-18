@@ -15,22 +15,28 @@ import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../helpers/mutate";
 import { cacheAuthData } from "../../utilities/storage";
 import { guarantorTypes } from "../../types";
+import { garantorsSchems } from "../../utilities/schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LoadingComponent from "../../components/loading";
 
 export default function GuarantorForm({ navigation }: any) {
+
+	
 	const {
 		control,
 		setValue,
 		handleSubmit,
 		watch,
 		formState: { errors },
-	} = useForm<guarantorTypes>();
-	// resolver: yupResolver(loginSchems),
+	} = useForm<guarantorTypes>({
+		resolver: yupResolver(garantorsSchems),
+	});
 
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			cacheAuthData("step", 4);
-			navigation.navigate("verifyAddress");
+			navigation.navigate("capture");
 		},
 		onError: (err) => {
 			console.error(err);
@@ -38,13 +44,12 @@ export default function GuarantorForm({ navigation }: any) {
 	});
 
 	const onSubmit = (data: guarantorTypes) => {
-		// mutate(data);
-		navigation.navigate("capture");
-		// console.warn(data);
+		mutate(data);
 	};
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending}/>
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<View style={styles.title}>

@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -8,7 +8,16 @@ import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
 import { logInTypes } from "../../types";
 import { useFocusEffect } from "@react-navigation/native";
-import { getCachedAuthData } from "../../utilities/storage";
+import {
+	cacheAuthData,
+	clearAuthData,
+	getCachedAuthData,
+} from "../../utilities/storage";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchems } from "../../utilities/schema";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "../../helpers/mutate";
+import LoadingComponent from "../../components/loading";
 
 export default function Login({ navigation }: any) {
 	const {
@@ -16,24 +25,26 @@ export default function Login({ navigation }: any) {
 		handleSubmit,
 		watch,
 		formState: { errors },
-	} = useForm<logInTypes>();
-	// resolver: yupResolver(loginSchems),
+	} = useForm<logInTypes>({
+		resolver: yupResolver(loginSchems),
+	});
 
 	useFocusEffect(
 		useCallback(() => {
 			(async () => {
+				await clearAuthData("step");
+				// console.log(await getCachedAuthData("user-data"));
+				// await cacheAuthData("user-data", { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyMDU1ZDhlMTczMDBkMWVlOGQ1NDgiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzE1NjAyNzgzLCJleHAiOjE3MTU2MDYzODN9.vwsKuo5lB6_EgNmhL8d-7Szmj8joLfQ7b39hDhTcMHA" });
 				try {
 					const step = await getCachedAuthData("step");
 					if (step === 1) {
 						navigation.navigate("verifyVehicle");
 					} else if (step === 2) {
-						navigation.navigate("option");
-					}
-					else if (step === 3) {
-						navigation.navigate("option");
-					}
-					else if (step === 4) {
-						navigation.navigate("option");
+						navigation.navigate("verifyAddress");
+					} else if (step === 3) {
+						navigation.navigate("guarantorForm");
+					} else if (step === 4) {
+						navigation.navigate("capture");
 					}
 				} catch (err) {
 					return null;
@@ -42,8 +53,27 @@ export default function Login({ navigation }: any) {
 		}, [])
 	);
 
+	const { isPending, mutate, error } = useMutation({
+		mutationFn: login,
+		onSuccess: async (data) => {
+			// await cacheAuthData("user-data", { token: data?.data?.data?.token });
+			console.log({ token: data?.data?.data?.token });
+			// navigation.navigate("UserStack")
+		},
+		onError: (err: { msg: string; success: boolean }) => {
+			// Alert.alert("Message", `${err?.msg}`);
+			console.log(JSON.stringify(err, null, 2));
+		},
+	});
+
+	const onSubmit = (data: logInTypes) => {
+		// mutate(data);
+			navigation.navigate("UserStack")
+	};
+
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<View style={styles.title}>
 					<Typography type="text24">Welcome back!</Typography>
@@ -56,6 +86,7 @@ export default function Login({ navigation }: any) {
 						control={control}
 						errors={errors}
 						name="email"
+						placeholder="Email"
 					/>
 					<InputComponent
 						label="Enter your password"
@@ -63,14 +94,12 @@ export default function Login({ navigation }: any) {
 						control={control}
 						errors={errors}
 						name="password"
-					/>
+						placeholder="password"
+						/>
 				</View>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>
-				<CustButton
-					type="rounded"
-					onPress={() => navigation.navigate("UserStack")}
-				>
+				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Log in
 					</Typography>

@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { StyleSheet, View, Platform } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -10,11 +10,70 @@ import {
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
-import File from "../../assets/svg/file.svg";
+import LottieView from "lottie-react-native";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { vehicleTypes } from "../../types";
+import { vehicleSchems } from "../../utilities/schema";
+import PickImage from "../../components/input/imagePicker";
+import Show from "../../components/show";
+import FilePreview from "../../components/filePreview";
+import {
+	QueryFilters,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { updateUser } from "../../helpers/mutate";
+import { UserContext } from "../../components/contex/userContex";
+import LoadingComponent from "../../components/loading";
 
 export default function Vehicle_Details({ navigation }: any) {
+	const { userData } = useContext(UserContext);
+	const queryClient = useQueryClient();
+
+	const {
+		control,
+		handleSubmit,
+		watch,
+		setValue,
+		clearErrors,
+		formState: { errors },
+	} = useForm<vehicleTypes | any>({
+		resolver: yupResolver(vehicleSchems),
+		defaultValues: {
+			vehicleType: userData?.vehicleType,
+			vehicleBrand: userData?.vehicleBrand,
+			plateNumber: userData?.plateNumber,
+			image: userData?.vehicleLicense,
+		},
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-profile" as QueryFilters);
+		},
+		onError: (err) => {
+			console.error(JSON.stringify(err,null,2));
+		},
+	});
+
+	const onSubmit = (data: vehicleTypes) => {
+		const formData = new FormData();
+		formData.append("image", data?.image as any);
+		formData.append("plateNumber", data?.plateNumber);
+		formData.append("vehicleBrand", data?.vehicleBrand);
+		formData.append("vehicleType", data?.vehicleType);
+		mutate(formData);
+	};
+
+	useEffect(() => {
+		console.log(JSON.stringify(userData, null, 2));
+	}, [userData]);
+
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 				<KeyboardView sx={{ gap: 50, flex: 1 }}>
 					<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -41,7 +100,7 @@ export default function Vehicle_Details({ navigation }: any) {
 										paddingVertical: 13,
 									}}
 									type="rounded"
-									onPress={() => navigation.navigate("login")}
+									onPress={handleSubmit(onSubmit)}
 								>
 									<Typography type="text16" sx={{ color: colors.black }}>
 										Edit
@@ -53,61 +112,78 @@ export default function Vehicle_Details({ navigation }: any) {
 							<InputComponent
 								label="Select vehicle type"
 								type="dropdown"
-								onChange={() => {}}
 								data={[
 									{ label: "Car", value: "Car" },
 									{ label: "Car", value: "Car" },
 									{ label: "Car", value: "Car" },
 								]}
 								placeholder="Select vehicle type"
+								name="vehicleType"
+								control={control}
+								errors={errors}
+								defualtValue={userData?.vehicleType}
 							/>
 							<InputComponent
 								label="What brand is your vehicle?"
 								type="text"
-								onChange={() => {}}
 								placeholder="e.g. Toyota"
+								name="vehicleBrand"
+								control={control}
+								errors={errors}
 							/>
 							<InputComponent
 								label="What is your vehicle plate number?"
 								type="text"
-								onChange={() => {}}
 								placeholder="Enter * digit"
+								name="plateNumber"
+								control={control}
+								errors={errors}
 							/>
-							<View style={{ gap: 10 }}>
-								<Typography type="text14" sx={{ color: colors.white }}>
-									Upload your drivers license
-								</Typography>
-								<View
-									style={{
-										flexDirection: "row",
-										gap: 10,
-										backgroundColor: colors.tint,
-										borderRadius: 40,
-										paddingVertical: 15,
-										paddingHorizontal: 20,
-									}}
-								>
-									<File />
-									<Typography type="text16" sx={{ color: colors.black }}>
-										My license (front)
+							<PickImage
+								imageName="image"
+								errors={errors}
+								setValue={setValue}
+								control={control}
+								clearErrors={clearErrors}
+							>
+								<View style={styles.image_wrap}>
+									<Typography type="text16" sx={{ color: colors.white_1 }}>
+										Upload your drivers license
 									</Typography>
+									<View style={styles.image_placeholder}>
+										<LottieView
+											autoPlay
+											style={{
+												width: 100,
+												height: 50,
+											}}
+											source={require("../../assets/lottile/imageFile.json")}
+										/>
+										<Typography type="text14" sx={{ color: colors.black_1 }}>
+											Tap here to upload document
+										</Typography>
+										<Typography type="text14" sx={{ color: colors.grey }}>
+											Max 10mb file allowed
+										</Typography>
+									</View>
 								</View>
-								<View
-									style={{
-										flexDirection: "row",
-										gap: 10,
-										backgroundColor: colors.tint,
-										borderRadius: 40,
-										paddingVertical: 15,
-										paddingHorizontal: 20,
-									}}
+							</PickImage>
+							<Show>
+								<Show.When
+									isTrue={
+										watch("image") !== undefined ||
+										userData?.vehicleLicense !== undefined
+									}
 								>
-									<File />
-									<Typography type="text16" sx={{ color: colors.black }}>
-										My license (back)
-									</Typography>
-								</View>
-							</View>
+									<FilePreview
+										handelDelete={() => {
+											setValue("image", undefined);
+										}}
+										handelPreview={() => {}}
+										type="Driver's licence"
+									/>
+								</Show.When>
+							</Show>
 						</View>
 					</InnerWrapper>
 				</KeyboardView>
@@ -124,6 +200,23 @@ const styles = StyleSheet.create({
 	inputContain: {
 		gap: 20,
 		flex: 1,
+	},
+	image_wrap: {
+		gap: 15,
+	},
+	image_placeholder: {
+		alignItems: "center",
+		justifyContent: "center",
+		borderWidth: 1,
+		borderColor: colors.yellow,
+		borderRadius: 30,
+		paddingVertical: "5%",
+		gap: 10,
+		backgroundColor: colors.tint,
+		...Platform.select({
+			ios: {},
+			android: {},
+		}),
 	},
 	buttonCont: {
 		alignItems: "center",

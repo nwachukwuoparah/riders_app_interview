@@ -5,10 +5,42 @@ import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { QueryFilters, useMutation, useQueryClient } from "@tanstack/react-query";
+import { bankDetailsSchems } from "../../utilities/schema";
+import { bankDetailsType } from "../../types";
+import { updateUser } from "../../helpers/mutate";
+import LoadingComponent from "../../components/loading";
 
-export default function Payment({ navigation }: any) {
+export default function BankInfo({ navigation }: any) {
+	const queryClient = useQueryClient();
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<bankDetailsType | any>({
+		resolver: yupResolver(bankDetailsSchems),
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			navigation.navigate("bankDetails");
+			queryClient.invalidateQueries("get-profile" as QueryFilters);
+		},
+		onError: (err) => {
+			console.error(JSON.stringify(err, null, 2));
+		},
+	});
+
+	const onSubmit = (data: bankDetailsType) => {
+		mutate(data);
+	};
+
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<View style={styles.title}>
 					<CustButton
@@ -20,32 +52,34 @@ export default function Payment({ navigation }: any) {
 				</View>
 				<View style={{ ...styles.inputContain }}>
 					<InputComponent
-						label="Select bank"
-						type="dropdown"
-						onChange={() => {}}
-						data={[
-							{ label: "Car", value: "Car" },
-							{ label: "Car", value: "Car" },
-							{ label: "Car", value: "Car" },
-						]}
-						placeholder="Select bank"
-					/>
-					<InputComponent
-						label="Your account number"
+						label="Bank name"
 						type="text"
-						onChange={() => {}}
+						placeholder="Bank name"
+						name="bankName"
+						control={control}
+						errors={errors}
+					/>
+
+					<InputComponent
+						label="Account number"
+						type="text"
 						placeholder="Enter here"
+						name="accountName"
+						control={control}
+						errors={errors}
 					/>
 					<InputComponent
 						label="Sort code"
 						type="text"
-						onChange={() => {}}
 						placeholder="Enter here"
+						name="sortCode"
+						control={control}
+						errors={errors}
 					/>
 				</View>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>
-				<CustButton type="rounded" onPress={() => navigation.navigate("paymentDetails")}>
+				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Save payment details
 					</Typography>

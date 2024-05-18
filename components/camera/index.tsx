@@ -5,28 +5,24 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../../constant/theme";
 
-export default function Camera_() {
+export default function Camera_({
+	capture,
+}: {
+	capture: (image: object) => void;
+}) {
 	const [type, setType] = useState(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
 	const cameraRef = useRef<Camera | null>(null);
-	const [photoUri, setPhotoUri] = useState<string | null>(null);
 
 	useEffect(() => {
-		askPermission(); // Call askPermission once the component mounts
-	}, []); // Empty dependency array means this effect runs only once, on mount
-
-	useEffect(() => {
-		console.log(photoUri);
-	}, [photoUri]);
-
-	const askPermission = () => {
-		if (!permission?.granted && !permission) {
-			requestPermission();
-		}
-	};
+		(() => {
+			if (!permission?.granted && !permission) {
+				requestPermission();
+			}
+		})();
+	}, []);
 
 	function toggleCameraType() {
-		console.log("call");
 		setType((current) =>
 			current === CameraType.back ? CameraType.front : CameraType.back
 		);
@@ -36,14 +32,21 @@ export default function Camera_() {
 		if (cameraRef.current) {
 			try {
 				const { uri } = await cameraRef.current.takePictureAsync();
-				setPhotoUri(uri);
-				console.log(uri);
+				// console.log(uri);
+				let name = uri.split("/").pop() as string;
+				let match = /\.(\w+)$/.exec(name);
+				let type = match ? `image/${match[1]}` : "image";
+				capture({ uri, name, type });
+				// console.log({ uri, name, type });
 			} catch (error) {
 				console.error("Error taking picture:", error);
 			}
 		}
 	};
 
+	useEffect(() => {
+		console.log(type);
+	}, [type])
 	return (
 		<View style={styles.container}>
 			<Camera style={styles.camera} type={type} ref={cameraRef}>
@@ -74,10 +77,11 @@ export default function Camera_() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
+		justifyContent: "center"
 	},
 	camera: {
 		flex: 1,
+		borderRadius:400,
 		alignItems: "center",
 		justifyContent: "flex-end",
 	},

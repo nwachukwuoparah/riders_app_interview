@@ -19,7 +19,6 @@ export type textType = {
 export interface textInputPropType {
 	type?: "text" | "hidden";
 	label?: string;
-	children?: React.ReactNode;
 	wrapperStyle?: StyleProp<ViewStyle>;
 	style?: StyleProp<TextStyle>;
 	placeholder?: string;
@@ -28,6 +27,7 @@ export interface textInputPropType {
 	defaultValue?: string;
 	hidden?: boolean;
 	multiLine?: boolean;
+	autoFocus?: boolean;
 	ref?: Ref<TextInput> | undefined;
 	keyboardType?: KeyboardTypeOptions;
 	control: any;
@@ -40,12 +40,14 @@ export interface textInputMethodType {
 }
 
 export interface dateInputPropType {
-	onChange: (value: Date | undefined) => void;
 	label: string;
-	placeholder?: string;
+	defaultValue?: string;
 	mode: "date" | "time";
 	wrapperStyle?: StyleProp<ViewStyle>;
 	style?: StyleProp<TextStyle>;
+	control: any;
+	errors: UseFormStateReturn<any>["errors"];
+	name: string;
 }
 
 export interface CustCheckBoxProps {
@@ -127,7 +129,7 @@ export interface signUpTypes {
 	firstName: string;
 	lastName: string;
 	email: string;
-	phone: number;
+	phone: string;
 	password: string;
 }
 
@@ -136,24 +138,61 @@ export interface logInTypes {
 	password: string;
 }
 
+export interface updateUserTypes {
+	firstName: string;
+	lastName: string;
+	email: string;
+	phone: string;
+	dateOfBirth: string;
+}
+
 export interface vehicleTypes {
-	plateNumber: number;
+	plateNumber: string;
 	vehicleType: string;
 	vehicleBrand: string;
-	image: { uri: string; name: string; type: string };
+	image: any;
 }
 
 export interface addressTypes {
-	currentAddress: number;
-	// postCode: number;
-	plateNumber: number;
-	image: { uri: string; name: string; type: string };
+	currentAddress: string;
+	addressDocType: string;
+	image: any;
 }
 
 export interface guarantorTypes {
 	guarantorName: string;
-	guarantorPhone: number;
+	guarantorPhone: string;
 	nextOfKin: string;
-	kinPhone: number;
+	kinPhone: string;
 	kinRelationship: string;
+}
+
+export interface captureTypes {
+	image: object;
+}
+
+export interface filePreviewType {
+	type?: string;
+	handelPreview: () => void;
+	handelDelete: () => void;
+}
+
+export interface periodDataType {
+	[key: string]: boolean;
+}
+
+export interface workingShiftType {
+	morning: periodDataType;
+	evening: periodDataType;
+}
+
+export interface bankDetailsType {}
+
+export interface changePasswordType {
+	oldPassword: string;
+	newPassword: string;
+}
+
+export interface changePasswordWithConfirmType extends changePasswordType {
+	confirmPassword: string;
 }

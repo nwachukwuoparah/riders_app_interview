@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -12,9 +12,29 @@ import User from "../../assets/svg/user.svg";
 import ProfileCard from "../../components/profile";
 import { openBrowserAsync } from "expo-web-browser";
 import { CommonActions } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "../../helpers/query";
+import LoadingComponent from "../../components/loading";
+import { UserContext } from "../../components/contex/userContex";
+import Rating from "../../components/rating";
 
 export default function Profile({ navigation }: any) {
-	const onRefresh = () => {};
+	const { userData, setUser_Data } = useContext(UserContext);
+
+	const { data, isFetching, error } = useQuery({
+		queryKey: ["get-profile"],
+		queryFn: getProfile,
+		staleTime: 600000,
+	});
+
+	useEffect(() => {
+		if (data) {
+			setUser_Data(data?.data?.data);
+		} else {
+			console.log(JSON.stringify(error, null, 2));
+		}
+	}, [data, error]);
+
 	const logOut = async () => {
 		navigation.dispatch(
 			CommonActions.reset({
@@ -30,8 +50,10 @@ export default function Profile({ navigation }: any) {
 			})
 		);
 	};
+
 	return (
 		<Container>
+			<LoadingComponent display={isFetching} />
 			<InnerWrapper sx={{ gap: 25 }}>
 				<View
 					style={{
@@ -52,8 +74,10 @@ export default function Profile({ navigation }: any) {
 				>
 					<View style={styles.user}>
 						<User />
-						<Typography type="text24">John Doe</Typography>
-						<Typography type="text16">0 rides done</Typography>
+						<Typography type="text24">{userData?.firstName}</Typography>
+						<Typography type="text16">
+							{userData?.totalRides} rides done
+						</Typography>
 					</View>
 					<View style={{ gap: 5 }}>
 						{[
@@ -70,7 +94,16 @@ export default function Profile({ navigation }: any) {
 							},
 							{ value: "My address", route: "address", type: "routh" },
 							{ value: "My guarantors", route: "guarantorForm", type: "routh" },
-							{ value: "Payment details", route: "payment", type: "routh" },
+							{
+								value: "Payment details",
+								route:
+									!userData?.bankName &&
+									!userData?.accountName &&
+									!userData?.sortCode
+										? "bankInfo"
+										: "bankDetails",
+								type: "routh",
+							},
 							{
 								value: "Password reset",
 								route: "changePassword",

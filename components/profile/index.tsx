@@ -11,10 +11,14 @@ export default function ProfileCard({
 	index = 0,
 	value,
 	onPress,
+	label,
+	check,
 }: {
 	type?: string;
 	index?: number | undefined;
 	value?: string;
+	label?: string;
+	check?: boolean;
 	onPress?: () => void;
 }) {
 	return (
@@ -31,6 +35,7 @@ export default function ProfileCard({
 						borderTopRightRadius: index < 1 ? 15 : 0,
 						borderTopLeftRadius: index < 1 ? 15 : 0,
 						padding: 10,
+						paddingVertical: 15,
 					}}
 				>
 					<View
@@ -84,6 +89,7 @@ export default function ProfileCard({
 						borderTopRightRadius: index < 1 ? 15 : 0,
 						borderTopLeftRadius: index < 1 ? 15 : 0,
 						padding: 10,
+						paddingVertical: 15,
 					}}
 				>
 					<View
@@ -108,14 +114,14 @@ export default function ProfileCard({
 									color: colors.white,
 								}}
 							>
-								{value}
+								{label}
 							</Typography>
 						</View>
 						<View
 							style={{
 								width: 45,
 								padding: 3,
-								backgroundColor: colors.tint,
+								backgroundColor: check ? colors.tint : colors.grey_b,
 								borderRadius: 20,
 								overflow: "hidden",
 							}}
@@ -123,8 +129,8 @@ export default function ProfileCard({
 							<View
 								style={{
 									padding: 10,
-									backgroundColor: colors.yellow,
-									alignSelf: "flex-start",
+									backgroundColor: check ? colors.yellow : colors.grey,
+									alignSelf: check ? "flex-end" : "flex-start",
 									borderRadius: 10,
 								}}
 							></View>

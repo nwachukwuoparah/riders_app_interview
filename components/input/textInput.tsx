@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
 import { textInputMethodType, textInputPropType } from "../../types";
-import { useRef, forwardRef, useImperativeHandle } from "react";
+import { useRef, forwardRef, useImperativeHandle, useState } from "react";
 import colors from "../../constant/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { font } from "../../utilities/loadFont";
@@ -10,7 +10,6 @@ import { Controller } from "react-hook-form";
 const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 	(
 		{
-			children,
 			editable,
 			style,
 			wrapperStyle,
@@ -24,10 +23,12 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 			control,
 			errors,
 			name,
+			autoFocus,
 		}: textInputPropType,
 		ref
 	) => {
 		const textInputRef = useRef<TextInput>(null);
+		const [active, setActive] = useState(false);
 
 		const clearTextInput = () => {
 			if (textInputRef.current) {
@@ -49,7 +50,7 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 				backgroundColor: colors.grey_a,
 				borderRadius: 30,
 				borderWidth: 1,
-				borderColor: !false ? colors.grey_a : colors.yellow,
+				borderColor: !active ? colors.grey_a : colors.yellow,
 				paddingHorizontal: "3%",
 				...(wrapperStyle as object),
 			},
@@ -69,32 +70,36 @@ const CustTextInput = forwardRef<textInputMethodType, textInputPropType>(
 			<View style={{ gap: 10 }}>
 				{label && <Typography type="text16">{label}</Typography>}
 				<View style={styles.inputWrapper}>
-					{children}
 					<Controller
 						control={control}
 						name={name}
 						render={({ field: { onChange, onBlur, value } }) => (
 							<TextInput
-							autoCapitalize="none"
+								autoCapitalize="none"
 								ref={textInputRef}
 								multiline={multiLine}
 								maxLength={maxLength}
-								onFocus={()=>{
-									
-								}}
+								onBlur={() => setActive(false)}
+								onFocus={() => setActive(true)}
+								autoFocus={autoFocus}
 								keyboardType={keyboardType}
 								defaultValue={defaultValue}
 								onChangeText={onChange}
 								value={value}
 								style={styles.textInput}
 								placeholder={placeholder}
-								placeholderTextColor={colors.white}
+								placeholderTextColor={colors.grey_b}
 								editable={editable}
 								secureTextEntry={hidden}
 							/>
 						)}
 					/>
 				</View>
+				{errors?.[name] && (
+					<Typography type="text14" sx={{ color: colors.red }}>
+						{errors?.[name]?.message}
+					</Typography>
+				)}
 			</View>
 		);
 	}

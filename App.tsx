@@ -13,10 +13,8 @@ import Splash from "./components/splashScreen";
 import { StatusBar, View } from "react-native";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import {
-	QueryClient,
-	QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import UserProvider from "./components/contex/userContex";
 
 const queryClient = new QueryClient();
 
@@ -48,9 +46,11 @@ export default function App() {
 					<Show.Else>
 						<GestureHandlerRootView style={{ flex: 1 }}>
 							<NavigationContainer>
-								<BottomSheetModalProvider>
-									<MainStack />
-								</BottomSheetModalProvider>
+								<UserProvider>
+									<BottomSheetModalProvider>
+										<MainStack />
+									</BottomSheetModalProvider>
+								</UserProvider>
 							</NavigationContainer>
 						</GestureHandlerRootView>
 					</Show.Else>

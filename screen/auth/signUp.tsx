@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -20,6 +20,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createUser } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
 import { cacheAuthData } from "../../utilities/storage";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signUpSchems } from "../../utilities/schema";
 
 export default function SignUp({ navigation }: any) {
 	const {
@@ -27,33 +29,30 @@ export default function SignUp({ navigation }: any) {
 		handleSubmit,
 		watch,
 		formState: { errors },
-	} = useForm<signUpTypes>();
-	// resolver: yupResolver(loginSchems),
+	} = useForm<signUpTypes | any>({
+		resolver: yupResolver(signUpSchems),
+	});
 
-	const { isPending, mutate } = useMutation({
+	const { isPending, mutate, error } = useMutation({
 		mutationFn: createUser,
 		onSuccess: async (data) => {
-			// await cacheAuthData("user-data", { token: data?.data?.data?.token });
-			console.log({ token: data?.data?.data?.token });
-			// cacheAuthData("step", 1);
-			// navigation.navigate("verifyVehicle");
+			await cacheAuthData("user-data", { token: data?.data?.data?.token });
+			cacheAuthData("step", 1);
+			navigation.navigate("verifyVehicle");
 		},
-		onError: (err) => {
-			let error = err;
-			console.error(error);
+		onError: (err: { msg: string; success: boolean }) => {
+			Alert.alert("Message", `${err?.msg}`);
 		},
 	});
 
 	const onSubmit = (data: signUpTypes) => {
 		mutate(data);
 	};
-	console.log(isPending);
-	
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
-				<LoadingComponent display={isPending} />
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<>
 						<View style={styles.title}>
@@ -84,6 +83,7 @@ export default function SignUp({ navigation }: any) {
 									control={control}
 									errors={errors}
 									name="firstName"
+									autoFocus={true}
 								/>
 								<InputComponent
 									label="Your last name "
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	inputContain: {
-		gap: 35,
+		gap: 20,
 		marginHorizontal: "5%",
 		marginBottom: 20,
 		width: wp("90%"),
