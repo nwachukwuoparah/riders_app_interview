@@ -10,8 +10,18 @@ import {
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { InputComponent } from "../components/input";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function WalletModal({ cancelRef, close, modalOpen }: any) {
+	const {
+		control,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<any>({
+		// resolver:yupResolver(signUpSchems),
+	});
 	return (
 		<BottomModal
 			bottomSheetModalRef={cancelRef}
@@ -20,72 +30,92 @@ export default function WalletModal({ cancelRef, close, modalOpen }: any) {
 			snapMin="25%"
 			snapMax="100%"
 		>
-				<InnerWrapper
-					sx={{
-						flex: 1,
+			<InnerWrapper
+				sx={{
+					flex: 1,
+					width: "100%",
+					paddingHorizontal: "5%",
+					gap: 10,
+					alignItems: "center",
+				}}
+			>
+				<View style={styles.top}>
+					<CustButton type="back" color={colors.white} onPress={close} />
+					<Typography type="text24" sx={{ color: colors.white }}>
+						Enter amount to withdraw
+					</Typography>
+				</View>
+				<View
+					style={{
+						flexDirection: "row",
 						width: "100%",
-						paddingHorizontal: "5%",
-						gap: 10,
-						alignItems: "center",
+						height: "8%",
+						borderRadius: 30,
+						overflow: "hidden",
+						borderWidth: 1,
+						borderColor: colors.yellow,
+						backgroundColor: colors.grey_a,
+						justifyContent: "space-between",
 					}}
 				>
-					<View style={styles.top}>
-						<CustButton type="back" color={colors.white} onPress={close} />
-						<Typography type="text24" sx={{ color: colors.white }}>
-							Enter amount to withdraw
-						</Typography>
-					</View>
 					<View
 						style={{
-							flexDirection: "row",
-							width: "100%",
-							height: "8%",
-							borderRadius: 30,
-							overflow: "hidden",
-							borderWidth: 1,
-							borderColor: colors.yellow,
-							backgroundColor: colors.grey_a,
-							justifyContent: "space-between",
+							width: "15%",
+							alignItems: "center",
+							justifyContent: "center",
+							backgroundColor: colors.grey,
 						}}
 					>
-						<View
-							style={{
-								width: "15%",
-								alignItems: "center",
-								justifyContent: "center",
-								backgroundColor: colors.grey,
-							}}
-						>
-							<Typography sx={{ color: colors.white }} type="text24">
-								£
-							</Typography>
-						</View>
-						<InputComponent
-							wrapperStyle={{
-								width: "85%",
-								height: "100%",
-								// paddingHorizontal: "10%",
-								borderRadius: 0,
-								borderBottomWidth: 0,
-							}}
-							style={{
-								textAlign: "center",
-								fontSize: hp("2.2%"),
-								top: 0,
-							}}
-							onChange={() => {}}
-							// control={control}
-							// name="amount"
-							type="text"
-							// placeholder="Enter amount"
-							// keyboardType="numeric"
-							// errors={errors}
-						/>
+						<Typography sx={{ color: colors.white }} type="text24">
+							£
+						</Typography>
 					</View>
-					<Typography sx={{ color: colors.white }} type="text14">
-						Wallet Balance: £1800
-					</Typography>
-				</InnerWrapper>
+					{/* <InputComponent
+						wrapperStyle={{
+							width: "85%",
+							height: "100%",
+							// paddingHorizontal: "10%",
+							borderRadius: 0,
+							borderBottomWidth: 0,
+						}}
+						style={{
+							// textAlign: "center",
+							// fontSize: hp("2.2%"),
+							top: 0,
+						}}
+						onChange={() => {}}
+						// control={control}
+						// name="amount"
+						// placeholder="Enter amount"
+						// keyboardType="numeric"
+						// errors={errors}
+					/> */}
+
+					<InputComponent
+						wrapperStyle={{
+							width: "85%",
+							height: "100%",
+							paddingHorizontal: "10%",
+							borderRadius: 0,
+							borderWidth: 0,
+						}}
+						style={{
+							textAlign: "center",
+							fontSize: hp("2.2%"),
+							top: 0,
+						}}
+						type="text"
+						placeholder="enter your first name"
+						control={control}
+						errors={errors}
+						name="firstName"
+						autoFocus={true}
+					/>
+				</View>
+				<Typography sx={{ color: colors.white }} type="text14">
+					Wallet Balance: £1800
+				</Typography>
+			</InnerWrapper>
 
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={() => {}}>
