@@ -19,9 +19,10 @@ import { signUpTypes } from "../../types";
 import { useMutation } from "@tanstack/react-query";
 import { createUser } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
-import { cacheAuthData } from "../../utilities/storage";
+import { cacheAuthData, clearAuthData } from "../../utilities/storage";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signUpSchems } from "../../utilities/schema";
+import { handleError } from "../../helpers";
 
 export default function SignUp({ navigation }: any) {
 	const {
@@ -36,16 +37,22 @@ export default function SignUp({ navigation }: any) {
 	const { isPending, mutate, error } = useMutation({
 		mutationFn: createUser,
 		onSuccess: async (data) => {
-			await cacheAuthData("user-data", { token: data?.data?.data?.token });
+			await cacheAuthData("user-data", {
+				token: data?.data?.data?.token,
+				status: false,
+			});
+			Alert.alert("Message", data?.data?.msg);
 			cacheAuthData("step", 1);
-			navigation.navigate("verifyVehicle");
+			navigation.navigate("verifyRider");
 		},
-		onError: (err: { msg: string; success: boolean }) => {
-			Alert.alert("Message", `${err?.msg}`);
+		onError: async (err: { msg: string; success: boolean }) => {
+			await clearAuthData("verify-email");
+			handleError(err);
 		},
 	});
 
-	const onSubmit = (data: signUpTypes) => {
+	const onSubmit = async (data: signUpTypes) => {
+		await cacheAuthData("verify-email", watch("email"));
 		mutate(data);
 	};
 
@@ -108,6 +115,22 @@ export default function SignUp({ navigation }: any) {
 									errors={errors}
 									name="email"
 								/>
+								{/* <InputComponent
+									label="Your email address"
+									type="text"
+									placeholder="enter your email"
+									control={control}
+									errors={errors}
+									name="email"
+								/> */}
+								<InputComponent
+									label="Date of birth"
+									type="date"
+									mode="date"
+									control={control}
+									errors={errors}
+									name="dateOfBirth"
+								/>
 								<InputComponent
 									label="Create your password"
 									type="hidden"
@@ -115,6 +138,7 @@ export default function SignUp({ navigation }: any) {
 									control={control}
 									errors={errors}
 									name="password"
+									watch={watch}
 								/>
 							</View>
 						</ScrollContainer>

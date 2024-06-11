@@ -25,6 +25,7 @@ import { workingHours } from "../../helpers/mutate";
 import { periodDataType, workingShiftType } from "../../types";
 import LoadingComponent from "../../components/loading";
 import { getWorkHours } from "../../helpers/query";
+import { handleError } from "../../helpers";
 
 const initialData = {
 	morning: {
@@ -84,7 +85,7 @@ export default function WorkingHours({ navigation }: any) {
 			setData({ morning, evening });
 		}
 		if (error) {
-			console.log(JSON.stringify(error, null, 2));
+			handleError(error, navigation);
 		}
 	}, [working_hours, error]);
 

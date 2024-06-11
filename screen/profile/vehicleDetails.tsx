@@ -67,10 +67,6 @@ export default function Vehicle_Details({ navigation }: any) {
 		mutate(formData);
 	};
 
-	useEffect(() => {
-		console.log(JSON.stringify(userData, null, 2));
-	}, [userData]);
-
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />

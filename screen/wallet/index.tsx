@@ -43,7 +43,7 @@ export default function Wallet({ navigation }: any) {
 							Track your earnings and rides here
 						</Typography>
 					</View>
-					<CustButton type="bell" color={colors.white} />
+					<CustButton type="bell" color={colors.white} onPress={() => navigation.navigate("notification")} />
 				</View>
 				<View style={styles.body}>
 					<TouchableOpacity
@@ -70,20 +70,7 @@ export default function Wallet({ navigation }: any) {
 					>
 						<Typography type="text16">Available</Typography>
 					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => {
-							setType("points");
-						}}
-						style={{
-							...styles.button,
-							borderBottomWidth: 1,
-							borderColor: type === "points" ? colors.yellow : colors.grey_b,
-						}}
-					>
-						<Typography type="text16">Points</Typography>
-					</TouchableOpacity>
 				</View>
-
 				<View
 					style={{
 						...styles.point_dash,

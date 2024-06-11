@@ -5,13 +5,33 @@ export const signUpSchems = yup.object().shape({
 	lastName: yup.string().required("Last name is required"),
 	phone: yup.string().required("Phone number is required"),
 	email: yup.string().email("Invalid email").required("Email is required"),
-	password: yup.string().required("Password is required"),
-	dateOfBirth: yup.string(),
+	password: yup
+		.string()
+		.required("Password is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+	dateOfBirth: yup.string().required("Date of birth is required"),
+});
+
+export const verifySchems = yup.object().shape({
+	otp: yup.string().required("Otp field is required"),
 });
 
 export const loginSchems = yup.object().shape({
 	email: yup.string().email("Invalid email").required("Email is required"),
-	password: yup.string().required("Password is required"),
+	password: yup
+		.string()
+		.required("Password is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+});
+
+export const forgetSchems = yup.object().shape({
+	email: yup.string().email("Invalid email").required("Email is required"),
 });
 
 export const vehicleSchems = yup.object().shape({
@@ -50,9 +70,45 @@ export const bankDetailsSchems = yup.object().shape({
 });
 
 export const changePasswordSchems = yup.object().shape({
-	oldPassword: yup.string().required("Password field is required"),
-	newPassword: yup.string().required("New password field is required"),
-	confirmPassword: yup.string().required("Confirm password field is required"),
+	oldPassword: yup
+		.string()
+		.required("Password field is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+	newPassword: yup
+		.string()
+		.required("New password field is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+	confirmPassword: yup
+		.string()
+		.required("Confirm password field is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+});
+
+export const resetPasswordSchems = yup.object().shape({
+	otp: yup.string().required("Otp field is required"),
+	newPassword: yup
+		.string()
+		.required("New password field is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
+	confirmPassword: yup
+		.string()
+		.required("Confirm password field is required")
+		.matches(
+			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+			"Should contain at least 8 characters, a number, upper case and special characters"
+		),
 });
 
 export const supportSchems = yup.object().shape({

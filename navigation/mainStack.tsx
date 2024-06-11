@@ -3,25 +3,34 @@ import AuthStack from "./authStack";
 import BottomTab from "./bottomNav";
 import UserStack from "./userStack";
 import { getCachedAuthData } from "../utilities/storage";
+import { useEffect } from "react";
 
 const RootStack = createStackNavigator();
 
-let userToken: null | String = null;
-let userStep: null | String = null;
+let userToken: null | String;
+let userStep: number | null;
+let userStatus: boolean = false;
 (async () => {
 	try {
-		const { token } = await getCachedAuthData("user-data");
+		const { status, token } = await getCachedAuthData("user-data");
 		const step = await getCachedAuthData("step");
 		userToken = token;
 		userStep = step;
+		userStatus = status;
+		console.log(token,status);
 	} catch (err) {
-		return (userToken = null);
+		userToken = null;
+		userStep = null;
 	}
 })();
+
 const MainStack = () => {
+
 	return (
 		<RootStack.Navigator
-			initialRouteName=	{!userStep && userToken === undefined ? "AuthStack" : "UserStack"}
+			initialRouteName={
+				!userStep && userStatus && userToken ? "UserStack" : "AuthStack"
+			}
 			screenOptions={{ headerShown: false }}
 		>
 			<RootStack.Screen name="AuthStack" component={AuthStack} />

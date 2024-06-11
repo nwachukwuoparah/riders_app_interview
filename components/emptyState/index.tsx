@@ -16,7 +16,7 @@ export default function EmptyState({
 	top,
 }: {
 	title: string;
-	message: string;
+	message?: string;
 	onRefresh: () => void;
 	top?: string;
 }) {

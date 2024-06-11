@@ -12,8 +12,8 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signUpTypes, updateUserTypes } from "../../types";
-import { signUpSchems, updateUserSchems } from "../../utilities/schema";
+import { updateUserTypes } from "../../types";
+import { updateUserSchems } from "../../utilities/schema";
 import {
 	QueryFilters,
 	useMutation,
@@ -22,14 +22,15 @@ import {
 import { updateProfile } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
+import { handleError } from "../../helpers";
 
 export default function Profile_Details({ navigation }: any) {
 	const { userData } = useContext(UserContext);
 	const queryClient = useQueryClient();
+
 	const {
 		control,
 		handleSubmit,
-		watch,
 		formState: { errors },
 	} = useForm<updateUserTypes | any>({
 		resolver: yupResolver(updateUserSchems),
@@ -45,10 +46,11 @@ export default function Profile_Details({ navigation }: any) {
 	const { isPending, mutate, error } = useMutation({
 		mutationFn: updateProfile,
 		onSuccess: async (data) => {
+			Alert.alert("Message", data?.data?.msg);
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
 		},
 		onError: (err: { msg: string; success: boolean }) => {
-			Alert.alert("Message", `${err?.msg}`);
+			handleError(err);
 		},
 	});
 

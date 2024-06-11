@@ -1,11 +1,5 @@
-import React, { useContext, useRef, useState } from "react";
-import {
-	Alert,
-	Platform,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import React, { useContext } from "react";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -15,7 +9,6 @@ import {
 } from "../../components/container";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { InputComponent } from "../../components/input";
 import { UserContext } from "../../components/contex/userContex";
 import { useForm } from "react-hook-form";
@@ -47,7 +40,7 @@ export default function Contact({ navigation }: any) {
 	});
 
 	const onSubmit = (data: any) => {
-		mutate({ ...data, email: userData?.email });
+		mutate({ ...data, email: userData?.email, userType: "Rider" });
 	};
 
 	return (

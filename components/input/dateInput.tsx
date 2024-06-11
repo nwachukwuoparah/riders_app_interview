@@ -49,7 +49,7 @@ const DatePicker = ({
 			marginVertical: "2%",
 			justifyContent: "space-between",
 			padding: "2%",
-			paddingHorizontal:"5%",
+			paddingHorizontal: "5%",
 			alignItems: "center",
 			borderRadius: 30,
 			borderWidth: 1,
@@ -66,7 +66,6 @@ const DatePicker = ({
 	return (
 		<View style={{ gap: 10 }}>
 			{label && <Typography type="text16">{label}</Typography>}
-
 			<Controller
 				control={control}
 				name={name}
@@ -92,7 +91,7 @@ const DatePicker = ({
 											onChange={(e, value) => {
 												if (e.type === "set") {
 													setdateVal(value);
-													field.onChange(value)
+													field.onChange(value);
 												}
 											}}
 										/>
@@ -117,14 +116,14 @@ const DatePicker = ({
 								<Typography
 									sx={{
 										position: "absolute",
-										left: "2%",
+										left: "6.5%",
 										zIndex: -1,
 										color: colors.grey_c,
 									}}
 									type="text16"
 								>
 									{defaultValue || dateVal
-										? moment(dateVal).format("dddd, Do MMM, YYYY")
+										? moment(defaultValue?defaultValue:dateVal).format("dddd, Do MMM, YYYY")
 										: "select date"}
 								</Typography>
 							</Show.When>
@@ -144,7 +143,7 @@ const DatePicker = ({
 								</Typography>
 							</Show.When>
 						</Show>
-
+						
 						<Show>
 							<Show.When isTrue={mode === "date"}>
 								<MaterialCommunityIcons
@@ -164,6 +163,11 @@ const DatePicker = ({
 					</TouchableOpacity>
 				)}
 			/>
+				{errors?.[name] && (
+					<Typography type="text14" sx={{ color: colors.red }}>
+						{errors?.[name]?.message}
+					</Typography>
+				)}
 		</View>
 	);
 };

@@ -28,3 +28,23 @@ export const getPointHistory = async (): Promise<any> => {
 		},
 	});
 };
+
+export const getOverview = async (): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.get(`${Api}/rider/overview?timeFrame=weekly`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const getOrders= async (data:any): Promise<any> => {
+	console.log(data?.queryKey?.[1]);
+	  
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.get(`${Api}/order${data?.queryKey?.[1]}`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};

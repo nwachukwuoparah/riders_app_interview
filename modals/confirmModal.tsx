@@ -32,12 +32,10 @@ export default function ConfirmModal({
 								Normal orders
 							</Typography>
 				<View style={{ width: "90%", gap: 15 }}>
-					<InputComponent
-						// label="Filter by date"
+					{/* <InputComponent
 						type="otp"
-						// mode="date"
 						// onChange={() => {}}
-					/>
+					/> */}
 					<CustButton
 						type="rounded"
 						onPress={cancelOrder}

@@ -9,46 +9,50 @@ import {
 import { Controller } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
-export const OtpInput = ({ control, errors }: otpProps) => {
+export const OtpInput = ({
+	control,
+	errors,
+	inputCount,
+	name,
+	label,
+}: otpProps) => {
 	const styles = StyleSheet.create({
 		otpComp: {
-			marginTop: "10%",
-			width: "80%",
 			justifyContent: "space-between",
 		},
-
 		otpText: {
 			borderWidth: 1,
-			borderColor: colors.yellow,
-			marginHorizontal: wp("1%"),
+			borderBottomWidth: 1,
+			height: hp("8%"),
+			width: hp("8%"),
 			borderRadius: 10,
-			backgroundColor: colors.white,
+			backgroundColor: colors.grey_a,
+			color:  colors.white,
 		},
 	});
 
 	return (
 		<View style={{ gap: 10 }}>
-			{/* <Controller
+			{label && <Typography type="text16" >{label}</Typography>}
+			<Controller
 				control={control}
-				name="otp"
-				render={({ field }) => ( */}
-			<OTPTextInput
-				inputCount={4}
-				containerStyle={styles.otpComp}
-				textInputStyle={styles.otpText}
-				offTintColor={colors.yellow}
-				// tintColor={colors.yellow}
-				// handleTextChange={(text) => {
-				// 	field.onChange(text);
-				// }}
+				name={name || "otp"}
+				render={({ field }) => (
+					<OTPTextInput
+						inputCount={inputCount || 4}
+						containerStyle={{ ...styles.otpComp }}
+						textInputStyle={styles.otpText}
+						offTintColor={
+							errors?.["otp"] || errors?.[name] ? colors.red : colors.grey
+						}
+						tintColor={colors.yellow}
+						handleTextChange={(text) => {
+							field.onChange(text);
+						}}
+						autoFocus={true}
+					/>
+				)}
 			/>
-			{/* )}
-			/> */}
-			{/* {errors?.["otp"] && (
-				<Typography type="text14" sx={{ color: colors.red }}>
-					{errors?.["otp"]?.message}
-				</Typography>
-			)} */}
 		</View>
 	);
 };

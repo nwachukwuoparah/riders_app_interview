@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -14,6 +14,7 @@ import { changePasswordWithConfirmType, changePasswordType } from "../../types";
 import LoadingComponent from "../../components/loading";
 
 export default function ChangePassword({ navigation }: any) {
+
 	const {
 		control,
 		handleSubmit,
@@ -28,7 +29,8 @@ export default function ChangePassword({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: changePassword,
 		onSuccess: async (data) => {
-			console.log(data?.data?.data);
+			console.log(data?.data);
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
 			console.error(JSON.stringify(err, null, 2));
@@ -74,6 +76,7 @@ export default function ChangePassword({ navigation }: any) {
 						control={control}
 						errors={errors}
 						placeholder="Old password"
+						watch={watch}
 					/>
 					<InputComponent
 						label="Enter new password"
@@ -82,6 +85,7 @@ export default function ChangePassword({ navigation }: any) {
 						control={control}
 						errors={errors}
 						placeholder="New password"
+						watch={watch}
 					/>
 					<InputComponent
 						label="Confirm new password"
@@ -90,6 +94,7 @@ export default function ChangePassword({ navigation }: any) {
 						control={control}
 						errors={errors}
 						placeholder="Confirm new password"
+						watch={watch}
 					/>
 				</View>
 			</InnerWrapper>

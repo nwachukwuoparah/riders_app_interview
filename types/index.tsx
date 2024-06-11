@@ -33,6 +33,7 @@ export interface textInputPropType {
 	control: any;
 	errors: UseFormStateReturn<any>["errors"];
 	name: string;
+	watch?: any;
 }
 
 export interface textInputMethodType {
@@ -41,12 +42,12 @@ export interface textInputMethodType {
 
 export interface dateInputPropType {
 	label: string;
-	defaultValue?: string;
+	defaultValue?: Date;
 	mode: "date" | "time";
 	wrapperStyle?: StyleProp<ViewStyle>;
 	style?: StyleProp<TextStyle>;
 	control: any;
-	errors: UseFormStateReturn<any>["errors"];
+	errors?: UseFormStateReturn<any>["errors"];
 	name: string;
 }
 
@@ -120,9 +121,10 @@ export interface otpProps {
 	style?: StyleProp<ViewStyle>;
 	label?: string;
 	defaultValue?: string;
-	countryCode?: any;
-	control?: any;
-	errors?: UseFormStateReturn<any>["errors"];
+	control: any;
+	errors: UseFormStateReturn<any>["errors"];
+	inputCount?: number;
+	name: string;
 }
 
 export interface signUpTypes {
@@ -133,9 +135,25 @@ export interface signUpTypes {
 	password: string;
 }
 
+export interface riderOtpType {
+	otp: string;
+}
+
+export interface verifyRiderType extends riderOtpType {
+	email: string;
+}
+
 export interface logInTypes {
 	email: string;
 	password: string;
+}
+
+export interface forgetTypes {
+	email: string;
+}
+
+export interface requestCardType {
+	item: any;
 }
 
 export interface updateUserTypes {
@@ -194,5 +212,20 @@ export interface changePasswordType {
 }
 
 export interface changePasswordWithConfirmType extends changePasswordType {
+	confirmPassword: string;
+}
+
+export interface resetPasswordType {
+	otp: string;
+	newPassword: string;
+	email: string;
+}
+
+interface resetPassword {
+	otp: string;
+	newPassword: string;
+}
+
+export interface resetPasswordWithConfirmType extends resetPassword {
 	confirmPassword: string;
 }

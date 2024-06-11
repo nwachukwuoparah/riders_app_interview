@@ -1,5 +1,11 @@
-import React, { useCallback, useEffect } from "react";
-import { Alert, Platform, StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import {
+	Alert,
+	Platform,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { InputComponent } from "../../components/input";
@@ -18,6 +24,7 @@ import { loginSchems } from "../../utilities/schema";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
+import { handleError } from "../../helpers";
 
 export default function Login({ navigation }: any) {
 	const {
@@ -32,18 +39,22 @@ export default function Login({ navigation }: any) {
 	useFocusEffect(
 		useCallback(() => {
 			(async () => {
-				await clearAuthData("step");
-				// console.log(await getCachedAuthData("user-data"));
-				// await cacheAuthData("user-data", { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyMDU1ZDhlMTczMDBkMWVlOGQ1NDgiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzE1NjAyNzgzLCJleHAiOjE3MTU2MDYzODN9.vwsKuo5lB6_EgNmhL8d-7Szmj8joLfQ7b39hDhTcMHA" });
+				// await clearAuthData("step");
 				try {
 					const step = await getCachedAuthData("step");
+					const reset_email = await getCachedAuthData("reset-email");
+					if (reset_email) {
+						navigation.navigate("resetPassword");
+					}
 					if (step === 1) {
-						navigation.navigate("verifyVehicle");
+						navigation.navigate("verifyRider");
 					} else if (step === 2) {
-						navigation.navigate("verifyAddress");
+						navigation.navigate("verifyVehicle");
 					} else if (step === 3) {
-						navigation.navigate("guarantorForm");
+						navigation.navigate("verifyAddress");
 					} else if (step === 4) {
+						navigation.navigate("guarantorForm");
+					} else if (step === 5) {
 						navigation.navigate("capture");
 					}
 				} catch (err) {
@@ -56,19 +67,19 @@ export default function Login({ navigation }: any) {
 	const { isPending, mutate, error } = useMutation({
 		mutationFn: login,
 		onSuccess: async (data) => {
-			// await cacheAuthData("user-data", { token: data?.data?.data?.token });
-			console.log({ token: data?.data?.data?.token });
-			// navigation.navigate("UserStack")
+			await cacheAuthData("user-data", {
+				token: data?.data?.data?.token,
+				status: true,
+			});
+			navigation.navigate("UserStack");
 		},
 		onError: (err: { msg: string; success: boolean }) => {
-			// Alert.alert("Message", `${err?.msg}`);
-			console.log(JSON.stringify(err, null, 2));
+			handleError(err);
 		},
 	});
 
 	const onSubmit = (data: logInTypes) => {
-		// mutate(data);
-			navigation.navigate("UserStack")
+		mutate(data);
 	};
 
 	return (
@@ -95,7 +106,22 @@ export default function Login({ navigation }: any) {
 						errors={errors}
 						name="password"
 						placeholder="password"
-						/>
+						watch={watch}
+					/>
+					<TouchableOpacity
+						onPress={() => navigation.navigate("forgotPassword")}
+						style={{ alignSelf: "flex-end" }}
+					>
+						<Typography type="text14" sx={{ color: colors.white }}>
+							Forgot password?{"  "}
+							<Typography
+								type="text14"
+								sx={{ color: "#B09000", textDecorationLine: "underline" }}
+							>
+								Click here
+							</Typography>
+						</Typography>
+					</TouchableOpacity>
 				</View>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>

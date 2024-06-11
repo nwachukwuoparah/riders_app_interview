@@ -1,22 +1,87 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BottomModal from "./index";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Typography from "../components/typography";
 import colors from "../constant/theme";
 import CustButton from "../components/button";
 import { InputComponent } from "../components/input";
 import { Ionicons } from "@expo/vector-icons";
+import { useForm } from "react-hook-form";
+import {
+	cacheAuthData,
+	clearAuthData,
+	getCachedAuthData,
+} from "../utilities/storage";
+import moment from "moment";
 
-export default function FilterModal({
-	cancelRef,
-	cancelOrder,
-	modalOpen,
-}: any) {
+export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
+	const filterRef = useRef({
+		status: false,
+		date: new Date(),
+	});
+	const [isFilterChanged, setIsFilterChanged] = useState(false);
+	const [status, setStatus] = useState<boolean>(false);
+	const [filter, setFilter] = useState<{ status: boolean; date: any }>({
+		status: false,
+		date: new Date(),
+	});
+
+	const {
+		control,
+		watch,
+		formState: { errors },
+	} = useForm<any>();
+
+	useEffect(() => {
+		(async () => {
+			setFilter((pre) => {
+				const date = moment(watch("date")).startOf("day");
+				return {
+					...pre,
+					date: date,
+				};
+			});
+		})();
+	}, [watch("date")]);
+
+	useEffect(() => {
+		(async () => {
+			const filterData = await getCachedAuthData("filter-data");
+			if (filterData !== undefined) {
+				setFilter(filterData);
+				setStatus(filter.status);
+				filterRef.current = filterData;
+			}
+		})();
+	}, []);
+
+	useEffect(() => {
+		(async () => {
+			setFilter((pre) => ({
+				...pre,
+				status: status,
+			}));
+		})();
+	}, [status]);
+
+	const onSubmit = async () => {
+		await cacheAuthData("filter-data", filter);
+		filterRef.current = filter;
+		closeFilter();
+	};
+
+	useEffect(() => {
+		(() => {
+			let result = JSON.stringify(filter) === JSON.stringify(filterRef.current);
+			setIsFilterChanged(!result);
+		})();
+	}, [filter]);
+
 	return (
 		<BottomModal
-			bottomSheetModalRef={cancelRef}
+			bottomSheetModalRef={filterRe}
 			open={modalOpen}
-			handleClose={cancelOrder}
+			handleClose={closeFilter}
 			snapMin="25%"
 			snapMax="45%"
 		>
@@ -24,28 +89,61 @@ export default function FilterModal({
 				<Typography type="text16" sx={{ color: colors.white }}>
 					Apply filters
 				</Typography>
-				<Typography type="text16" sx={{ color: colors.yellow }}>
-					Reset
-				</Typography>
+				<TouchableOpacity
+					onPress={() => {
+						clearAuthData("filter-data");
+						setFilter({
+							status: false,
+							date: new Date(),
+						});
+					}}
+				>
+					<Typography type="text16" sx={{ color: colors.yellow }}>
+						Reset
+					</Typography>
+				</TouchableOpacity>
 			</View>
 
 			<View style={styles.body}>
 				<View style={{ width: "90%", gap: 15 }}>
-					<Typography type="text16" sx={{ color: colors.white }}>
-						Apply filters
-					</Typography>
+					<TouchableOpacity onPress={onSubmit}>
+						<Typography type="text16" sx={{ color: colors.white }}>
+							Apply filters
+						</Typography>
+					</TouchableOpacity>
 					<View style={{ flexDirection: "row", gap: 20 }}>
-						<View style={styles.order}>
-							<Typography type="text16" sx={{ color: colors.white }}>
-								Scheduled orders
-							</Typography>
-							<Ionicons name="close-sharp" size={24} color={colors.white} />
-						</View>
-						<View style={styles.order}>
-							<Typography type="text16" sx={{ color: colors.white }}>
-								Normal orders
-							</Typography>
-						</View>
+						{[
+							{ label: "Scheduled orders", status: true },
+							{ label: "Normal orders", status: false },
+						].map((i, index) => (
+							<TouchableOpacity
+								key={index}
+								onPress={() => {
+									setStatus(i?.status);
+								}}
+							>
+								<View
+									style={{
+										...styles.order,
+										borderColor:
+											filter?.status === i?.status
+												? colors.yellow
+												: colors.grey_a,
+									}}
+								>
+									<Typography type="text16" sx={{ color: colors.white }}>
+										{i?.label}
+									</Typography>
+									{filter?.status === i?.status && (
+										<Ionicons
+											name="close-sharp"
+											size={24}
+											color={colors.white}
+										/>
+									)}
+								</View>
+							</TouchableOpacity>
+						))}
 					</View>
 				</View>
 				<View style={{ width: "90%", gap: 15 }}>
@@ -53,12 +151,14 @@ export default function FilterModal({
 						label="Filter by date"
 						type="date"
 						mode="date"
-						onChange={() => {}}
+						control={control}
+						name="date"
+						defaultValue={filter.date}
 					/>
 					<CustButton
+						onPress={onSubmit}
 						type="rounded"
-						onPress={cancelOrder}
-						sx={{ width: "100%" }}
+						sx={{ width: "100%", opacity: isFilterChanged ? 1 : 0.4 }}
 					>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Apply filters
@@ -90,7 +190,6 @@ const styles = StyleSheet.create({
 	},
 	order: {
 		borderWidth: 1,
-		borderColor: colors.yellow,
 		padding: 10,
 		borderRadius: 30,
 		flexDirection: "row",

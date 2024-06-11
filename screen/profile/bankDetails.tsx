@@ -17,10 +17,6 @@ export default function Bank_details({ navigation }: any) {
 		setConfirm(!confirm);
 	};
 
-	useEffect(() => {
-		console.log(userData);
-	}, [userData]);
-
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -35,7 +31,7 @@ export default function Bank_details({ navigation }: any) {
 						<CustButton
 							type="back"
 							sx={{ color: colors.white }}
-							onPress={() => navigation.goBack()}
+							// onPress={() => navigation.goBack()}
 						/>
 						<Typography type="text24">Payment details</Typography>
 					</View>

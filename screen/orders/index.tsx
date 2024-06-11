@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
@@ -15,36 +15,72 @@ import { Ionicons } from "@expo/vector-icons";
 import CancelModal from "../../modals/cancelModal";
 import FilterModal from "../../modals/filterModal";
 import ConfirmModal from "../../modals/confirmModal";
-
+import { useQuery } from "@tanstack/react-query";
+import { getOrders } from "../../helpers/query";
+import { getCachedAuthData } from "../../utilities/storage";
+import { handleError } from "../../helpers";
 
 export default function Order({ navigation }: any) {
 	const [type, setType] = useState("pending");
 	const [cancel, setCancel] = useState(false);
-	const [filter, setFilter] = useState(false);
+	const [displayFilter, setDisplayFilter] = useState(false);
 	const [confirm, setConfirm] = useState(false);
 	const cancelRef = useRef(null);
 	const filterRef = useRef(null);
 	const confirmRef = useRef(null);
-	
+	const [filter, setFilter] = useState(
+		`?schedule=false`
+	);
+	const { data, isFetching, error } = useQuery({
+		queryKey: ["get-order", filter],
+		queryFn: getOrders,
+		// staleTime: 600000,
+	});
+
 	const cancelOrder = () => {
 		setCancel(!cancel);
-		setFilter(filter);
+		setDisplayFilter(displayFilter);
 		setConfirm(false);
 	};
 	const toogleFilter = () => {
-		setFilter(!filter);
+		setDisplayFilter(!displayFilter);
 		setCancel(false);
 		setConfirm(false);
 	};
 	const toogleConfirm = () => {
 		setConfirm(!confirm);
-		setFilter(false);
+		setDisplayFilter(false);
 		setCancel(false);
 	};
 
+	useEffect(() => {
+		if (error) {
+			handleError(error);
+		}
+	}, [error]);
+
+	useEffect(() => {
+		(async () => {
+			if (!displayFilter) {
+				const data = await getCachedAuthData("filter-data");
+				if (data !== undefined && type === "pending") {
+					setFilter(`?schedule=${data?.status}&createdAt=${data?.date}`);
+				} else {
+					setFilter(
+						`?schedule=${data?.status}&createdAt=${data?.date}&riderStatus=${type}`
+					);
+				}
+			}
+		})();
+	}, [displayFilter, type]);
+
+	useEffect(() => {
+		console.log(data?.data?.data);
+	}, [data]);
+
 	return (
 		<Container>
-			<InnerWrapper sx={{ gap: 30,flex: 1  }}>
+			<InnerWrapper sx={{ gap: 30, flex: 1 }}>
 				<View
 					style={{
 						flexDirection: "row",
@@ -58,7 +94,11 @@ export default function Order({ navigation }: any) {
 							Track your earnings and rides here
 						</Typography>
 					</View>
-					<CustButton type="bell" color={colors.white} />
+					<CustButton
+						type="bell"
+						color={colors.white}
+						onPress={() => navigation.navigate("notification")}
+					/>
 				</View>
 				<View style={styles.body}>
 					<TouchableOpacity
@@ -114,16 +154,36 @@ export default function Order({ navigation }: any) {
 						Filter orders
 					</Typography>
 				</CustButton>
-				<Show>
-					<Show.When isTrue={true}>
+				<FlatList
+					showsVerticalScrollIndicator={false}
+					style={{
+						// flex: 1,
+						width: "100%",
+					}}
+					contentContainerStyle={{
+						gap: 30,
+						paddingTop: "2%",
+						paddingBottom: "15%",
+					}}
+					data={data?.data?.data}
+					renderItem={({ item }: any) => (
 						<Ordercard
 							onPress={() => navigation.navigate("orderDetails")}
 							type={type}
 							cancel={cancelOrder}
 							confirm={toogleConfirm}
 						/>
-					</Show.When>
-					<Show.Else>
+					)}
+					// keyExtractor={(item) => item?._id}
+					// refreshControl={
+					// 	<RefreshControl
+					// 		refreshing={isFetching}
+					// 		onRefresh={onRefresh}
+					// 		colors={[appColors.yellow]}
+					// 		tintColor={appColors.yellow}
+					// 	/>
+					// // }
+					ListEmptyComponent={() => (
 						<View
 							style={{
 								alignItems: "center",
@@ -138,8 +198,8 @@ export default function Order({ navigation }: any) {
 								trip requests
 							</Typography>
 						</View>
-					</Show.Else>
-				</Show>
+					)}
+				/>
 			</InnerWrapper>
 			<CancelModal
 				cancelRef={cancelRef}
@@ -147,9 +207,9 @@ export default function Order({ navigation }: any) {
 				modalOpen={cancel}
 			/>
 			<FilterModal
-				cancelRef={filterRef}
-				cancelOrder={toogleFilter}
-				modalOpen={filter}
+				filterRe={filterRef}
+				closeFilter={toogleFilter}
+				modalOpen={displayFilter}
 			/>
 			<ConfirmModal
 				cancelRef={confirmRef}

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -16,9 +16,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { guarantorTypes } from "../../types";
 import { garantorsSchems } from "../../utilities/schema";
 import { updateUser } from "../../helpers/mutate";
-import { QueryFilters, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	QueryFilters,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
+import { handleError } from "../../helpers";
 
 export default function Guarantors({ navigation }: any) {
 	const { userData } = useContext(UserContext);
@@ -42,10 +47,11 @@ export default function Guarantors({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
+			Alert.alert("Message", data?.data?.msg);
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
 		},
 		onError: (err) => {
-			console.error(err);
+			handleError(err);
 		},
 	});
 
@@ -122,9 +128,10 @@ export default function Guarantors({ navigation }: any) {
 								control={control}
 								errors={errors}
 								data={[
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
+									{ label: "Brother", value: "Brother" },
+									{ label: "Siater", value: "Siater" },
+									{ label: "Mom", value: "Mom" },
+									{ label: "Dad", value: "Dad" },
 								]}
 								placeholder="Select relationship"
 								defualtValue={userData?.kinRelationship}

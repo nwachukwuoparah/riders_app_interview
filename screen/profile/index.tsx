@@ -17,23 +17,14 @@ import { getProfile } from "../../helpers/query";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
 import Rating from "../../components/rating";
+import {
+	cacheAuthData,
+	clearAuthData,
+	getCachedAuthData,
+} from "../../utilities/storage";
 
 export default function Profile({ navigation }: any) {
-	const { userData, setUser_Data } = useContext(UserContext);
-
-	const { data, isFetching, error } = useQuery({
-		queryKey: ["get-profile"],
-		queryFn: getProfile,
-		staleTime: 600000,
-	});
-
-	useEffect(() => {
-		if (data) {
-			setUser_Data(data?.data?.data);
-		} else {
-			console.log(JSON.stringify(error, null, 2));
-		}
-	}, [data, error]);
+	const { userData, isFetching } = useContext(UserContext);
 
 	const logOut = async () => {
 		navigation.dispatch(
@@ -50,7 +41,6 @@ export default function Profile({ navigation }: any) {
 			})
 		);
 	};
-
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />
@@ -66,7 +56,11 @@ export default function Profile({ navigation }: any) {
 						<Typography type="text24">My profile</Typography>
 						<Typography type="text16">Manage your account here</Typography>
 					</View>
-					<CustButton type="bell" color={colors.white} />
+					<CustButton
+						type="bell"
+						color={colors.white}
+						onPress={() => navigation.navigate("notification")}
+					/>
 				</View>
 				<ScrollContainer
 					sx={{ height: "100%" }}
@@ -123,10 +117,11 @@ export default function Profile({ navigation }: any) {
 						].map((i, index) => (
 							<TouchableOpacity
 								key={index}
-								onPress={() => {
+								onPress={async () => {
 									if (i?.type && i?.type === "routh") {
 										navigation.navigate(i?.route);
 									} else if (i?.type && i.type === "log-out") {
+										await clearAuthData("user-data");
 										logOut();
 									} else if (i?.type && i.type === "web") {
 										openBrowserAsync("https://afrilish.com/legalpage");

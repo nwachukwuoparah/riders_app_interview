@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import { Alert, StyleSheet, View } from "react-native";
 import colors from "../../constant/theme";
 import Typography from "../typography";
 import CustButton from "../button";
@@ -8,18 +8,58 @@ import { font } from "../../utilities/loadFont";
 import Clock from "../../assets/svg/clock.svg";
 import RequesIcon from "../../assets/svg/requesIcon.svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { requestCardType } from "../../types";
+import { handleError, truncateString } from "../../helpers";
+import {
+	QueryFilters,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { acceptOrder, updateUser } from "../../helpers/mutate";
 
-export default function RequestCard() {
+export default function RequestCard({ item }: requestCardType) {
+	const queryClient = useQueryClient();
+	useEffect(() => {
+		console.log(JSON.stringify(item, null, 2));
+	}, [item]);
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: acceptOrder,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-profile" as QueryFilters);
+			Alert.alert("Success", "Status updated successfuly");
+			userMutate({ status: "off-line" });
+		},
+		onError: (err: { msg: string; success: boolean }) => {
+			console.log(handleError(err));
+			console.log("call");
+		},
+	});
+
+	const { isPending: userUpdate, mutate: userMutate } = useMutation({
+		mutationFn: updateUser,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-profile" as QueryFilters);
+		},
+		onError: (err: { msg: string; success: boolean }) => {
+			console.log(JSON.stringify(err, null, 2));
+		},
+	});
+
+	const aceptOrder = () => {
+		mutate({ id: item._id });
+		console.log(item._id);
+	};
 	return (
 		<View style={styles.card}>
 			<View style={styles.card_top}>
-				<View style={{ marginLeft: 15 }}>
+				<View style={{ marginLeft: 15, gap: 10 }}>
 					<Typography type="text16" sx={{ color: colors.white_1 }}>
-						{true ? "Normal delivery" : "Schedule delivery"}
+						{!item?.schedule ? "Normal delivery" : "Schedule delivery"}
 					</Typography>
 					<View style={styles.price_tag}>
 						<Typography type="text24" sx={{ color: colors.white_1 }}>
-							£10
+							{`£ ${item?.ridersFee}`}
 						</Typography>
 					</View>
 				</View>
@@ -34,7 +74,7 @@ export default function RequestCard() {
 				</View>
 			</View>
 			<Show>
-				<Show.When isTrue={true}>
+				<Show.When isTrue={item?.schedule}>
 					<View
 						style={{
 							flexDirection: "row",
@@ -65,7 +105,7 @@ export default function RequestCard() {
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										29th street, nothingham
+										{`${truncateString(item?.deliveryAddress)}`}
 									</Typography>
 								</View>
 							</View>
@@ -96,7 +136,7 @@ export default function RequestCard() {
 											alignSelf: "flex-start",
 										}}
 									>
-										From
+										To
 									</Typography>
 									<Typography
 										type="text14"
@@ -135,8 +175,8 @@ export default function RequestCard() {
 										justifyContent: "space-between",
 									}}
 								>
-									{[1, 2, 3]?.map((i) => (
-										<View style={{ flexDirection: "row", gap: 5 }}>
+									{[1, 2, 3]?.map((i, index) => (
+										<View key={index} style={{ flexDirection: "row", gap: 5 }}>
 											<Clock />
 											<Typography
 												type="text14"
@@ -161,7 +201,7 @@ export default function RequestCard() {
 					>
 						<RequesIcon />
 						<View style={styles.single_order}>
-							<View style={{ gap: 15 }}>
+							<View style={{ gap: 10, width: "100%" }}>
 								<View style={styles.single_order_banner}>
 									<Typography type="text14" sx={{ color: colors.white_1 }}>
 										From
@@ -171,26 +211,43 @@ export default function RequestCard() {
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										29th street, nothingham
+										{`${truncateString(
+											item?.["vendorDetails"]?.[0]?.address,
+											40
+										)}`}
 									</Typography>
 								</View>
 								<View style={styles.single_order_banner}>
 									<Typography type="text14" sx={{ color: colors.white_1 }}>
-										From
+										To
 									</Typography>
 									<Typography
 										type="text16"
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										29th street, nothingham
+										{`${truncateString(item?.deliveryAddress, 40)}`}
+									</Typography>
+								</View>
+								<View style={styles.single_order_banner}>
+									<Typography type="text14" sx={{ color: colors.white_1 }}>
+										Total distance
+									</Typography>
+									<Typography
+										type="text16"
+										fontfamily={font.DMSans_700Bold}
+										sx={{ color: colors.white_1 }}
+									>
+										{`${item?.totalDistance} km`}
 									</Typography>
 								</View>
 							</View>
-							<View
+							{/* <View
 								style={{
+									flexDirection: "row",
 									justifyContent: "space-between",
-									gap: 10,
+									// gap: 10,
+									width: "25%",
 								}}
 							>
 								<View style={styles.single_order_distance}>
@@ -219,13 +276,13 @@ export default function RequestCard() {
 									>
 										20km
 									</Typography>
-								</View>
-							</View>
+								</View> 
+							</View>*/}
 						</View>
 					</View>
 				</Show.Else>
 			</Show>
-			<CustButton type="rounded" sx={{ width: "100%" }}>
+			<CustButton type="rounded" sx={{ width: "100%" }} onPress={aceptOrder}>
 				<Typography type="text16" fontfamily={font.DMSans_700Bold}>
 					Accept order
 				</Typography>
@@ -263,8 +320,6 @@ const styles = StyleSheet.create({
 	single_order: {
 		gap: 10,
 		width: "95%",
-		flexDirection: "row",
-		justifyContent: "space-between",
 	},
 	single_order_banner: {
 		padding: 12,
