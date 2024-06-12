@@ -54,7 +54,7 @@ export default function Vehicle_Details({ navigation }: any) {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
 		},
 		onError: (err) => {
-			console.error(JSON.stringify(err,null,2));
+			console.error(JSON.stringify(err, null, 2));
 		},
 	});
 
@@ -70,40 +70,42 @@ export default function Vehicle_Details({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
-				<KeyboardView sx={{ gap: 50, flex: 1 }}>
-					<InnerWrapper sx={{ gap: 50, flex: 1 }}>
-						<View
-							style={{
-								flexDirection: "row",
-								alignItems: "center",
-								justifyContent: "space-between",
-							}}
-						>
-							<View style={styles.title}>
-								<CustButton
-									type="back"
-									sx={{ color: colors.white }}
-									onPress={() => navigation.goBack()}
-								/>
-								<Typography type="text24">My vehicle details</Typography>
-							</View>
-							<View style={{ width: "22%" }}>
-								<CustButton
-									sx={{
-										width: "100%",
-										backgroundColor: colors.white,
-										paddingVertical: 13,
-									}}
-									type="rounded"
-									onPress={handleSubmit(onSubmit)}
-								>
-									<Typography type="text16" sx={{ color: colors.black }}>
-										Edit
-									</Typography>
-								</CustButton>
-							</View>
+
+			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
+				<KeyboardView sx={{ gap: 30, flex: 1 }}>
+					<View
+						style={{
+							width: "100%",
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+						}}
+					>
+						<View style={styles.title}>
+							<CustButton
+								type="back"
+								sx={{ color: colors.white }}
+								onPress={() => navigation.goBack()}
+							/>
+							<Typography type="text24">My vehicle details</Typography>
 						</View>
+						<View style={{ width: "22%" }}>
+							<CustButton
+								sx={{
+									width: "100%",
+									backgroundColor: colors.white,
+									paddingVertical: 13,
+								}}
+								type="rounded"
+								onPress={handleSubmit(onSubmit)}
+							>
+								<Typography type="text16" sx={{ color: colors.black }}>
+									Edit
+								</Typography>
+							</CustButton>
+						</View>
+					</View>
+					<ScrollContainer innerStyles={{ paddingBottom: 20 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Select vehicle type"
@@ -181,9 +183,9 @@ export default function Vehicle_Details({ navigation }: any) {
 								</Show.When>
 							</Show>
 						</View>
-					</InnerWrapper>
+					</ScrollContainer>
 				</KeyboardView>
-			</ScrollContainer>
+			</InnerWrapper>
 		</Container>
 	);
 }

@@ -41,6 +41,10 @@ export default function Profile({ navigation }: any) {
 			})
 		);
 	};
+
+	useEffect(() => {
+		console.log(JSON.stringify(userData, null, 2));
+	}, []);
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />
@@ -72,6 +76,7 @@ export default function Profile({ navigation }: any) {
 						<Typography type="text16">
 							{userData?.totalRides} rides done
 						</Typography>
+						<Rating maxStars={5} defaultRating={4} />
 					</View>
 					<View style={{ gap: 5 }}>
 						{[

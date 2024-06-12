@@ -1,13 +1,22 @@
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
-import { Container, InnerWrapper } from "../../components/container";
+import {
+	Container,
+	InnerWrapper,
+	KeyboardView,
+	ScrollContainer,
+} from "../../components/container";
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { QueryFilters, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	QueryFilters,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { bankDetailsSchems } from "../../utilities/schema";
 import { bankDetailsType } from "../../types";
 import { updateUser } from "../../helpers/mutate";
@@ -41,42 +50,46 @@ export default function BankInfo({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
-				<View style={styles.title}>
-					<CustButton
-						type="back"
-						sx={{ color: colors.white }}
-						onPress={() => navigation.goBack()}
-					/>
-					<Typography type="text24">Set up payment details</Typography>
-				</View>
-				<View style={{ ...styles.inputContain }}>
-					<InputComponent
-						label="Bank name"
-						type="text"
-						placeholder="Bank name"
-						name="bankName"
-						control={control}
-						errors={errors}
-					/>
+			<InnerWrapper sx={{ flex: 1 }}>
+				<KeyboardView sx={{ gap: 30, flex: 1 }}>
+					<View style={styles.title}>
+						<CustButton
+							type="back"
+							sx={{ color: colors.white }}
+							onPress={() => navigation.goBack()}
+						/>
+						<Typography type="text24">Set up payment details</Typography>
+					</View>
+					<ScrollContainer>
+					<View style={{ ...styles.inputContain }}>
+						<InputComponent
+							label="Bank name"
+							type="text"
+							placeholder="Bank name"
+							name="bankName"
+							control={control}
+							errors={errors}
+						/>
 
-					<InputComponent
-						label="Account number"
-						type="text"
-						placeholder="Enter here"
-						name="accountName"
-						control={control}
-						errors={errors}
-					/>
-					<InputComponent
-						label="Sort code"
-						type="text"
-						placeholder="Enter here"
-						name="sortCode"
-						control={control}
-						errors={errors}
-					/>
-				</View>
+						<InputComponent
+							label="Account number"
+							type="text"
+							placeholder="Enter here"
+							name="accountName"
+							control={control}
+							errors={errors}
+						/>
+						<InputComponent
+							label="Sort code"
+							type="text"
+							placeholder="Enter here"
+							name="sortCode"
+							control={control}
+							errors={errors}
+						/>
+					</View>
+					</ScrollContainer>
+				</KeyboardView>
 			</InnerWrapper>
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
@@ -91,8 +104,8 @@ export default function BankInfo({ navigation }: any) {
 
 const styles = StyleSheet.create({
 	title: {
-		display: "flex",
 		gap: 5,
+		width:"100%"
 	},
 	inputContain: {
 		gap: 20,

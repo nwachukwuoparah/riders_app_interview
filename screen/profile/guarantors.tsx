@@ -62,40 +62,41 @@ export default function Guarantors({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<ScrollContainer innerStyles={{ paddingBottom: 170 }}>
-				<KeyboardView sx={{ gap: 50, flex: 1 }}>
-					<InnerWrapper sx={{ gap: 50, flex: 1 }}>
-						<View
-							style={{
-								flexDirection: "row",
-								alignItems: "center",
-								justifyContent: "space-between",
-							}}
-						>
-							<View style={styles.title}>
-								<CustButton
-									type="back"
-									sx={{ color: colors.white }}
-									onPress={() => navigation.goBack()}
-								/>
-								<Typography type="text24">My guarantors</Typography>
-							</View>
-							<View style={{ width: "22%" }}>
-								<CustButton
-									sx={{
-										width: "100%",
-										backgroundColor: colors.white,
-										paddingVertical: 13,
-									}}
-									type="rounded"
-									onPress={handleSubmit(onSubmit)}
-								>
-									<Typography type="text16" sx={{ color: colors.black }}>
-										Edit
-									</Typography>
-								</CustButton>
-							</View>
+			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
+				<KeyboardView sx={{ gap: 30, flex: 1 }}>
+					<View
+						style={{
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+							width:"100%"
+						}}
+					>
+						<View style={styles.title}>
+							<CustButton
+								type="back"
+								sx={{ color: colors.white }}
+								onPress={() => navigation.goBack()}
+							/>
+							<Typography type="text24">My guarantors</Typography>
 						</View>
+						<View style={{ width: "22%" }}>
+							<CustButton
+								sx={{
+									width: "100%",
+									backgroundColor: colors.white,
+									paddingVertical: 13,
+								}}
+								type="rounded"
+								onPress={handleSubmit(onSubmit)}
+							>
+								<Typography type="text16" sx={{ color: colors.black }}>
+									Edit
+								</Typography>
+							</CustButton>
+						</View>
+					</View>
+					<ScrollContainer innerStyles={{ paddingBottom:60 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Your guarantor’s full name"
@@ -145,9 +146,9 @@ export default function Guarantors({ navigation }: any) {
 								defaultValue={userData?.kinPhone}
 							/>
 						</View>
-					</InnerWrapper>
+					</ScrollContainer>
 				</KeyboardView>
-			</ScrollContainer>
+			</InnerWrapper>
 		</Container>
 	);
 }

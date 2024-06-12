@@ -62,39 +62,40 @@ export default function Profile_Details({ navigation }: any) {
 		<Container>
 			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ flex: 1, gap: 15 }}>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						justifyContent: "space-between",
-					}}
-				>
-					<View style={styles.title}>
-						<CustButton
-							type="back"
-							sx={{ color: colors.white }}
-							onPress={() => navigation.goBack()}
-						/>
-						<Typography type="text24">My account details</Typography>
+				<KeyboardView sx={{ gap: 30, flex: 1 }}>
+					<View
+						style={{
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+							width:"100%",
+						}}
+					>
+						<View style={styles.title}>
+							<CustButton
+								type="back"
+								sx={{ color: colors.white }}
+								onPress={() => navigation.goBack()}
+							/>
+							<Typography type="text24">My account details</Typography>
+						</View>
+						<View style={{ width: "22%" }}>
+							<CustButton
+								sx={{
+									width: "100%",
+									backgroundColor: colors.white,
+									paddingVertical: 13,
+								}}
+								type="rounded"
+								onPress={handleSubmit(onSubmit)}
+							>
+								<Typography type="text16" sx={{ color: colors.black }}>
+									Edit
+								</Typography>
+							</CustButton>
+						</View>
 					</View>
-					<View style={{ width: "22%" }}>
-						<CustButton
-							sx={{
-								width: "100%",
-								backgroundColor: colors.white,
-								paddingVertical: 13,
-							}}
-							type="rounded"
-							onPress={handleSubmit(onSubmit)}
-						>
-							<Typography type="text16" sx={{ color: colors.black }}>
-								Edit
-							</Typography>
-						</CustButton>
-					</View>
-				</View>
-				<ScrollContainer innerStyles={{ paddingBottom: 100 }}>
-					<KeyboardView sx={{ gap: 50, flex: 1 }}>
+					<ScrollContainer innerStyles={{ paddingBottom: 50 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="First name"
@@ -138,8 +139,8 @@ export default function Profile_Details({ navigation }: any) {
 								defaultValue={userData?.dateOfBirth}
 							/>
 						</View>
-					</KeyboardView>
-				</ScrollContainer>
+					</ScrollContainer>
+				</KeyboardView>
 			</InnerWrapper>
 
 			<View style={styles.buttonCont}>
