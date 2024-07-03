@@ -1,10 +1,11 @@
 import axios from "axios";
 import { getCachedAuthData } from "../utilities/storage";
-const Api = "https://afrilish-version-2-0.onrender.com/api/v1";
+import {EXPO_PUBLIC_API } from "@env"
+
 
 export const getProfile = async (): Promise<any> => {
-	const { token } = await getCachedAuthData("user-data");
-	return await axios.get(`${Api}/rider/me`, {
+	const { token } = await getCachedAuthData("user-data");;
+	return await axios.get(`${EXPO_PUBLIC_API}/rider/me`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -13,7 +14,7 @@ export const getProfile = async (): Promise<any> => {
 
 export const getWorkHours = async (): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-	return await axios.get(`${Api}/working-hours`, {
+	return await axios.get(`${EXPO_PUBLIC_API}/working-hours`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -22,7 +23,7 @@ export const getWorkHours = async (): Promise<any> => {
 
 export const getPointHistory = async (): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-	return await axios.get(`${Api}/referral-point`, {
+	return await axios.get(`${EXPO_PUBLIC_API}/referral-point`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -31,18 +32,38 @@ export const getPointHistory = async (): Promise<any> => {
 
 export const getOverview = async (): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-	return await axios.get(`${Api}/rider/overview?timeFrame=weekly`, {
+	return await axios.get(`${EXPO_PUBLIC_API}/rider/overview?timeFrame=weekly`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
 	});
 };
 
-export const getOrders= async (data:any): Promise<any> => {
+export const getOrders = async (data: any): Promise<any> => {
 	console.log(data?.queryKey?.[1]);
-	  
+
 	const { token } = await getCachedAuthData("user-data");
-	return await axios.get(`${Api}/order${data?.queryKey?.[1]}`, {
+	console.log(token);
+
+	return await axios.get(`${EXPO_PUBLIC_API}/order${data?.queryKey?.[1]}`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const getWallet = async (): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.get(`${EXPO_PUBLIC_API}/rider/wallet`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const getTransactions = async (): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.get(`${EXPO_PUBLIC_API}/payout`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},

@@ -6,8 +6,9 @@ import {
 	Keyboard,
 	View,
 	Platform,
+	Pressable,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import colors from "../../constant/theme";
 import {
 	heightPercentageToDP as hp,
@@ -15,21 +16,23 @@ import {
 } from "react-native-responsive-screen";
 
 export const Container = ({ children, sx }: any) => {
+	const insets = useSafeAreaInsets();
 	const styles = StyleSheet.create({
 		container: {
 			width: wp("100%"),
 			flex: 1,
+			paddingTop: insets.top,
 			backgroundColor: colors.black_1,
 			alignItems: "center",
 		},
 	});
 
 	return (
-		<SafeAreaView style={{ ...styles.container, ...sx }}>
+		<View style={{ ...styles.container, ...sx }}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<>{children}</>
 			</TouchableWithoutFeedback>
-		</SafeAreaView>
+		</View>
 	);
 };
 
@@ -44,12 +47,10 @@ export const InnerWrapper = ({ children, sx }: any) => {
 	return <View style={{ ...styles.innerWrapper, ...sx }}>{children}</View>;
 };
 
-export const KeyboardView = ({ children, sx }: any) => {
+export const KeyboardView = ({ children, sx, style }: any) => {
 	const styles = StyleSheet.create({
 		wrapper: {
 			width: "100%",
-			// height: "100%",
-			alignItems: "center",
 		},
 	});
 
@@ -58,7 +59,12 @@ export const KeyboardView = ({ children, sx }: any) => {
 			style={{ ...styles.wrapper, ...sx }}
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
-			{children}
+			<Pressable
+				onPress={Keyboard.dismiss}
+				style={{ height: "100%", ...style }}
+			>
+				{children}
+			</Pressable>
 		</KeyboardAvoidingView>
 	);
 };

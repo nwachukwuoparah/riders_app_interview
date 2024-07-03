@@ -17,7 +17,6 @@ let userStatus: boolean = false;
 		userToken = token;
 		userStep = step;
 		userStatus = status;
-		console.log(token,status);
 	} catch (err) {
 		userToken = null;
 		userStep = null;

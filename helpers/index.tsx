@@ -83,7 +83,7 @@ export const checkPasswordStrength = async (
 	return Math.max(1, Math.min(5, checksPassed));
 };
 
-export const handleError = (err: any, navigation?: any, name?: string) => {
+export const handleError = (err: any, navigation?: any) => {
 	const axiosError = err as any;
 	if (axiosError?.response) {
 		if (
@@ -109,14 +109,13 @@ export const handleError = (err: any, navigation?: any, name?: string) => {
 			})();
 			return;
 		} else {
-			console.log(axiosError.response?.data);
-
+			console.log(axiosError.response?.data)
 			Alert.alert("Error", axiosError.response?.data?.message);
 			return axiosError.response?.data;
 		}
 	} else if (axiosError?.request) {
 		Alert.alert("Error", "Something went wrong try again.");
-		return { message: "Something went wrong try again." };
+		return { message: "Something went wrong try again!." };
 	} else {
 		return axiosError?.message;
 	}

@@ -7,7 +7,6 @@ import Show from "../show";
 import { font } from "../../utilities/loadFont";
 import Clock from "../../assets/svg/clock.svg";
 import RequesIcon from "../../assets/svg/requesIcon.svg";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { requestCardType } from "../../types";
 import { handleError, truncateString } from "../../helpers";
 import {
@@ -16,23 +15,19 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { acceptOrder, updateUser } from "../../helpers/mutate";
+import { Lottile } from "../lottile";
 
-export default function RequestCard({ item }: requestCardType) {
+export default function RequestCard({ item, navigate }: requestCardType) {
 	const queryClient = useQueryClient();
-	useEffect(() => {
-		console.log(JSON.stringify(item, null, 2));
-	}, [item]);
 
 	const { isPending, mutate } = useMutation({
 		mutationFn: acceptOrder,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Success", "Status updated successfuly");
 			userMutate({ status: "off-line" });
 		},
 		onError: (err: { msg: string; success: boolean }) => {
-			console.log(handleError(err));
-			console.log("call");
+			handleError(err);
 		},
 	});
 
@@ -40,6 +35,8 @@ export default function RequestCard({ item }: requestCardType) {
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
+			Alert.alert("Success", "Status updated successfuly");
+			navigate()
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			console.log(JSON.stringify(err, null, 2));
@@ -283,9 +280,13 @@ export default function RequestCard({ item }: requestCardType) {
 				</Show.Else>
 			</Show>
 			<CustButton type="rounded" sx={{ width: "100%" }} onPress={aceptOrder}>
-				<Typography type="text16" fontfamily={font.DMSans_700Bold}>
-					Accept order
-				</Typography>
+				{userUpdate || isPending ? (
+					<Lottile json={require("../../assets/lottile/imageFile.json")} />
+				) : (
+					<Typography type="text16" fontfamily={font.DMSans_700Bold}>
+						Accept order
+					</Typography>
+				)}
 			</CustButton>
 		</View>
 	);

@@ -42,7 +42,8 @@ export const vehicleSchems = yup.object().shape({
 });
 
 export const addressSchems = yup.object().shape({
-	currentAddress: yup.string().required("Current address is required"),
+	location: yup.string().required("City is required"),
+	postalCode: yup.string().required("Postal code is required"),
 	addressDocType: yup.string().required("Document type  is required"),
 	image: yup.mixed().required("Drivers liscense is required"),
 });
@@ -114,3 +115,7 @@ export const resetPasswordSchems = yup.object().shape({
 export const supportSchems = yup.object().shape({
 	message: yup.string().required("Message field is required"),
 });
+export const payOutSchems = yup.object().shape({
+	amount: yup.string().required("Amount field is required"),
+});
+

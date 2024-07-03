@@ -54,7 +54,8 @@ export default function VerifyAddress({ navigation }: any) {
 	const onSubmit = (data: addressTypes) => {
 		const formData = new FormData();
 		formData.append("image", data?.image as any);
-		formData.append("currentAddress", data?.currentAddress);
+		formData.append("location", data?.location);
+		formData.append("postalCode", data?.postalCode);
 		formData.append("addressDocType", data?.addressDocType);
 		mutate(formData);
 	};
@@ -64,7 +65,7 @@ export default function VerifyAddress({ navigation }: any) {
 			<Container>
 				<LoadingComponent display={isPending} />
 				<InnerWrapper sx={{ width: "100%", flex: 1 }}>
-					<KeyboardView sx={{ width: "100%", flex: 1 }}>
+					<KeyboardView sx={{ width: "100%", flex: 4.5 }}>
 						<View style={styles.title}>
 							<CustButton
 								type="back"
@@ -91,13 +92,21 @@ export default function VerifyAddress({ navigation }: any) {
 						</View>
 						<ScrollContainer>
 							<View style={{ ...styles.inputContain }}>
+							<InputComponent
+									label="Enter City"
+									type="text"
+									placeholder="Enter city"
+									control={control}
+									errors={errors}
+									name="location"
+								/>
 								<InputComponent
 									label="Enter post code"
 									type="text"
 									placeholder="Enter * digit"
 									control={control}
 									errors={errors}
-									name="currentAddress"
+									name="postalCode"
 								/>
 								<View style={styles.image_wrap}>
 									<InputComponent
@@ -205,6 +214,7 @@ const styles = StyleSheet.create({
 	},
 	// 4500-2001+2024
 	buttonCont: {
+		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: colors.black_1,

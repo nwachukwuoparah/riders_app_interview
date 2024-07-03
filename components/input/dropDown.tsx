@@ -65,7 +65,6 @@ const DropdownInput = ({
 			backgroundColor: colors.grey_a,
 			borderRadius: 20,
 			borderColor: colors.grey,
-			// top:5,
 			...(containerStyle as object),
 		},
 	});

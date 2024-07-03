@@ -1,9 +1,14 @@
 import React from "react";
 import BottomModal from "./index";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import Typography from "../components/typography";
 import colors from "../constant/theme";
-import { Container, InnerWrapper, KeyboardView } from "../components/container";
+import {
+	Container,
+	InnerWrapper,
+	KeyboardView,
+	ScrollContainer,
+} from "../components/container";
 import CustButton from "../components/button";
 import {
 	heightPercentageToDP as hp,
@@ -12,16 +17,50 @@ import {
 import { InputComponent } from "../components/input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { payOutSchems } from "../utilities/schema";
+import { requestPayout } from "../helpers/mutate";
+import {
+	QueryFilters,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { handleError } from "../helpers";
+import LoadingComponent from "../components/loading";
 
-export default function WalletModal({ cancelRef, close, modalOpen }: any) {
+export default function WalletModal({
+	cancelRef,
+	close,
+	modalOpen,
+	navigation,
+}: any) {
+	
+	const queryClient = useQueryClient();
 	const {
 		control,
 		handleSubmit,
 		watch,
 		formState: { errors },
 	} = useForm<any>({
-		// resolver:yupResolver(signUpSchems),
+		resolver: yupResolver(payOutSchems),
 	});
+
+	const { isPending, mutate, error } = useMutation({
+		mutationFn: requestPayout,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-wallet" as QueryFilters);
+			queryClient.invalidateQueries("get-transaction" as QueryFilters);
+			Alert.alert("Message", data?.data?.msg);
+			close();
+		},
+		onError: (err) => {
+			handleError(err, navigation);
+		},
+	});
+
+	const submit = (data: { amount: string; userType: string }) => {
+		mutate({ ...data, userType: "Rider" });
+	};
+
 	return (
 		<BottomModal
 			bottomSheetModalRef={cancelRef}
@@ -39,86 +78,75 @@ export default function WalletModal({ cancelRef, close, modalOpen }: any) {
 					alignItems: "center",
 				}}
 			>
-				<View style={styles.top}>
-					<CustButton type="back" color={colors.white} onPress={close} />
-					<Typography type="text24" sx={{ color: colors.white }}>
-						Enter amount to withdraw
-					</Typography>
-				</View>
-				<View
-					style={{
-						flexDirection: "row",
+				<ScrollContainer
+					innerStyles={{
+						flex: 1,
 						width: "100%",
-						height: "8%",
-						borderRadius: 30,
-						overflow: "hidden",
-						borderWidth: 1,
-						borderColor: colors.yellow,
-						backgroundColor: colors.grey_a,
-						justifyContent: "space-between",
+						gap: 10,
+						alignItems: "center",
 					}}
 				>
-					<View
-						style={{
-							width: "15%",
-							alignItems: "center",
-							justifyContent: "center",
-							backgroundColor: colors.grey,
-						}}
-					>
-						<Typography sx={{ color: colors.white }} type="text24">
-							£
+					<View style={styles.top}>
+						<CustButton type="back" color={colors.white} onPress={close} />
+						<Typography type="text24" sx={{ color: colors.white }}>
+							Enter amount to withdraw
 						</Typography>
 					</View>
-					{/* <InputComponent
-						wrapperStyle={{
-							width: "85%",
-							height: "100%",
-							// paddingHorizontal: "10%",
-							borderRadius: 0,
-							borderBottomWidth: 0,
-						}}
+					<View
 						style={{
-							// textAlign: "center",
-							// fontSize: hp("2.2%"),
-							top: 0,
+							flexDirection: "row",
+							width: "100%",
+							height: "8%",
+							borderRadius: 30,
+							overflow: "hidden",
+							borderWidth: 1,
+							borderColor: colors.yellow,
+							backgroundColor: colors.grey_a,
+							justifyContent: "space-between",
 						}}
-						onChange={() => {}}
-						// control={control}
-						// name="amount"
-						// placeholder="Enter amount"
-						// keyboardType="numeric"
-						// errors={errors}
-					/> */}
-
-					<InputComponent
-						wrapperStyle={{
-							width: "85%",
-							height: "100%",
-							paddingHorizontal: "10%",
-							borderRadius: 0,
-							borderWidth: 0,
-						}}
-						style={{
-							textAlign: "center",
-							fontSize: hp("2.2%"),
-							top: 0,
-						}}
-						type="text"
-						placeholder="enter your first name"
-						control={control}
-						errors={errors}
-						name="firstName"
-						autoFocus={true}
-					/>
-				</View>
-				<Typography sx={{ color: colors.white }} type="text14">
-					Wallet Balance: £1800
-				</Typography>
+					>
+						<View
+							style={{
+								width: "15%",
+								alignItems: "center",
+								justifyContent: "center",
+								backgroundColor: colors.grey,
+							}}
+						>
+							<Typography sx={{ color: colors.white }} type="text24">
+								£
+							</Typography>
+						</View>
+						<InputComponent
+							wrapperStyle={{
+								width: "85%",
+								height: "100%",
+								paddingHorizontal: "10%",
+								borderRadius: 0,
+								borderWidth: 0,
+							}}
+							style={{
+								textAlign: "center",
+								fontSize: hp("2.2%"),
+								top: 0,
+							}}
+							type="text"
+							placeholder="Enter amount"
+							control={control}
+							errors={errors}
+							name="amount"
+							autoFocus={true}
+							keyboardType="numeric"
+						/>
+					</View>
+					<Typography sx={{ color: colors.white }} type="text14">
+						Wallet Balance: £1800
+					</Typography>
+				</ScrollContainer>
 			</InnerWrapper>
 
 			<View style={styles.buttonCont}>
-				<CustButton type="rounded" onPress={() => {}}>
+				<CustButton type="rounded" onPress={handleSubmit(submit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
 						Withdraw
 					</Typography>
@@ -129,6 +157,7 @@ export default function WalletModal({ cancelRef, close, modalOpen }: any) {
 					</Typography>
 				</CustButton>
 			</View>
+			<LoadingComponent display={isPending} />
 		</BottomModal>
 	);
 }
@@ -137,7 +166,6 @@ const styles = StyleSheet.create({
 	top: {
 		width: "100%",
 		backgroundColor: colors.grey_a,
-		marginTop: 20,
 		gap: 5,
 	},
 	buttonCont: {

@@ -61,7 +61,7 @@ export default function Profile_Details({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<InnerWrapper sx={{ flex: 1, gap: 15 }}>
+			<InnerWrapper sx={{ flex: 6, gap: 15 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View
 						style={{
@@ -168,8 +168,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	buttonCont: {
-		width: "90%",
-		alignItems: "center",
-		justifyContent: "center",
+		flex:1,
+		width: "90%",paddingTop:"5%"
 	},
 });

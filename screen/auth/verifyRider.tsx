@@ -7,7 +7,11 @@ import {
 	View,
 } from "react-native";
 import CustButton from "../../components/button";
-import { Container, InnerWrapper } from "../../components/container";
+import {
+	Container,
+	InnerWrapper,
+	KeyboardView,
+} from "../../components/container";
 import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
@@ -25,11 +29,11 @@ import {
 } from "../../utilities/storage";
 import { font } from "../../utilities/loadFont";
 import Set_upModal from "../../modals/setupModal";
-import { handleError } from "../../helpers";
+import { handleError, truncateString } from "../../helpers";
 
 export default function VerifyRider({ navigation }: any) {
 	const [resend, setResend] = useState<number>(30);
-
+	const [email, setEmail] = useState<string>("");
 	const {
 		control,
 		handleSubmit,
@@ -61,7 +65,7 @@ export default function VerifyRider({ navigation }: any) {
 			},
 			onError: async (err: { msg: string; success: boolean }) => {
 				handleError(err);
-				setResend(30)
+				setResend(30);
 			},
 		});
 
@@ -71,6 +75,10 @@ export default function VerifyRider({ navigation }: any) {
 	};
 
 	useEffect(() => {
+		(async () => {
+			const email = await getCachedAuthData("verify-email");
+			setEmail(email);
+		})();
 		let interval = setInterval(() => {
 			setResend((prev: number) => (prev > 0 ? prev - 1 : 0));
 		}, 1000);
@@ -80,66 +88,68 @@ export default function VerifyRider({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending || resend_otp_pending} />
-			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
-				<View style={styles.title}>
-					<View style={{ gap: 5 }}>
-						<Typography type="text24">Enter verification code</Typography>
-						<Typography type="text16" fontfamily={font.DMSans_400Regular}>
-							A 4 digit code was sent to rider@gmail.com
-						</Typography>
-					</View>
-					<TouchableOpacity
-						onPress={async () => {
-							await clearAuthData("verify-email");
-							navigation.goBack();
-						}}
-					>
-						<Typography
-							type="text14"
-							sx={{ color: colors.tint, textDecorationLine: "underline" }}
+			<InnerWrapper sx={{ flex: 6 }}>
+				<KeyboardView sx={{ width: "100%" }} style={{ gap: 20 }}>
+					<View style={styles.title}>
+						<View style={{ gap: 5 }}>
+							<Typography type="text24">Enter verification code</Typography>
+							<Typography type="text16" fontfamily={font.DMSans_400Regular}>
+								A 4 digit code was sent to {truncateString(email, 16)}
+							</Typography>
+						</View>
+						<TouchableOpacity
+							onPress={async () => {
+								await clearAuthData("verify-email");
+								navigation.goBack();
+							}}
 						>
-							Change email address
-						</Typography>
-					</TouchableOpacity>
-				</View>
-				<View style={{ ...styles.inputContain }}>
-					<InputComponent
-						label="Enter OTP"
-						type="otp"
-						name="otp"
-						control={control}
-						errors={errors}
-					/>
-					<TouchableOpacity
-						onPress={async () => {
-							if (resend === 0) {
-								const email = await getCachedAuthData("verify-email");
-								resend_otp_mutate({email});
-							}
-						}}
-						style={{
-							alignItems: "center",
-							marginTop: "20%",
-							opacity: resend === 0 ? 1 : 0.6,
-						}}
-					>
-						<Typography
-							type="text14"
-							sx={{ color: colors.white, textAlign: "center", width: "80%" }}
-						>
-							Didn’t receive a link in your mail?{" "}
 							<Typography
 								type="text14"
-								sx={{ color: "#B09000", textDecorationLine: "underline" }}
+								sx={{ color: colors.tint, textDecorationLine: "underline" }}
 							>
-								Resend token
-							</Typography>{" "}
-							in {resend} s
-						</Typography>
-					</TouchableOpacity>
-				</View>
-			</InnerWrapper>
+								Change email address
+							</Typography>
+						</TouchableOpacity>
+					</View>
 
+					<View style={{ ...styles.inputContain }}>
+						<InputComponent
+							label="Enter OTP"
+							type="otp"
+							name="otp"
+							control={control}
+							errors={errors}
+						/>
+						<TouchableOpacity
+							onPress={async () => {
+								if (resend === 0) {
+									const email = await getCachedAuthData("verify-email");
+									resend_otp_mutate({ email });
+								}
+							}}
+							style={{
+								alignItems: "center",
+								marginTop: "20%",
+								opacity: resend === 0 ? 1 : 0.6,
+							}}
+						>
+							<Typography
+								type="text14"
+								sx={{ color: colors.white, textAlign: "center", width: "80%" }}
+							>
+								Didn’t receive a link in your mail?{" "}
+								<Typography
+									type="text14"
+									sx={{ color: "#B09000", textDecorationLine: "underline" }}
+								>
+									Resend token
+								</Typography>{" "}
+								in {resend} s
+							</Typography>
+						</TouchableOpacity>
+					</View>
+				</KeyboardView>
+			</InnerWrapper>
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
@@ -155,7 +165,7 @@ export default function VerifyRider({ navigation }: any) {
 const styles = StyleSheet.create({
 	title: {
 		display: "flex",
-		gap: 5,
+		gap: 20,
 	},
 	inputContain: {
 		gap: 20,
@@ -163,10 +173,10 @@ const styles = StyleSheet.create({
 	},
 	buttonCont: {
 		width: "100%",
+		flex: 1,
 		alignItems: "center",
-		justifyContent: "center",
 		backgroundColor: colors.black_1,
-		paddingTop: 15,
+		paddingTop: 25,
 		...Platform.select({
 			ios: {
 				shadowOpacity: 0.1,

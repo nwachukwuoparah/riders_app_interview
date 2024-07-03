@@ -12,15 +12,11 @@ import User from "../../assets/svg/user.svg";
 import ProfileCard from "../../components/profile";
 import { openBrowserAsync } from "expo-web-browser";
 import { CommonActions } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "../../helpers/query";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
 import Rating from "../../components/rating";
 import {
-	cacheAuthData,
-	clearAuthData,
-	getCachedAuthData,
+	clearAuthData
 } from "../../utilities/storage";
 
 export default function Profile({ navigation }: any) {
@@ -68,7 +64,7 @@ export default function Profile({ navigation }: any) {
 				</View>
 				<ScrollContainer
 					sx={{ height: "100%" }}
-					innerStyles={{ gap: 15, paddingBottom: "20%" }}
+					innerStyles={{ gap: 15, paddingBottom: "50%" }}
 				>
 					<View style={styles.user}>
 						<User />
@@ -76,7 +72,7 @@ export default function Profile({ navigation }: any) {
 						<Typography type="text16">
 							{userData?.totalRides} rides done
 						</Typography>
-						<Rating maxStars={5} defaultRating={4} />
+						<Rating maxStars={5} defaultRating={userData?.ratingAverage} />
 					</View>
 					<View style={{ gap: 5 }}>
 						{[

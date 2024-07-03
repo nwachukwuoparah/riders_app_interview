@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+	FlatList,
+	RefreshControl,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
@@ -9,7 +15,6 @@ import {
 	heightPercentageToDP as hp,
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import Show from "../../components/show";
 import Ordercard from "../../components/orderCard";
 import { Ionicons } from "@expo/vector-icons";
 import CancelModal from "../../modals/cancelModal";
@@ -19,28 +24,31 @@ import { useQuery } from "@tanstack/react-query";
 import { getOrders } from "../../helpers/query";
 import { getCachedAuthData } from "../../utilities/storage";
 import { handleError } from "../../helpers";
+import Show from "../../components/show";
 
 export default function Order({ navigation }: any) {
 	const [type, setType] = useState("pending");
 	const [cancel, setCancel] = useState(false);
 	const [displayFilter, setDisplayFilter] = useState(false);
 	const [confirm, setConfirm] = useState(false);
+	const [orderID, setOrderId] = useState<string>("");
 	const cancelRef = useRef(null);
 	const filterRef = useRef(null);
 	const confirmRef = useRef(null);
-	const [filter, setFilter] = useState(
-		`?schedule=false`
-	);
-	const { data, isFetching, error } = useQuery({
+	const [filter, setFilter] = useState(`?schedule=false`);
+
+	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-order", filter],
 		queryFn: getOrders,
 		// staleTime: 600000,
 	});
-
-	const cancelOrder = () => {
+	const cancelOrder = (id: string) => {
 		setCancel(!cancel);
 		setDisplayFilter(displayFilter);
 		setConfirm(false);
+		if (id) {
+			setOrderId(id);
+		}
 	};
 	const toogleFilter = () => {
 		setDisplayFilter(!displayFilter);
@@ -64,7 +72,7 @@ export default function Order({ navigation }: any) {
 			if (!displayFilter) {
 				const data = await getCachedAuthData("filter-data");
 				if (data !== undefined && type === "pending") {
-					setFilter(`?schedule=${data?.status}&createdAt=${data?.date}`);
+					setFilter(`?schedule=${data?.status}`); //&createdAt=${data?.date}
 				} else {
 					setFilter(
 						`?schedule=${data?.status}&createdAt=${data?.date}&riderStatus=${type}`
@@ -73,10 +81,6 @@ export default function Order({ navigation }: any) {
 			}
 		})();
 	}, [displayFilter, type]);
-
-	useEffect(() => {
-		console.log(data?.data?.data);
-	}, [data]);
 
 	return (
 		<Container>
@@ -115,15 +119,16 @@ export default function Order({ navigation }: any) {
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
-							setType("on-going");
+							setType("in-transit");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
-							borderColor: type === "on-going" ? colors.yellow : colors.grey_b,
+							borderColor:
+								type === "in-transit" ? colors.yellow : colors.grey_b,
 						}}
 					>
-						<Typography type="text16">Ongoing</Typography>
+						<Typography type="text16">In transit</Typography>
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
@@ -154,6 +159,7 @@ export default function Order({ navigation }: any) {
 						Filter orders
 					</Typography>
 				</CustButton>
+
 				<FlatList
 					showsVerticalScrollIndicator={false}
 					style={{
@@ -168,36 +174,45 @@ export default function Order({ navigation }: any) {
 					data={data?.data?.data}
 					renderItem={({ item }: any) => (
 						<Ordercard
-							onPress={() => navigation.navigate("orderDetails")}
+							onPress={() => navigation.navigate("orderDetails", item, type)}
 							type={type}
-							cancel={cancelOrder}
+							cancel={() => cancelOrder(item?._id)}
 							confirm={toogleConfirm}
+							item={item}
+							navigation={navigation}
 						/>
 					)}
-					// keyExtractor={(item) => item?._id}
-					// refreshControl={
-					// 	<RefreshControl
-					// 		refreshing={isFetching}
-					// 		onRefresh={onRefresh}
-					// 		colors={[appColors.yellow]}
-					// 		tintColor={appColors.yellow}
-					// 	/>
-					// // }
+					keyExtractor={(item) => item?._id}
+					refreshControl={
+						<RefreshControl
+							refreshing={isFetching}
+							onRefresh={refetch}
+							colors={[colors.yellow]}
+							tintColor={colors.yellow}
+						/>
+					}
 					ListEmptyComponent={() => (
-						<View
-							style={{
-								alignItems: "center",
-								alignSelf: "center",
-								justifyContent: "center",
-								marginTop: 30,
-							}}
-						>
-							<EmptyOrder width={wp("70%")} height={hp("35%")} />
-							<Typography type="text16" sx={{ textAlign: "center" }}>
-								You have no ongoing order at the moment, stay online to receive
-								trip requests
-							</Typography>
-						</View>
+						<Show>
+							<Show.When isTrue={isFetching}>
+								<></>
+							</Show.When>
+							<Show.Else>
+								<View
+									style={{
+										alignItems: "center",
+										alignSelf: "center",
+										justifyContent: "center",
+										marginTop: 30,
+									}}
+								>
+									<EmptyOrder width={wp("70%")} height={hp("35%")} />
+									<Typography type="text16" sx={{ textAlign: "center" }}>
+										You have no ongoing order at the moment, stay online to
+										receive trip requests
+									</Typography>
+								</View>
+							</Show.Else>
+						</Show>
 					)}
 				/>
 			</InnerWrapper>
@@ -205,6 +220,7 @@ export default function Order({ navigation }: any) {
 				cancelRef={cancelRef}
 				cancelOrder={cancelOrder}
 				modalOpen={cancel}
+				orderID={orderID}
 			/>
 			<FilterModal
 				filterRe={filterRef}

@@ -27,6 +27,7 @@ import LoadingComponent from "../../components/loading";
 import { handleError } from "../../helpers";
 
 export default function Login({ navigation }: any) {
+
 	const {
 		control,
 		handleSubmit,
@@ -41,6 +42,7 @@ export default function Login({ navigation }: any) {
 			(async () => {
 				// await clearAuthData("step");
 				try {
+
 					const step = await getCachedAuthData("step");
 					const reset_email = await getCachedAuthData("reset-email");
 					if (reset_email) {

@@ -63,7 +63,7 @@ export default function WorkingHours({ navigation }: any) {
 			queryClient.invalidateQueries("get-working-hours" as QueryFilters);
 		},
 		onError: (err) => {
-			console.error(JSON.stringify(err, null, 2));
+			handleError(error, navigation);
 		},
 	});
 
@@ -117,7 +117,7 @@ export default function WorkingHours({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending || isFetching} />
-			<InnerWrapper sx={{ gap: 20, flex: 1 }}>
+			<InnerWrapper sx={{ gap: 20, flex: 7 }}>
 				<View
 					style={{
 						flexDirection: "row",
@@ -224,8 +224,8 @@ const styles = StyleSheet.create({
 	},
 	buttonCont: {
 		width: "100%",
+		flex:1,
 		alignItems: "center",
-		justifyContent: "center",
 		backgroundColor: colors.black_1,
 		paddingTop: 15,
 		...Platform.select({

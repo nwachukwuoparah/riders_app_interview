@@ -30,15 +30,19 @@ const Rating = ({
 				const starValue = index + 1;
 				return (
 					<Show key={index}>
-						<Show.When isTrue={starValue <= rating}>
+						{/* <Show.When isTrue={defaultRating === 0}>
 							<Entypo
 								name="star"
 								size={25}
 								color={starValue <= rating ? colors.yellow : colors.grey}
 							/>
-						</Show.When>
+						</Show.When> */}
 						<Show.Else>
-							<Entypo name="star-outlined" size={25} color={colors.yellow} />
+							<Entypo
+								name="star-outlined"
+								size={25}
+								color={defaultRating === 0 ? colors.grey : colors.yellow}
+							/>
 						</Show.Else>
 					</Show>
 				);

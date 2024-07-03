@@ -1,10 +1,23 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+	useMemo,
+	useRef,
+} from "react";
+import {
+	PermissionsAndroid,
+	Platform,
+	StyleSheet,
+	Alert,
+	FlatList,
+	View,
+} from "react-native";
 import { Container } from "../../components/container";
 import Typography from "../../components/typography";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
 import colors, { darkModeStyle } from "../../constant/theme";
 import LocationIcon from "../../assets/svg/location.svg";
-import PinLocationIcon from "../../assets/svg/pin_location.svg";
 import CustButton from "../../components/button";
 import {
 	heightPercentageToDP as hp,
@@ -15,6 +28,7 @@ import { font } from "../../utilities/loadFont";
 import RequestCard from "../../components/requestCard";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
+import Geolocation from "react-native-geolocation-service";
 import io from "socket.io-client";
 import {
 	QueryFilters,
@@ -25,84 +39,145 @@ import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
 import { getCurrentLocation, handleError, truncateString } from "../../helpers";
 import { useFocusEffect } from "@react-navigation/native";
+import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
 
 const socket = io("https://afrilish-version-2-0.onrender.com", {
-	reconnectionAttempts: Infinity, // Unlimited reconnection attempts
-	reconnectionDelay: 2000, // Delay between reconnections in ms
+	reconnectionAttempts: Infinity,
+	reconnectionDelay: 2000,
 });
+
 const GOOGLE_MAPS_APIKEY = "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA";
 
-type LatLng = {
-	latitude: number;
-	longitude: number;
-};
+const Home = ({ navigation }: any) => {
+	const [destination, setDestination] = useState<any>();
+	const mapRef = useRef<MapView>(null);
+	const watchId = useRef<number | null>(null);
 
-const Home = () => {
-	// const [fromLatLng, setLatLng] = useState<LatLng>({
-	// 	latitude: 37.78825,
-	// 	longitude: -122.4324,
-	// });
-	// const toLatLng = {
-	// 	latitude: 6.5244, // Example latitude for "to" location (e.g., Lagos, Nigeria)
-	// 	longitude: 3.3792, // Example longitude for "to" location
-	// };
+	const [fromLatLng, setFromLatLng] = useState({
+		latitude: 5.475,
+		longitude: 7.025,
+	});
+	const [toLatLng, setToLatLng] = useState({
+		latitude: 5.485,
+		longitude: 7.035,
+	});
 
-	// useEffect(() => {
-	// 	(async () => {
-	// 		const location = await getCurrentLocation();
-	// 		if (location) {
-	// 			setLatLng({
-	// 				latitude: location?.coords?.latitude,
-	// 				longitude: location?.coords?.longitude,
-	// 			});
-	// 		}
-	// 	})();
-	// }, []);
+	useFocusEffect(
+		useCallback(() => {
+			const requestLocationPermission = async () => {
+				if (Platform.OS === "android") {
+					const granted = await PermissionsAndroid.request(
+						PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+					);
+					if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+						console.error("Location permission denied");
+						return;
+					}
+				}
+				startTracking();
+			};
+
+			const startTracking = () => {
+				watchId.current = Geolocation.watchPosition(
+					(position) => {
+						const { latitude, longitude } = position.coords;
+						setFromLatLng({ latitude, longitude });
+					},
+					(error) => {
+						console.error(error);
+					},
+					{
+						enableHighAccuracy: true,
+						distanceFilter: 0,
+						interval: 1000,
+						fastestInterval: 500,
+					}
+				);
+			};
+
+			requestLocationPermission();
+
+			return () => {
+				if (watchId.current !== null) {
+					Geolocation.clearWatch(watchId.current);
+				}
+			};
+			// (async () => {
+			// 	try {
+			// 		const destination = await getCachedAuthData("destination");
+			// 		setDestination(destination);
+			// 	} catch (error) {
+			// 		console.error("Error fetching cached data:", error);
+			// 	}
+			// })();
+		}, [])
+	);
+
+	const initialRegion = useMemo(
+		() => ({
+			latitude: 5.485,
+			longitude: 7.035,
+			latitudeDelta: 0.0922,
+			longitudeDelta: 0.0421,
+		}),
+		[]
+	);
 
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
 			<MapView
+				ref={mapRef}
 				provider="google"
 				style={styles.map}
 				customMapStyle={darkModeStyle}
-				initialRegion={{
-					latitude: 5.485,
-					longitude: 7.035,
-					latitudeDelta: 0.0922,
-					longitudeDelta: 0.0421,
-				}}
+				initialRegion={initialRegion}
 			>
-				{/* <Marker coordinate={fromLatLng}>
-					<PinLocationIcon width={50} />
-				</Marker>
-				<Marker coordinate={toLatLng}>
-					<PinLocationIcon width={50} />
-				</Marker> */}
-				{/* <MapViewDirections
-					origin={fromLatLng}
-					destination={toLatLng}
-					apikey={GOOGLE_MAPS_APIKEY}
-					strokeWidth={5}
-					strokeColor={colors.yellow_2}
-				/> */}
+				{fromLatLng && toLatLng && (
+					<>
+						<Marker coordinate={fromLatLng} />
+						<Marker coordinate={toLatLng} />
+						<MapViewDirections
+							// origin={destination?.from}
+							// destination={destination?.to}
+							origin={fromLatLng}
+							destination={toLatLng}
+							apikey={GOOGLE_MAPS_APIKEY}
+							strokeWidth={5}
+							strokeColor={colors.yellow_2}
+							onStart={(params) => {
+								console.log(
+									`Started routing between "${params.origin}" and "${params.destination}"`
+								);
+							}}
+							onReady={(result) => {
+								console.log(`Distance: ${result.distance} km`);
+								console.log(`Duration: ${result.duration} min.`);
+							}}
+							onError={(errorMessage) => {
+								console.error("GOT AN ERROR", errorMessage);
+							}}
+						/>
+					</>
+				)}
 			</MapView>
-			<SubHome />
+			<SubHome navigation={navigation} destination={destination} />
 		</Container>
 	);
 };
 
-function SubHome() {
+const SubHome = React.memo(({ navigation, destination }: any) => {
 	const queryClient = useQueryClient();
 	const { userData, setActive } = useContext(UserContext);
 	const [location, setLocation] = useState<any>();
 	const [rides, setRiders] = useState<any>([]);
 	const [request_rides, set_request_riders] = useState(false);
 	const [connected, setConnected] = useState(false);
+
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Success", "Status updated successfuly");
+			Alert.alert("Success", "Status updated successfully");
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
@@ -117,22 +192,16 @@ function SubHome() {
 			}
 			setActive(true);
 		})();
-		// const connect = null;
-		// if (rides.length > 0) {
-		// 	setInterval(() => {
-		// 		console.log("ca;ll");
-		// 	}, 5000);
-		// }
-		// Clean up on unfocus
-		return () => {
-			clearInterval;
-		};
+
+		return () => {};
 	}, []);
 
 	useFocusEffect(
 		useCallback(() => {
-			const handleConnect = async () => {
-				console.log("Connection successful: connection successful");
+			let intervalId: any = null;
+
+			const handleConnect = () => {
+				console.log("Connection successful");
 				setConnected(true);
 				set_request_riders(false);
 			};
@@ -142,15 +211,12 @@ function SubHome() {
 					set_request_riders(false);
 					Alert.alert("Message", data?.msg);
 				} else {
-					setRiders(data?.data); // Uncomment and use setRiders as needed
+					setRiders(data?.data);
 					console.log("Received order:", data);
 				}
 			};
 
 			const handleDisconnect = () => {
-				if (userData?.status === "on-line" && userData?._id) {
-					socket.on("connect", handleConnect);
-				}
 				setConnected(false);
 				console.log("Socket disconnected. Attempting to reconnect...");
 			};
@@ -159,26 +225,44 @@ function SubHome() {
 				console.error("Socket error:", error);
 			};
 
-			// Ensure userData is available and user is online
+			if (rides.length > 0 && connected) {
+				intervalId = setInterval(() => {
+					console.log("call");
+					socket.emit("join", {
+						userId: userData?._id,
+						type: "Rider",
+						lng: 6.9995863,
+						lat: 5.379239699999999,
+					});
+				}, 40000);
+
+				setTimeout(() => {
+					clearInterval(intervalId);
+					console.log("Interval cleared");
+				}, 60000);
+			}
+
 			if (userData?.status === "on-line" && userData?._id) {
 				console.log("running");
 
-				// Setup event listeners
 				socket.on("connect", handleConnect);
 				socket.on("afrilish-order", handleAfrilishOrder);
 				socket.on("error", handleError);
 				socket.on("disconnect", handleDisconnect);
 			}
 
-			// Clean up on unfocus
 			return () => {
 				socket.off("connect", handleConnect);
 				socket.off("afrilish-order", handleAfrilishOrder);
 				socket.off("error", handleError);
 				socket.off("disconnect", handleDisconnect);
 				socket.disconnect();
+				if (intervalId) {
+					clearInterval(intervalId);
+					console.log("Interval cleared on cleanup");
+				}
 			};
-		}, [userData])
+		}, [userData, rides, connected])
 	);
 
 	return (
@@ -198,20 +282,27 @@ function SubHome() {
 						<FlatList
 							showsVerticalScrollIndicator={false}
 							style={{
-								// flex: 1,
 								width: "100%",
 							}}
 							contentContainerStyle={{
 								gap: 30,
 								paddingTop: "2%",
-								paddingBottom: "15%",
+								paddingBottom: 150,
 							}}
 							data={rides}
-							renderItem={({ item }: any) => <RequestCard item={item} />}
+							renderItem={({ item }: any) => (
+								<RequestCard
+									navigate={() => {
+										navigation.navigate("Orders");
+										setRiders([]);
+									}}
+									item={item}
+								/>
+							)}
 							keyExtractor={(item) => item?._id}
 						/>
 					</Show.When>
-					<Show.When isTrue={userData === undefined}>
+					<Show.When isTrue={userData !== undefined || destination?.step !== 1}>
 						<></>
 					</Show.When>
 					<Show.When isTrue={userData?.status !== "on-line"}>
@@ -236,25 +327,21 @@ function SubHome() {
 								<View style={styles.switch}>
 									<CustButton
 										onPress={async () => {
-											Alert.alert("Message", "This feature is pending");
-											// if (connected) {
-											// 	console.log("Fetching ride");
-											// 	// Emit "join" event once after the connection is established
-											// 	socket.emit("join", {
-											// 		userId: userData?._id,
-											// 		type: "Rider",
-											// 		lng: -1.785035,
-											// 		lat: 53.645792,
-											// 		// lat: location?.coords?.latitude,
-											// 		// lng: location?.coords?.longitude,
-											// 	});
-											// 	set_request_riders(!request_rides);
-											// }
+											if (connected) {
+												console.log("Fetching ride");
+												socket.emit("join", {
+													userId: userData?._id,
+													type: "Rider",
+													lng: 6.9995863,
+													lat: 5.379239699999999,
+												});
+												set_request_riders(!request_rides);
+											}
 										}}
 										type="rounded"
 										sx={{
 											width: wp("85%"),
-											//  opacity: !connected ? 0.4 : 1
+											opacity: !connected ? 0.4 : 1,
 										}}
 									>
 										<Typography type="text16" sx={{ color: colors.black }}>
@@ -262,8 +349,7 @@ function SubHome() {
 										</Typography>
 									</CustButton>
 									<Typography type="text12">
-										Connected
-										{/* {connected ? "Connected" : "Connecting. . . ."} */}
+										{connected ? "Connected" : "Connecting. . . ."}
 									</Typography>
 								</View>
 							</Show.When>
@@ -281,18 +367,9 @@ function SubHome() {
 					</Show.Else>
 				</Show>
 			</View>
-			{/* <InnerWrapper
-				sx={{
-					// flex: 1,
-					justifyContent: "space-between",
-					backgroundColor: "red",
-				}}
-			>
-			
-			</InnerWrapper> */}
 		</>
 	);
-}
+});
 
 const styles = StyleSheet.create({
 	map: {
@@ -311,8 +388,7 @@ const styles = StyleSheet.create({
 	},
 	top: {
 		width: "90%",
-		marginTop: "5%",
-		paddingBottom: "3%",
+		marginTop: "0%",
 	},
 	bottom: {
 		width: "90%",
@@ -334,4 +410,3 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
-// sellers should not request ride for pick up orders

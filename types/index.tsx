@@ -154,6 +154,7 @@ export interface forgetTypes {
 
 export interface requestCardType {
 	item: any;
+	navigate: () => void;
 }
 
 export interface updateUserTypes {
@@ -172,7 +173,8 @@ export interface vehicleTypes {
 }
 
 export interface addressTypes {
-	currentAddress: string;
+	location: string;
+	postalCode: string;
 	addressDocType: string;
 	image: any;
 }

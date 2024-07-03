@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -60,12 +60,16 @@ export default function VerifyVehicle({ navigation }: any) {
 		mutate(formData);
 	};
 
+	useEffect(() => {
+		console.log(isPending);
+	}, [isPending]);
+
 	return (
-		<View style={{flex:1}}>
+		<View style={{ flex: 1 }}>
 			<Container>
 				<LoadingComponent display={isPending} />
 				<InnerWrapper sx={{ width: "100%", flex: 1 }}>
-					<KeyboardView sx={{ width: "100%", flex: 1 }}>
+					<KeyboardView sx={{ width: "100%", flex: 4.5 }}>
 						<View style={styles.title}>
 							<CustButton
 								type="back"
@@ -219,7 +223,7 @@ const styles = StyleSheet.create({
 	},
 	buttonCont: {
 		alignItems: "center",
-		justifyContent: "center",
+		flex: 1,
 		backgroundColor: colors.black_1,
 		paddingTop: 15,
 		...Platform.select({

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
@@ -6,7 +6,12 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import Ordercard from "../../components/orderCard";
 
-export default function Order({ navigation }: any) {
+export default function Order({ navigation, route }: any) {
+
+useEffect(() => {
+	console.log("call",route?.params)
+}, []) 
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 30 }}>
@@ -18,7 +23,7 @@ export default function Order({ navigation }: any) {
 					/>
 					<Typography type="text24">Order details</Typography>
 				</View>
-				<Ordercard />
+				<Ordercard item={route?.params} />
 			</InnerWrapper>
 		</Container>
 	);
