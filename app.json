@@ -21,7 +21,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.afrilish.rider",
-      "buildNumber": "26"
+      "buildNumber": "26",
+       "googleMapsApiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +34,8 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.afrilish.rider",
-      "versionCode": 2
+      "versionCode": 2,
+       "googleMapsApiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
     },
     "web": {
       "favicon": "./assets/favicon.png"

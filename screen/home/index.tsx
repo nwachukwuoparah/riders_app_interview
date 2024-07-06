@@ -132,7 +132,7 @@ const Home = ({ navigation }: any) => {
 				customMapStyle={darkModeStyle}
 				initialRegion={initialRegion}
 			>
-				{fromLatLng && toLatLng && (
+				{/* {fromLatLng && toLatLng && (
 					<>
 						<Marker coordinate={fromLatLng} />
 						<Marker coordinate={toLatLng} />
@@ -158,7 +158,7 @@ const Home = ({ navigation }: any) => {
 							}}
 						/>
 					</>
-				)}
+				)} */}
 			</MapView>
 			<SubHome navigation={navigation} destination={destination} />
 		</Container>
