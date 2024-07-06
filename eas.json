@@ -3,6 +3,16 @@
         "version": ">= 7.5.0"
     },
     "build": {
+        "development-simulator": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "ios": {
+                "simulator": true
+            },
+            "env": {
+                "EXPO_PUBLIC_API": "https://aftilish-development-server-e7f09cb1463d.herokuapp.com/api/v1"
+            }
+        },
         "development": {
             "developmentClient": true,
             "distribution": "internal",
