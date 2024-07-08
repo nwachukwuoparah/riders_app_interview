@@ -3,7 +3,7 @@ import * as Location from "expo-location";
 import { CommonActions } from "@react-navigation/native";
 import { clearAuthData } from "../utilities/storage";
 
-export const getCurrentLocation = async () => {
+export const getCurrentLocation = async (latitude: any, longitude: any) => {
 	try {
 		// Request permission to access the device's location
 		let { status } = await Location.requestForegroundPermissionsAsync();
@@ -11,10 +11,9 @@ export const getCurrentLocation = async () => {
 			Alert.alert("Permission to access location was denied");
 			return;
 		}
-
-		// Get the current location
-		let currentLocation = await Location.getCurrentPositionAsync({});
-		let { latitude, longitude } = currentLocation.coords;
+		// // Get the current location
+		// let currentLocation = await Location.getCurrentPositionAsync({});
+		// let { latitude, longitude } = currentLocation.coords;
 
 		// Reverse geocode to get the address
 		let reverseGeocode = await Location.reverseGeocodeAsync({
@@ -25,20 +24,19 @@ export const getCurrentLocation = async () => {
 		if (reverseGeocode.length > 0) {
 			let address = reverseGeocode[0];
 			return {
-				coords: currentLocation.coords,
 				address: `${address.street !== null ? address.street : ""} ${
 					address.city
 				}, ${address.region}`,
 			};
 		} else {
 			return {
-				coords: currentLocation.coords,
 				address: "Address not found",
 			};
 		}
 	} catch (error) {
-		Alert.alert("Error getting location:", `${error}`);
-		console.log(error);
+		Promise.reject(error);
+		// Alert.alert("Error getting location:", `${error}`);
+		// console.log(error);
 	}
 };
 
@@ -109,7 +107,7 @@ export const handleError = (err: any, navigation?: any) => {
 			})();
 			return;
 		} else {
-			console.log(axiosError.response?.data)
+			console.log(axiosError.response?.data);
 			Alert.alert("Error", axiosError.response?.data?.message);
 			return axiosError.response?.data;
 		}

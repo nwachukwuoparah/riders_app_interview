@@ -26,7 +26,7 @@ import {
 import Show from "../../components/show";
 import { font } from "../../utilities/loadFont";
 import RequestCard from "../../components/requestCard";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import Geolocation from "react-native-geolocation-service";
 import io from "socket.io-client";
@@ -40,18 +40,19 @@ import { UserContext } from "../../components/contex/userContex";
 import { getCurrentLocation, handleError, truncateString } from "../../helpers";
 import { useFocusEffect } from "@react-navigation/native";
 import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
+import { EXPO_PUBLIC_API } from "@env";
 
-const socket = io("https://afrilish-version-2-0.onrender.com", {
+const socket = io(EXPO_PUBLIC_API, {
 	reconnectionAttempts: Infinity,
 	reconnectionDelay: 2000,
 });
-
 const GOOGLE_MAPS_APIKEY = "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA";
 
 const Home = ({ navigation }: any) => {
 	const [destination, setDestination] = useState<any>();
 	const mapRef = useRef<MapView>(null);
 	const watchId = useRef<number | null>(null);
+	const [location, setLocation] = useState<any>();
 
 	const [fromLatLng, setFromLatLng] = useState({
 		latitude: 5.475,
@@ -64,24 +65,16 @@ const Home = ({ navigation }: any) => {
 
 	useFocusEffect(
 		useCallback(() => {
-			const requestLocationPermission = async () => {
-				if (Platform.OS === "android") {
-					const granted = await PermissionsAndroid.request(
-						PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-					);
-					if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-						console.error("Location permission denied");
-						return;
-					}
-				}
-				startTracking();
-			};
-
-			const startTracking = () => {
+			(() => {
 				watchId.current = Geolocation.watchPosition(
-					(position) => {
+					async (position) => {
 						const { latitude, longitude } = position.coords;
+						const location = await getCurrentLocation(latitude, longitude);
 						setFromLatLng({ latitude, longitude });
+						console.log("logs", location);
+						if (location) {
+							setLocation(location);
+						}
 					},
 					(error) => {
 						console.error(error);
@@ -93,9 +86,9 @@ const Home = ({ navigation }: any) => {
 						fastestInterval: 500,
 					}
 				);
-			};
+			})();
 
-			requestLocationPermission();
+			// requestLocationPermission();
 
 			return () => {
 				if (watchId.current !== null) {
@@ -125,14 +118,14 @@ const Home = ({ navigation }: any) => {
 
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
-			<MapView
+			{/* <MapView
 				ref={mapRef}
-				provider="google"
+				provider={PROVIDER_GOOGLE}
 				style={styles.map}
 				customMapStyle={darkModeStyle}
 				initialRegion={initialRegion}
 			>
-				{/* {fromLatLng && toLatLng && (
+				{fromLatLng && toLatLng && (
 					<>
 						<Marker coordinate={fromLatLng} />
 						<Marker coordinate={toLatLng} />
@@ -158,17 +151,20 @@ const Home = ({ navigation }: any) => {
 							}}
 						/>
 					</>
-				)} */}
-			</MapView>
-			<SubHome navigation={navigation} destination={destination} />
+				)}
+			</MapView> */}
+			<SubHome
+				navigation={navigation}
+				destination={destination}
+				location={location}
+			/>
 		</Container>
 	);
 };
 
-const SubHome = React.memo(({ navigation, destination }: any) => {
+const SubHome = React.memo(({ navigation, destination, location }: any) => {
 	const queryClient = useQueryClient();
 	const { userData, setActive } = useContext(UserContext);
-	const [location, setLocation] = useState<any>();
 	const [rides, setRiders] = useState<any>([]);
 	const [request_rides, set_request_riders] = useState(false);
 	const [connected, setConnected] = useState(false);
@@ -186,15 +182,10 @@ const SubHome = React.memo(({ navigation, destination }: any) => {
 
 	useEffect(() => {
 		(async () => {
-			const location = await getCurrentLocation();
-			if (location) {
-				setLocation(location);
-			}
 			setActive(true);
 		})();
-
 		return () => {};
-	}, []);
+	}, [location]);
 
 	useFocusEffect(
 		useCallback(() => {
