@@ -46,6 +46,7 @@ const socket = io(EXPO_PUBLIC_API, {
 	reconnectionAttempts: Infinity,
 	reconnectionDelay: 2000,
 });
+
 const GOOGLE_MAPS_APIKEY = "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA";
 
 const Home = ({ navigation }: any) => {
@@ -71,7 +72,6 @@ const Home = ({ navigation }: any) => {
 						const { latitude, longitude } = position.coords;
 						const location = await getCurrentLocation(latitude, longitude);
 						setFromLatLng({ latitude, longitude });
-						console.log("logs", location);
 						if (location) {
 							setLocation(location);
 						}
