@@ -38,9 +38,9 @@ export default function Profile({ navigation }: any) {
 		);
 	};
 
-	useEffect(() => {
-		console.log(JSON.stringify(userData, null, 2));
-	}, []);
+	// useEffect(() => {
+	// 	console.log(JSON.stringify(userData, null, 2));
+	// }, []); 
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />

@@ -45,8 +45,10 @@ export default function Wallet({ navigation }: any) {
 		if (error) {
 			handleError(error);
 		}
-		console.log(transa_data?.data?.data);
-	}, [transa_data, error]);
+		if (transa_Error) {
+			handleError(transa_Error);
+		}
+	}, [error, transa_Error]);
 
 	const onRefresh = () => {
 		refetch();
@@ -131,7 +133,7 @@ export default function Wallet({ navigation }: any) {
 									}}
 								>
 									£{" "}
-									{data?.data?.data?.wallet
+									{data?.data?.data
 										? new Intl.NumberFormat("en-US").format(
 												data?.data?.data?.wallet
 										  )
@@ -163,7 +165,7 @@ export default function Wallet({ navigation }: any) {
 										color: colors.white,
 									}}
 								>
-									£ 250
+									£ 0
 								</Typography>
 							</View>
 						</Show.Else>
@@ -194,7 +196,7 @@ export default function Wallet({ navigation }: any) {
 
 							<FlatList
 								style={{ height: "57%", width: "100%" }}
-								data={[1, 2, 3, 4, 5, 6, 7]}
+								data={transa_data?.data?.data}
 								showsVerticalScrollIndicator={false}
 								contentContainerStyle={{
 									gap: 5,
@@ -212,9 +214,6 @@ export default function Wallet({ navigation }: any) {
 								// keyExtractor={({ _id }) => _id}
 								ListEmptyComponent={() => (
 									<Show>
-										{/* <Show.When isTrue={!true}>
-									<Loading title="Fetching vendor" />
-								</Show.When> */}
 										<Show.Else>
 											<EmptyState
 												onRefresh={onRefresh}

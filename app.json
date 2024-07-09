@@ -38,7 +38,9 @@
       "package": "com.afrilish.rider",
       "versionCode": 2,
       "config": {
-        "googleMapsApiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
+        "googleMaps": {
+          "apiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
+        }
       }
     },
     "web": {

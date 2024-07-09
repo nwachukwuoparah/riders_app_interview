@@ -40,7 +40,9 @@ import { UserContext } from "../../components/contex/userContex";
 import { getCurrentLocation, handleError, truncateString } from "../../helpers";
 import { useFocusEffect } from "@react-navigation/native";
 import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
-import { EXPO_PUBLIC_API } from "@env";
+// import { EXPO_PUBLIC_API } from "@env";
+let EXPO_PUBLIC_API =
+	"https://aftilish-development-server-e7f09cb1463d.herokuapp.com";
 
 const socket = io(EXPO_PUBLIC_API, {
 	reconnectionAttempts: Infinity,
@@ -59,6 +61,7 @@ const Home = ({ navigation }: any) => {
 		latitude: 5.475,
 		longitude: 7.025,
 	});
+
 	const [toLatLng, setToLatLng] = useState({
 		latitude: 5.485,
 		longitude: 7.035,
@@ -77,7 +80,7 @@ const Home = ({ navigation }: any) => {
 						}
 					},
 					(error) => {
-						console.error(error);
+						console.error("error",error);
 					},
 					{
 						enableHighAccuracy: true,
@@ -87,8 +90,6 @@ const Home = ({ navigation }: any) => {
 					}
 				);
 			})();
-
-			// requestLocationPermission();
 
 			return () => {
 				if (watchId.current !== null) {
@@ -117,7 +118,7 @@ const Home = ({ navigation }: any) => {
 	);
 
 	return (
-		<Container sx={{ justifyContent: "space-between" }}>
+		<Container sx={{ justifyContent: "space-between"}}>
 			{/* <MapView
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
@@ -148,7 +149,7 @@ const Home = ({ navigation }: any) => {
 							}}
 							onError={(errorMessage) => {
 								console.error("GOT AN ERROR", errorMessage);
-							}}
+							}} 
 						/>
 					</>
 				)}
@@ -177,8 +178,8 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
-		},
-	});
+		}, 
+	}); 
 
 	useEffect(() => {
 		(async () => {
@@ -190,7 +191,6 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 	useFocusEffect(
 		useCallback(() => {
 			let intervalId: any = null;
-
 			const handleConnect = () => {
 				console.log("Connection successful");
 				setConnected(true);
@@ -198,17 +198,18 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 			};
 
 			const handleAfrilishOrder = (data: any) => {
-				if (data?.msg === "No Order available in your location") {
+				if (data?.msg === "No order available in your location") {
 					set_request_riders(false);
 					Alert.alert("Message", data?.msg);
 				} else {
-					setRiders(data?.data);
+					setRiders(data?.data); 
 					console.log("Received order:", data);
 				}
 			};
 
 			const handleDisconnect = () => {
 				setConnected(false);
+				handleConnect();
 				console.log("Socket disconnected. Attempting to reconnect...");
 			};
 
@@ -216,10 +217,10 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				console.error("Socket error:", error);
 			};
 
-			if (rides.length > 0 && connected) {
+			if (rides?.length > 0 && connected) { 
 				intervalId = setInterval(() => {
 					console.log("call");
-					socket.emit("join", {
+					socket.emit("join", { 
 						userId: userData?._id,
 						type: "Rider",
 						lng: 6.9995863,
@@ -235,16 +236,15 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 
 			if (userData?.status === "on-line" && userData?._id) {
 				console.log("running");
-
 				socket.on("connect", handleConnect);
-				socket.on("afrilish-order", handleAfrilishOrder);
+				socket.on("rider-message", handleAfrilishOrder);
 				socket.on("error", handleError);
 				socket.on("disconnect", handleDisconnect);
 			}
 
 			return () => {
 				socket.off("connect", handleConnect);
-				socket.off("afrilish-order", handleAfrilishOrder);
+				socket.off("rider-message", handleAfrilishOrder);
 				socket.off("error", handleError);
 				socket.off("disconnect", handleDisconnect);
 				socket.disconnect();
@@ -293,12 +293,13 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 							keyExtractor={(item) => item?._id}
 						/>
 					</Show.When>
-					<Show.When isTrue={userData !== undefined || destination?.step !== 1}>
+					<Show.When isTrue={userData === undefined}>
+						{/* //|| destination?.step === 1 */} 
 						<></>
 					</Show.When>
 					<Show.When isTrue={userData?.status !== "on-line"}>
 						<View style={styles.switch}>
-							<CustButton
+							<CustButton 
 								onPress={() => {
 									mutate({ status: "on-line" });
 								}}
@@ -320,15 +321,15 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 										onPress={async () => {
 											if (connected) {
 												console.log("Fetching ride");
-												socket.emit("join", {
+												socket.emit("rider", {
 													userId: userData?._id,
-													type: "Rider",
 													lng: 6.9995863,
-													lat: 5.379239699999999,
+													lat: 5.379239699999999
 												});
 												set_request_riders(!request_rides);
 											}
 										}}
+
 										type="rounded"
 										sx={{
 											width: wp("85%"),
@@ -379,10 +380,11 @@ const styles = StyleSheet.create({
 	},
 	top: {
 		width: "90%",
-		marginTop: "0%",
+		marginTop: "5%",
 	},
 	bottom: {
 		width: "90%",
+		 marginBottom: "10%" 
 	},
 	switch: {
 		backgroundColor: colors.black,

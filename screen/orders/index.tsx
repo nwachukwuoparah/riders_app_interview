@@ -41,7 +41,8 @@ export default function Order({ navigation }: any) {
 		queryKey: ["get-order", filter],
 		queryFn: getOrders,
 		// staleTime: 600000,
-	});
+	}); 
+
 	const cancelOrder = (id: string) => {
 		setCancel(!cancel);
 		setDisplayFilter(displayFilter);
@@ -50,11 +51,13 @@ export default function Order({ navigation }: any) {
 			setOrderId(id);
 		}
 	};
+
 	const toogleFilter = () => {
 		setDisplayFilter(!displayFilter);
 		setCancel(false);
 		setConfirm(false);
 	};
+
 	const toogleConfirm = () => {
 		setConfirm(!confirm);
 		setDisplayFilter(false);
@@ -65,7 +68,7 @@ export default function Order({ navigation }: any) {
 		if (error) {
 			handleError(error);
 		}
-	}, [error]);
+	}, [error]); 
 
 	useEffect(() => {
 		(async () => {
@@ -106,7 +109,7 @@ export default function Order({ navigation }: any) {
 				</View>
 				<View style={styles.body}>
 					<TouchableOpacity
-						onPress={() => {
+						onPress={() => { 
 							setType("pending");
 						}}
 						style={{
