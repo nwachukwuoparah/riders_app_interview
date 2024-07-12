@@ -39,12 +39,6 @@ const Referal = ({ navigation }: any) => {
 		refetch();
 	};
 
-
-	useEffect(() => {
-		console.log(data);
-		console.log(isFetching);
-	}, [data,isFetching])
-
 	return (
 		<Container>
 			<View

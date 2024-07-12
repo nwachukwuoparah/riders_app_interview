@@ -5,6 +5,7 @@ import { Pressable, TouchableOpacity, View } from "react-native";
 import colors from "../../constant/theme";
 import Typography from "../typography";
 import Show from "../show";
+import moment from "moment";
 
 export default function ProfileCard({
 	type,
@@ -13,6 +14,8 @@ export default function ProfileCard({
 	onPress,
 	label,
 	check,
+	createdAt,
+	amount,
 }: {
 	type?: string;
 	index?: number | undefined;
@@ -20,6 +23,8 @@ export default function ProfileCard({
 	label?: string;
 	check?: boolean;
 	onPress?: () => void;
+	createdAt?: Date;
+	amount?: Number;
 }) {
 	return (
 		<Show>
@@ -170,7 +175,7 @@ export default function ProfileCard({
 									color: colors.white,
 								}}
 							>
-								21/04/2024
+								{moment(createdAt).format("dddd, MMMM Do YYYY")}
 							</Typography>
 							<Typography
 								type="text16"
@@ -178,7 +183,7 @@ export default function ProfileCard({
 									color: colors.white,
 								}}
 							>
-								09:00am
+								{moment(createdAt).format("h:mm:ss a")}
 							</Typography>
 						</View>
 						<Typography
@@ -187,7 +192,7 @@ export default function ProfileCard({
 								color: "red",
 							}}
 						>
-							-£125
+							-£ {amount}
 						</Typography>
 					</View>
 				</View>

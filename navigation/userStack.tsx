@@ -12,6 +12,7 @@ import Contact from "../screen/profile/contact";
 import BankInfo from "../screen/profile/bankInfo";
 import bank_details from "../screen/profile/bankDetails";
 import Notification from "../screen/notification";
+import Update_capture from "../screen/profile/updateCapture";
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,7 @@ const UserStack = () => {
 			<Stack.Screen name="referal" component={Referal} />
 			<Stack.Screen name="contact" component={Contact} />
 			<Stack.Screen name="notification" component={Notification} />
+			<Stack.Screen name="updatecapture" component={Update_capture} />
 		</Stack.Navigator>
 	);
 };

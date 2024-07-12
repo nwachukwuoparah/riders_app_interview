@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable, TouchableOpacity } from "react-native";
 import Typography from "../typography";
 import colors from "../../constant/theme";
@@ -17,9 +17,11 @@ import {
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { rejectOrder } from "../../helpers/mutate";
+import { rejectOrder, updateOrder } from "../../helpers/mutate";
 import LoadingComponent from "../loading";
-import { cacheAuthData } from "../../utilities/storage";
+import { cacheAuthData, clearAuthData } from "../../utilities/storage";
+import { font } from "../../utilities/loadFont";
+import moment from "moment";
 
 export default function Ordercard({
 	onPress,
@@ -36,86 +38,28 @@ export default function Ordercard({
 	item: any;
 	navigation: any;
 }) {
-	useEffect(() => {
-		console.log(JSON.stringify(item, null, 2));
-	}, []);
+	const queryClient = useQueryClient();
 
-	const styles = StyleSheet.create({
-		ongoing_card: {
-			backgroundColor: colors.grey_a,
-			padding: 15,
-			borderRadius: 20,
-			gap: 30,
+	const { isPending, mutate } = useMutation({
+		mutationFn: updateOrder, 
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-order" as QueryFilters);
+			console.log(data?.data);
 		},
-		top: {
-			flexDirection: "row",
-			alignItems: "center",
-			justifyContent: "space-between",
-		},
-		status: {
-			padding: 5,
-			backgroundColor: colors.tint,
-			borderRadius: 15,
-			paddingHorizontal: 10,
-		},
-		direction: { gap: 5 },
-		time: {
-			gap: 5,
+		onError: (err: { msg: string; success: boolean }) => {
+			handleError(err);
+			clearAuthData("destination");
 		},
 	});
+
+	// useEffect(() => {
+	// 	console.log(JSON.stringify(item, null, 2));
+	// }, []);
 
 	return (
 		<>
 			<Show>
-				<Show.When isTrue={type === "in-transit"}>
-					<Pressable onPress={onPress}>
-						<View style={styles.ongoing_card}>
-							<View style={styles.top}>
-								<Typography type="text16">Completed</Typography>
-								<View style={styles.status}>
-									<Typography type="text14" sx={{ color: colors.black }}>
-										Arrival in 22m
-									</Typography>
-								</View>
-							</View>
-							<View style={styles.direction}>
-								<Typography type="text14" sx={{ color: colors.white }}>
-									To
-								</Typography>
-								<Typography type="text16" sx={{ color: colors.white }}>
-									Kings close, notthingham
-								</Typography>
-							</View>
-							<OngoingIcon />
-							<View style={styles.direction}>
-								<Typography type="text14" sx={{ color: colors.white }}>
-									From
-								</Typography>
-								<Typography type="text16" sx={{ color: colors.white }}>
-									{item?.vendorId?.address}
-								</Typography>
-							</View>
-							<View style={{ gap: 10 }}>
-								<CustButton
-									type="rounded"
-									sx={{ width: "100%" }}
-									onPress={confirm}
-								>
-									<Typography type="text16" sx={{ color: colors.white }}>
-										I’ve arrived
-									</Typography>
-								</CustButton>
-								<Typography
-									type="text14"
-									sx={{ color: colors.white, textAlign: "center" }}
-								>
-									Let the customer know when you’ve reached their destination
-								</Typography>
-							</View>
-						</View>
-					</Pressable>
-				</Show.When>
-				<Show.When isTrue={type === "pending"}>
+				<Show.When isTrue={type === "orderStatus=ready&orderStatus=picked"}>
 					<Pressable onPress={onPress}>
 						<View style={styles.ongoing_card}>
 							<View style={styles.top}>
@@ -123,13 +67,13 @@ export default function Ordercard({
 									style={{ ...styles.status, backgroundColor: colors.black }}
 								>
 									<Typography type="text16">
-										{item?.schedule ? "Schedule" : "Normal"}
+										{item?.schedule ? "Schedule" : "Normal delivery"}
 									</Typography>
 								</View>
-
+ 
 								<View style={styles.status}>
 									<Typography type="text14" sx={{ color: colors.black }}>
-										01:00pm
+										{moment(item?.createdAt).format("h:mm a")}
 									</Typography>
 								</View>
 							</View>
@@ -138,20 +82,24 @@ export default function Ordercard({
 								<View style={{ gap: 15 }}>
 									<View style={styles.direction}>
 										<Typography type="text14" sx={{ color: colors.white }}>
-											To
+											Pick up from
 										</Typography>
 										<Typography type="text16" sx={{ color: colors.white }}>
-											{truncateString(item?.deliveryAddress, 40)}
+											<Typography
+												type="text16"
+												fontfamily={font.DMSans_700Bold}
+												sx={{ color: colors.white }}
+											>
+												{item?.vendorId?.address}
+											</Typography>
 										</Typography>
 									</View>
 									<View style={styles.direction}>
 										<Typography type="text14" sx={{ color: colors.white }}>
-											From
+											Delivery to
 										</Typography>
 										<Typography type="text16" sx={{ color: colors.white }}>
-											<Typography type="text16" sx={{ color: colors.white }}>
-												{truncateString(item?.vendorId?.address, 50)}
-											</Typography>
+											{truncateString(item?.deliveryAddress, 40)}
 										</Typography>
 									</View>
 								</View>
@@ -178,47 +126,129 @@ export default function Ordercard({
 									</TouchableOpacity>
 								</View>
 							)}
-							<View style={{ gap: 10 }}>
-								<CustButton
-									type="rounded"
-									onPress={() => {
-										(async () => {
-											// users: {
-											// 	lng: item?.locationCoord?.coordinates[0],
-											// 	lat: item?.locationCoord?.coordinates[1],
-											// },
-											// console.log(JSON.stringify(item, null, 2));
-											let curentLocation = await getCurrentLocation();
-											if (curentLocation) {
+							<Show>
+								<Show.When isTrue={true}>
+									<View style={{ gap: 10 }}>
+										<CustButton
+											type="rounded"
+											onPress={async () => {
+												mutate({
+													id: item?._id,
+													orderStatus: "in-transit",
+													isAfrilish: true,
+												});
+												// await cacheAuthData("destination", {
+												// 	step: 2,
+												// 	to: {
+												// 		longitude: item?.locationCoord?.coordinates[0],
+												// 		latitude: item?.locationCoord?.coordinates[1],
+												// 	},
+												// });
+												// navigation.navigate("Home");
+											}}
+											sx={{
+												//  opacity: isPending ? 0.5 : 1,
+												width: "100%",
+											}}
+										>
+											<Typography type="text16" sx={{ color: colors.black }}>
+												{/* Proceede to pick up */}
+												I’ve picked order up
+											</Typography>
+										</CustButton>
+									</View>
+								</Show.When>
+								<Show.When isTrue={!true}>
+									<View style={{ gap: 10 }}>
+										<CustButton
+											type="rounded"
+											onPress={async () => {
 												await cacheAuthData("destination", {
 													step: 1,
 													to: {
-														longitude: item?.vendorId?.locationCoord?.coordinates[0],
-														latitude: item?.vendorId?.locationCoord?.coordinates[1],
-													},
-													from: {
-														longitude: curentLocation?.coords?.longitude,
-														latitude: curentLocation?.coords?.latitude,
+														longitude:
+															item?.vendorId?.locationCoord?.coordinates[0],
+														latitude:
+															item?.vendorId?.locationCoord?.coordinates[1],
 													},
 												});
 												navigation.navigate("Home");
-											}
-										})();
-									}}
-									sx={{
-										//  opacity: isPending ? 0.5 : 1,
-										width: "100%",
-									}}
+											}}
+											sx={{
+												width: "100%",
+											}}
+										>
+											<Typography type="text16" sx={{ color: colors.black }}>
+												Proceed to pick up
+											</Typography>
+										</CustButton>
+
+										<Typography
+											type="text14"
+											sx={{ color: colors.white, textAlign: "center" }}
+										>
+											If you don’t pick up in 10 mins, this order will be
+											re-assigned to a different rider2333
+										</Typography>
+									</View>
+								</Show.When>
+							</Show>
+						</View>
+					</Pressable>
+				</Show.When>
+				<Show.When isTrue={type === "in-transit"}>
+					<Pressable onPress={onPress}>
+						<View style={styles.ongoing_card}>
+							<View style={styles.top}>
+								<Typography type="text16">
+									{item?.schedule ? "Schedule" : "Normal delivery"}
+								</Typography>
+								<View style={styles.status}>
+									<Typography type="text14" sx={{ color: colors.black }}>
+										{moment(item?.createdAt).format("h:mm a")}
+									</Typography>
+								</View>
+							</View>
+							<View style={styles.direction}>
+								<Typography type="text14" sx={{ color: colors.white }}>
+									Pick up from
+								</Typography>
+								<Typography
+									type="text16"
+									fontfamily={font.DMSans_700Bold}
+									sx={{ color: colors.white }}
+								>
+									{item?.vendorId?.address}
+								</Typography>
+							</View>
+							<OngoingIcon />
+							<View style={styles.direction}>
+								<Typography type="text14" sx={{ color: colors.white }}>
+									Delivery to
+								</Typography>
+								<Typography
+									type="text16"
+									fontfamily={font.DMSans_700Bold}
+									sx={{ color: colors.white }}
+								>
+									{item?.deliveryAddress}
+								</Typography>
+							</View>
+							<View style={{ gap: 10 }}>
+								<CustButton
+									type="rounded"
+									sx={{ width: "100%" }}
+									onPress={confirm}
 								>
 									<Typography type="text16" sx={{ color: colors.black }}>
-										Proceede to pick up
+										I’ve arrived to deliver order
 									</Typography>
 								</CustButton>
 								<Typography
 									type="text14"
 									sx={{ color: colors.white, textAlign: "center" }}
 								>
-									Let the seller know when you’ve reached their destination
+									Let the customer know when you’ve reached their destination
 								</Typography>
 							</View>
 						</View>
@@ -230,7 +260,7 @@ export default function Ordercard({
 							<View style={styles.top}>
 								<View style={styles.status}>
 									<Typography type="text14" sx={{ color: colors.black }}>
-										01:00pm
+										{moment(item?.createdAt).format("h:mm a")}
 									</Typography>
 								</View>
 							</View>
@@ -305,6 +335,31 @@ export default function Ordercard({
 					</Pressable>
 				</Show.Else>
 			</Show>
+			<LoadingComponent display={isPending} />
 		</>
 	);
 }
+
+const styles = StyleSheet.create({
+	ongoing_card: {
+		backgroundColor: colors.grey_a,
+		padding: 15,
+		borderRadius: 20,
+		gap: 30,
+	},
+	top: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+	},
+	status: {
+		padding: 5,
+		backgroundColor: colors.tint,
+		borderRadius: 15,
+		paddingHorizontal: 10,
+	},
+	direction: { gap: 5 },
+	time: {
+		gap: 5,
+	},
+});

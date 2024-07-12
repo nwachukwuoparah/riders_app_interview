@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
 	FlatList,
+	Pressable,
 	RefreshControl,
 	StyleSheet,
 	TouchableOpacity,
@@ -58,6 +59,10 @@ export default function Wallet({ navigation }: any) {
 	const toogleModal = () => {
 		setModal(!openModal);
 	};
+
+	useEffect(() => {
+		console.log(JSON.stringify(transa_data?.data?.data, null, 2));
+	}, []); 
 
 	return (
 		<Container>
@@ -165,7 +170,12 @@ export default function Wallet({ navigation }: any) {
 										color: colors.white,
 									}}
 								>
-									£ 0
+									£{" "}
+									{transa_data?.data
+										? new Intl.NumberFormat("en-US").format(
+												transa_data?.data?.pendingOrderAmount
+										  )
+										: "---"}
 								</Typography>
 							</View>
 						</Show.Else>
@@ -210,8 +220,16 @@ export default function Wallet({ navigation }: any) {
 										tintColor={colors.yellow}
 									/>
 								}
-								renderItem={(item: any) => <ProfileCard />}
-								// keyExtractor={({ _id }) => _id}
+								renderItem={(item: any) => (
+									<Pressable
+										onPress={() => {
+											console.log(item);
+										}}
+									>
+										<ProfileCard {...item?.item} />
+									</Pressable>
+								)}
+								keyExtractor={({ _id }) => _id}
 								ListEmptyComponent={() => (
 									<Show>
 										<Show.Else>
@@ -233,6 +251,7 @@ export default function Wallet({ navigation }: any) {
 				close={toogleModal}
 				modalOpen={openModal}
 				navigation={navigation}
+				balance={data?.data?.data?.wallet}
 			/>
 		</Container>
 	);

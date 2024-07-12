@@ -32,8 +32,8 @@ export default function WalletModal({
 	close,
 	modalOpen,
 	navigation,
+	balance,
 }: any) {
-	
 	const queryClient = useQueryClient();
 	const {
 		control,
@@ -140,7 +140,7 @@ export default function WalletModal({
 						/>
 					</View>
 					<Typography sx={{ color: colors.white }} type="text14">
-						Wallet Balance: £1800
+						Wallet Balance: £ {balance}
 					</Typography>
 				</ScrollContainer>
 			</InnerWrapper>

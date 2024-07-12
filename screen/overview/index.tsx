@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from "react";
-import { Alert, RefreshControl, StyleSheet, View } from "react-native";
+import React, { useContext} from "react";
+import { RefreshControl, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -12,14 +12,10 @@ import { font } from "../../utilities/loadFont";
 import Expand_more from "../../assets/svg/expand_more.svg";
 import OverviewIcon from "../../assets/svg/overviewIcon.svg";
 import {
-	QueryFilters,
-	useMutation,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
 import { getOverview } from "../../helpers/query";
-import { updateUser } from "../../helpers/mutate";
-import { handleError } from "../../helpers";
 import { UserContext } from "../../components/contex/userContex";
 
 export default function Overview({ navigation }: any) {

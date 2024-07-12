@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
 		height: hp("100%"),
 		backgroundColor: "rgba(0, 0, 0, 0.3)",
 		position: "absolute",
+		paddingBottom: "20%",
 	},
 	bottomSheet: { backgroundColor: colors.grey_a },
 });

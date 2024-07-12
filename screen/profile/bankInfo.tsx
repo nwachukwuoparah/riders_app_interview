@@ -21,6 +21,7 @@ import { bankDetailsSchems } from "../../utilities/schema";
 import { bankDetailsType } from "../../types";
 import { updateUser } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
+import { handleError } from "../../helpers";
 
 export default function BankInfo({ navigation }: any) {
 	const queryClient = useQueryClient();
@@ -39,7 +40,7 @@ export default function BankInfo({ navigation }: any) {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
 		},
 		onError: (err) => {
-			console.error(JSON.stringify(err, null, 2));
+		handleError(err)
 		},
 	});
 
@@ -50,7 +51,7 @@ export default function BankInfo({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<InnerWrapper sx={{ flex: 1 }}>
+			<InnerWrapper sx={{ flex: 7 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View style={styles.title}>
 						<CustButton
@@ -61,33 +62,35 @@ export default function BankInfo({ navigation }: any) {
 						<Typography type="text24">Set up payment details</Typography>
 					</View>
 					<ScrollContainer>
-					<View style={{ ...styles.inputContain }}>
-						<InputComponent
-							label="Bank name"
-							type="text"
-							placeholder="Bank name"
-							name="bankName"
-							control={control}
-							errors={errors}
-						/>
+						<View style={{ ...styles.inputContain }}>
+							<InputComponent
+								label="Bank name"
+								type="text"
+								placeholder="Bank name"
+								name="bankName"
+								control={control}
+								errors={errors}
+							/>
 
-						<InputComponent
-							label="Account number"
-							type="text"
-							placeholder="Enter here"
-							name="accountName"
-							control={control}
-							errors={errors}
-						/>
-						<InputComponent
-							label="Sort code"
-							type="text"
-							placeholder="Enter here"
-							name="sortCode"
-							control={control}
-							errors={errors}
-						/>
-					</View>
+							<InputComponent
+								label="Account number"
+								type="text"
+								placeholder="Enter here"
+								name="accountName"
+								control={control}
+								errors={errors}
+								keyboardType="numeric"
+							/>
+							<InputComponent
+								label="Sort code"
+								type="text"
+								placeholder="Enter here"
+								name="sortCode"
+								control={control}
+								errors={errors}
+								keyboardType="numeric"
+							/>
+						</View>
 					</ScrollContainer>
 				</KeyboardView>
 			</InnerWrapper>
@@ -105,7 +108,7 @@ export default function BankInfo({ navigation }: any) {
 const styles = StyleSheet.create({
 	title: {
 		gap: 5,
-		width:"100%"
+		width: "100%",
 	},
 	inputContain: {
 		gap: 20,
@@ -113,8 +116,8 @@ const styles = StyleSheet.create({
 	},
 	buttonCont: {
 		width: "100%",
+		flex: 1,
 		alignItems: "center",
-		justifyContent: "center",
 		backgroundColor: colors.black_1,
 		paddingTop: 15,
 		...Platform.select({

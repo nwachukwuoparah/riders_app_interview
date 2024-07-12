@@ -14,8 +14,7 @@ import {
 	verifyRiderType,
 } from "../types";
 import { getCachedAuthData } from "../utilities/storage";
-import { EXPO_PUBLIC_API } from "@env"
-
+import { EXPO_PUBLIC_API } from "@env";
 
 export const createUser = async (data: signUpTypes): Promise<any> => {
 	return await axios.post(`${EXPO_PUBLIC_API}/rider`, data);
@@ -125,7 +124,7 @@ export const acceptOrder = async (data: { id: string }): Promise<any> => {
 export const rejectOrder = async (data: { id: string }): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
 	console.log(token);
-	console.log("id",data);
+	console.log("id", data);
 	return await axios.patch(
 		`${EXPO_PUBLIC_API}/rider/cancel-order/${data?.id}`,
 		{},
@@ -139,11 +138,31 @@ export const rejectOrder = async (data: { id: string }): Promise<any> => {
 
 export const requestPayout = async (data: any): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-  return await axios.post(`${EXPO_PUBLIC_API}/payout`, data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
+	return await axios.post(`${EXPO_PUBLIC_API}/payout`, data, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const updateOrder = async (data: any): Promise<any> => {
+	let { id, ...others } = data;
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.patch(`${EXPO_PUBLIC_API}/order/${id}`, others, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const confirmOrder = async (data: any): Promise<any> => {
+	let { id, ...others } = data;
+	const { token } = await getCachedAuthData("user-data");
+	console.log(id); 
+	
+	return await axios.patch(`${EXPO_PUBLIC_API}/rider/deliver-order/${id}`, others, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
 };

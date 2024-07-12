@@ -45,7 +45,6 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 
 	const aceptOrder = () => {
 		mutate({ id: item._id });
-		console.log(item._id);
 	};
 	return (
 		<View style={styles.card}>
@@ -55,7 +54,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 						{!item?.schedule ? "Normal delivery" : "Schedule delivery"}
 					</Typography>
 					<View style={styles.price_tag}>
-						<Typography type="text24" sx={{ color: colors.white_1 }}>
+						<Typography type="text24" sx={{ color: colors.black }}>
 							{`£ ${item?.ridersFee}`}
 						</Typography>
 					</View>
@@ -283,7 +282,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 				{userUpdate || isPending ? (
 					<Lottile json={require("../../assets/lottile/imageFile.json")} />
 				) : (
-					<Typography type="text16" fontfamily={font.DMSans_700Bold}>
+					<Typography type="text16" sx={{color:colors.black}} fontfamily={font.DMSans_700Bold}>
 						Accept order
 					</Typography>
 				)}

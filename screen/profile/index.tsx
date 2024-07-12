@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+	Image,
+	Pressable,
+	RefreshControl,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -15,12 +22,11 @@ import { CommonActions } from "@react-navigation/native";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
 import Rating from "../../components/rating";
-import {
-	clearAuthData
-} from "../../utilities/storage";
+import { clearAuthData } from "../../utilities/storage";
+import Show from "../../components/show";
 
 export default function Profile({ navigation }: any) {
-	const { userData, isFetching } = useContext(UserContext);
+	const { userData, isFetching, refetch } = useContext(UserContext);
 
 	const logOut = async () => {
 		navigation.dispatch(
@@ -38,9 +44,6 @@ export default function Profile({ navigation }: any) {
 		);
 	};
 
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(userData, null, 2));
-	// }, []); 
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />
@@ -64,10 +67,49 @@ export default function Profile({ navigation }: any) {
 				</View>
 				<ScrollContainer
 					sx={{ height: "100%" }}
-					innerStyles={{ gap: 15, paddingBottom: "50%" }}
+					innerStyles={{ gap: 15, paddingBottom: "30%" }}
+					refreshControl={
+						<RefreshControl
+							refreshing={isFetching}
+							onRefresh={refetch}
+							colors={[colors.yellow]}
+							tintColor={colors.yellow}
+						/>
+					}
 				>
 					<View style={styles.user}>
-						<User />
+						<Pressable
+							onPress={() => {
+								navigation.navigate("updatecapture");
+							}}
+						>
+							<Show>
+								<Show.When isTrue={userData?.image !== undefined}>
+									<View
+										style={{
+											width: "100%",
+											alignItems: "center",
+										}}
+									>
+										<Image
+											source={{ uri: userData?.image }}
+											style={{
+												width: 120,
+												height: 120,
+												borderRadius: 100,
+												borderWidth: 1,
+												borderColor: colors.yellow,
+											}}
+											resizeMode="cover"
+										/>
+									</View>
+								</Show.When>
+								<Show.Else>
+									<User />
+								</Show.Else>
+							</Show>
+						</Pressable>
+
 						<Typography type="text24">{userData?.firstName}</Typography>
 						<Typography type="text16">
 							{userData?.totalRides} rides done

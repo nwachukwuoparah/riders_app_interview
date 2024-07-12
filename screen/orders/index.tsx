@@ -27,21 +27,20 @@ import { handleError } from "../../helpers";
 import Show from "../../components/show";
 
 export default function Order({ navigation }: any) {
-	const [type, setType] = useState("pending");
+	const [type, setType] = useState("orderStatus=ready&orderStatus=picked");
 	const [cancel, setCancel] = useState(false);
 	const [displayFilter, setDisplayFilter] = useState(false);
 	const [confirm, setConfirm] = useState(false);
 	const [orderID, setOrderId] = useState<string>("");
 	const cancelRef = useRef(null);
 	const filterRef = useRef(null);
-	const confirmRef = useRef(null);
-	const [filter, setFilter] = useState(`?schedule=false`);
+	const [filter, setFilter] = useState(`?schedule=false&orderStatus=ready&orderStatus=picked`);
 
 	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-order", filter],
 		queryFn: getOrders,
-		// staleTime: 600000,
-	}); 
+		staleTime: 600000,
+	});
 
 	const cancelOrder = (id: string) => {
 		setCancel(!cancel);
@@ -58,32 +57,45 @@ export default function Order({ navigation }: any) {
 		setConfirm(false);
 	};
 
-	const toogleConfirm = () => {
+	const toogleConfirm = (id: string) => {
 		setConfirm(!confirm);
 		setDisplayFilter(false);
 		setCancel(false);
+		if (id) {
+			setOrderId(id);
+		}
 	};
 
 	useEffect(() => {
 		if (error) {
 			handleError(error);
 		}
-	}, [error]); 
+	}, [error]);
 
 	useEffect(() => {
 		(async () => {
 			if (!displayFilter) {
 				const data = await getCachedAuthData("filter-data");
-				if (data !== undefined && type === "pending") {
-					setFilter(`?schedule=${data?.status}`); //&createdAt=${data?.date}
+				console.log(data);
+				if (data !== undefined && type === "orderStatus=ready&orderStatus=picked") {
+					setFilter(`?schedule=${data?.status}&orderStatus=ready&orderStatus=picked`); //&createdAt=${data?.date}
 				} else {
 					setFilter(
-						`?schedule=${data?.status}&createdAt=${data?.date}&riderStatus=${type}`
+						`?schedule=${data?.status}&orderStatus=${type}` //&createdAt=${data?.date}
 					);
 				}
 			}
 		})();
 	}, [displayFilter, type]);
+
+	useEffect(() => {
+		// console.log(JSON.stringify(data?.data?.data,null,2));
+		console.log(filter);
+	}, [filter]);
+
+	useEffect(() => {
+		console.log(JSON.stringify(data?.data?.data, null, 2));
+	}, [data]);
 
 	return (
 		<Container>
@@ -109,13 +121,13 @@ export default function Order({ navigation }: any) {
 				</View>
 				<View style={styles.body}>
 					<TouchableOpacity
-						onPress={() => { 
-							setType("pending");
+						onPress={() => {
+							setType("orderStatus=ready&orderStatus=picked");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
-							borderColor: type === "pending" ? colors.yellow : colors.grey_b,
+							borderColor: type === "orderStatus=ready&orderStatus=picked" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">Pending</Typography>
@@ -180,7 +192,7 @@ export default function Order({ navigation }: any) {
 							onPress={() => navigation.navigate("orderDetails", item, type)}
 							type={type}
 							cancel={() => cancelOrder(item?._id)}
-							confirm={toogleConfirm}
+							confirm={() => toogleConfirm(item?._id)}
 							item={item}
 							navigation={navigation}
 						/>
@@ -231,9 +243,9 @@ export default function Order({ navigation }: any) {
 				modalOpen={displayFilter}
 			/>
 			<ConfirmModal
-				cancelRef={confirmRef}
-				cancelOrder={toogleConfirm}
+				closeModal={toogleConfirm}
 				modalOpen={confirm}
+				orderID={orderID}
 			/>
 		</Container>
 	);

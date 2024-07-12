@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-query";
 import React, { createContext, useEffect, useState } from "react";
 import { getProfile } from "../../helpers/query";
-import { getCachedAuthData } from "../../utilities/storage";
 import { handleError } from "../../helpers";
 import { updateUser } from "../../helpers/mutate";
 import { Alert } from "react-native";
@@ -20,7 +19,7 @@ const UserProvider = ({ children }: any) => {
 	const queryClient = useQueryClient();
 	const navigation = useNavigation();
 
-	const { data, isFetching, error } = useQuery({
+	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-profile"],
 		queryFn: getProfile,
 		staleTime: 600000,
@@ -45,13 +44,11 @@ const UserProvider = ({ children }: any) => {
 		if (error) {
 			handleError(error);
 		}
-
-		console.log("active", active);
 	}, [data, error, active]);
 
 	return (
 		<UserContext.Provider
-			value={{ userData, isFetching, setActive, isPending, mutate }}
+			value={{ userData, isFetching, refetch, setActive, isPending, mutate }}
 		>
 			{children}
 		</UserContext.Provider>

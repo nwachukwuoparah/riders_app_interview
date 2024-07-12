@@ -19,9 +19,7 @@ export default function Update_capture({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
-			// clearAuthData("step");
-			// navigation.navigate("UserStack");
-			// console.log(data?.data);
+			navigation.goBack();
 		},
 		onError: (err) => {
 			handleError(err);

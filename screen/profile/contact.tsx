@@ -46,13 +46,14 @@ export default function Contact({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<KeyboardView sx={{ height: "90%" }}>
-				<InnerWrapper sx={{ gap: 30 }}>
+			<InnerWrapper sx={{ flex: 7 }}>
+				<KeyboardView sx={{ height: "90%" }}>
 					<View
 						style={{
 							flexDirection: "row",
 							alignItems: "center",
 							justifyContent: "space-between",
+							paddingBottom: "5%",
 						}}
 					>
 						<View style={styles.title}>
@@ -87,13 +88,8 @@ export default function Contact({ navigation }: any) {
 							errors={errors}
 						/>
 					</ScrollContainer>
-				</InnerWrapper>
-				<View style={styles.buttonCont}>
-					<View
-						style={{ width: "95%", flexDirection: "row", alignItems: "center" }}
-					></View>
-				</View>
-			</KeyboardView>
+				</KeyboardView>
+			</InnerWrapper>
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>
@@ -123,8 +119,7 @@ const styles = StyleSheet.create({
 	buttonCont: {
 		width: "100%",
 		alignItems: "center",
-		justifyContent: "center",
-		flexDirection: "row",
+		flex: 1,
 		backgroundColor: colors.black_1,
 		paddingTop: 15,
 		...Platform.select({

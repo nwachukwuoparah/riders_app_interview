@@ -41,10 +41,7 @@ export const getOverview = async (): Promise<any> => {
 
 export const getOrders = async (data: any): Promise<any> => {
 	console.log(data?.queryKey?.[1]);
-
 	const { token } = await getCachedAuthData("user-data");
-	console.log(token);
-
 	return await axios.get(`${EXPO_PUBLIC_API}/order${data?.queryKey?.[1]}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,

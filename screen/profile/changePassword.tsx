@@ -14,7 +14,6 @@ import { changePasswordWithConfirmType, changePasswordType } from "../../types";
 import LoadingComponent from "../../components/loading";
 
 export default function ChangePassword({ navigation }: any) {
-
 	const {
 		control,
 		handleSubmit,
@@ -59,7 +58,7 @@ export default function ChangePassword({ navigation }: any) {
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
+			<InnerWrapper sx={{ gap: 50, flex: 6 }}>
 				<View style={styles.title}>
 					<CustButton
 						type="back"
@@ -119,11 +118,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	buttonCont: {
+		flex: 1,
 		width: "100%",
 		alignItems: "center",
-		justifyContent: "center",
 		backgroundColor: colors.black_1,
-		paddingTop: 15,
+		paddingTop: 20,
 		...Platform.select({
 			ios: {
 				shadowOpacity: 0.1,

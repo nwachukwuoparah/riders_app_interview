@@ -74,7 +74,7 @@ const CustButton = ({ children, type, sx, onPress, color }: propType) => {
 					<Ionicons
 						name="ios-close-outline"
 						style={{ ...styles.closeButn, ...sx }}
-						size={40}
+						size={hp(4)}
 						color={color}
 					/>
 				</TouchableOpacity>

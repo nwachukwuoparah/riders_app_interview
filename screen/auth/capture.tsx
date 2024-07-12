@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clearAuthData } from "../../utilities/storage";
 import { updateUser } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
+import { handleError } from "../../helpers";
 
 export default function Capture({ navigation }: any) {
 	const [photoUri, setPhotoUri] = useState<object | null>(null);
@@ -20,12 +21,9 @@ export default function Capture({ navigation }: any) {
 		onSuccess: async (data) => {
 			clearAuthData("step");
 			navigation.navigate("UserStack");
-			console.log(data?.data);
 		},
 		onError: (err) => {
-			if (err) {
-				console.error(JSON.stringify(err, null, 2));
-			}
+			handleError(err);
 		},
 	});
 

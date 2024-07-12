@@ -41,6 +41,7 @@ import { getCurrentLocation, handleError, truncateString } from "../../helpers";
 import { useFocusEffect } from "@react-navigation/native";
 import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
 // import { EXPO_PUBLIC_API } from "@env";
+
 let EXPO_PUBLIC_API =
 	"https://aftilish-development-server-e7f09cb1463d.herokuapp.com";
 
@@ -80,7 +81,7 @@ const Home = ({ navigation }: any) => {
 						}
 					},
 					(error) => {
-						console.error("error",error);
+						console.error("error", error);
 					},
 					{
 						enableHighAccuracy: true,
@@ -118,7 +119,7 @@ const Home = ({ navigation }: any) => {
 	);
 
 	return (
-		<Container sx={{ justifyContent: "space-between"}}>
+		<Container sx={{ justifyContent: "space-between" }}>
 			{/* <MapView
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
@@ -152,7 +153,7 @@ const Home = ({ navigation }: any) => {
 							}} 
 						/>
 					</>
-				)}
+				)} 
 			</MapView> */}
 			<SubHome
 				navigation={navigation}
@@ -178,8 +179,8 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
-		}, 
-	}); 
+		},
+	});
 
 	useEffect(() => {
 		(async () => {
@@ -195,14 +196,14 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				console.log("Connection successful");
 				setConnected(true);
 				set_request_riders(false);
-			};
+			}; 
 
 			const handleAfrilishOrder = (data: any) => {
 				if (data?.msg === "No order available in your location") {
 					set_request_riders(false);
 					Alert.alert("Message", data?.msg);
 				} else {
-					setRiders(data?.data); 
+					setRiders(data?.data);
 					console.log("Received order:", data);
 				}
 			};
@@ -217,10 +218,10 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				console.error("Socket error:", error);
 			};
 
-			if (rides?.length > 0 && connected) { 
+			if (rides?.length > 0 && connected) {
 				intervalId = setInterval(() => {
 					console.log("call");
-					socket.emit("join", { 
+					socket.emit("join", {
 						userId: userData?._id,
 						type: "Rider",
 						lng: 6.9995863,
@@ -235,29 +236,27 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 			}
 
 			if (userData?.status === "on-line" && userData?._id) {
-				console.log("running");
 				socket.on("connect", handleConnect);
 				socket.on("rider-message", handleAfrilishOrder);
 				socket.on("error", handleError);
 				socket.on("disconnect", handleDisconnect);
 			}
-
-			return () => {
+			return () => { 
 				socket.off("connect", handleConnect);
 				socket.off("rider-message", handleAfrilishOrder);
 				socket.off("error", handleError);
 				socket.off("disconnect", handleDisconnect);
 				socket.disconnect();
-				if (intervalId) {
+				if (intervalId) { 
 					clearInterval(intervalId);
 					console.log("Interval cleared on cleanup");
 				}
-			};
+			}; 
 		}, [userData, rides, connected])
-	);
-
+ 	);   
+  
 	return (
-		<>
+		<> 
 			<View style={styles.top}>
 				<View style={styles.search}>
 					<LocationIcon />
@@ -276,30 +275,29 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 								width: "100%",
 							}}
 							contentContainerStyle={{
-								gap: 30,
+								gap: 30, 
 								paddingTop: "2%",
 								paddingBottom: 150,
-							}}
+							}}     
 							data={rides}
 							renderItem={({ item }: any) => (
-								<RequestCard
+						 		<RequestCard
 									navigate={() => {
 										navigation.navigate("Orders");
-										setRiders([]);
+										setRiders([]); 
 									}}
-									item={item}
+									item={item}  
 								/>
 							)}
 							keyExtractor={(item) => item?._id}
-						/>
+						/> 
 					</Show.When>
 					<Show.When isTrue={userData === undefined}>
-						{/* //|| destination?.step === 1 */} 
 						<></>
 					</Show.When>
 					<Show.When isTrue={userData?.status !== "on-line"}>
 						<View style={styles.switch}>
-							<CustButton 
+							<CustButton
 								onPress={() => {
 									mutate({ status: "on-line" });
 								}}
@@ -319,17 +317,16 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 								<View style={styles.switch}>
 									<CustButton
 										onPress={async () => {
-											if (connected) {
+											if (connected && userData?._id) {
 												console.log("Fetching ride");
 												socket.emit("rider", {
 													userId: userData?._id,
-													lng: 6.9995863,
-													lat: 5.379239699999999
+													lng: -1.785035,
+													lat: 53.645792,
 												});
 												set_request_riders(!request_rides);
 											}
 										}}
-
 										type="rounded"
 										sx={{
 											width: wp("85%"),
@@ -384,7 +381,7 @@ const styles = StyleSheet.create({
 	},
 	bottom: {
 		width: "90%",
-		 marginBottom: "10%" 
+		marginBottom: "10%",
 	},
 	switch: {
 		backgroundColor: colors.black,

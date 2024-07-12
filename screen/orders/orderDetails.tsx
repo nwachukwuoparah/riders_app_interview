@@ -7,10 +7,9 @@ import colors from "../../constant/theme";
 import Ordercard from "../../components/orderCard";
 
 export default function Order({ navigation, route }: any) {
-
-useEffect(() => {
-	console.log("call",route?.params)
-}, []) 
+	useEffect(() => {
+		console.log("call", route?.params);
+	}, []);
 
 	return (
 		<Container>
@@ -23,11 +22,11 @@ useEffect(() => {
 					/>
 					<Typography type="text24">Order details</Typography>
 				</View>
-				<Ordercard item={route?.params} />
+				<Ordercard item={route?.params} navigation={navigation} />
 			</InnerWrapper>
 		</Container>
 	);
-}
+};
 
 const styles = StyleSheet.create({
 	title: {
