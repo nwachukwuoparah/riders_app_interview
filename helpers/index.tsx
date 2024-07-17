@@ -5,16 +5,6 @@ import { clearAuthData } from "../utilities/storage";
 
 export const getCurrentLocation = async (latitude: any, longitude: any) => {
 	try {
-		// Request permission to access the device's location
-		let { status } = await Location.requestForegroundPermissionsAsync();
-		if (status !== "granted") {
-			Alert.alert("Permission to access location was denied");
-			return;
-		}
-		// // Get the current location
-		// let currentLocation = await Location.getCurrentPositionAsync({});
-		// let { latitude, longitude } = currentLocation.coords;
-
 		// Reverse geocode to get the address
 		let reverseGeocode = await Location.reverseGeocodeAsync({
 			latitude,

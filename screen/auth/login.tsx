@@ -42,7 +42,6 @@ export default function Login({ navigation }: any) {
 			(async () => {
 				// await clearAuthData("step");
 				try {
-
 					const step = await getCachedAuthData("step");
 					const reset_email = await getCachedAuthData("reset-email");
 					if (reset_email) {
@@ -126,6 +125,7 @@ export default function Login({ navigation }: any) {
 					</TouchableOpacity>
 				</View>
 			</InnerWrapper>
+
 			<View style={styles.buttonCont}>
 				<CustButton type="rounded" onPress={handleSubmit(onSubmit)}>
 					<Typography type="text16" sx={{ color: colors.black }}>

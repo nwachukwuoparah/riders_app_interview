@@ -60,9 +60,9 @@ export default function VerifyVehicle({ navigation }: any) {
 		mutate(formData);
 	};
 
-	useEffect(() => {
-		console.log(isPending);
-	}, [isPending]);
+	// useEffect(() => {
+	// 	console.log(isPending);
+	// }, [isPending]);
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -126,6 +126,7 @@ export default function VerifyVehicle({ navigation }: any) {
 									name="plateNumber"
 								/>
 								<PickImage
+									// allowsMultipleSelection={true}
 									imageName="image"
 									errors={errors}
 									setValue={setValue}
@@ -156,13 +157,16 @@ export default function VerifyVehicle({ navigation }: any) {
 								</PickImage>
 								<Show>
 									<Show.When isTrue={watch("image") !== undefined}>
+										{/* {(watch("image"))?.map((i: any, index: number) => ( */}
 										<FilePreview
+											// key={index}
 											handelDelete={() => {
 												setValue("image", undefined);
 											}}
-											handelPreview={() => {}}
-											type="Drivers liscense"
+											handelPreview={() => { }}
+											type="Driver's licence"
 										/>
+										{/* ))} */}
 									</Show.When>
 								</Show>
 							</View>
@@ -199,7 +203,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	inputContain: {
-		gap: 35,
+		gap: 20,
 		marginHorizontal: "5%",
 		marginBottom: 20,
 		paddingTop: 20,

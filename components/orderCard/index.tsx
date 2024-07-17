@@ -6,6 +6,7 @@ import OngoingIcon from "../../assets/svg/ongoingIcon.svg";
 import CustButton from "../button";
 import Show from "../show";
 import RequesIcon from "../../assets/svg/requesIcon.svg";
+import Clock from "../../assets/svg/clock.svg";
 import {
 	heightPercentageToDP as hp,
 	widthPercentageToDP as wp,
@@ -41,7 +42,7 @@ export default function Ordercard({
 	const queryClient = useQueryClient();
 
 	const { isPending, mutate } = useMutation({
-		mutationFn: updateOrder, 
+		mutationFn: updateOrder,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-order" as QueryFilters);
 			console.log(data?.data);
@@ -52,14 +53,14 @@ export default function Ordercard({
 		},
 	});
 
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(item, null, 2));
-	// }, []);
+	useEffect(() => {
+		console.log(JSON.stringify(item, null, 2));
+	}, []);
 
 	return (
 		<>
 			<Show>
-				<Show.When isTrue={type === "orderStatus=ready&orderStatus=picked"}>
+				<Show.When isTrue={item?.schedule}>
 					<Pressable onPress={onPress}>
 						<View style={styles.ongoing_card}>
 							<View style={styles.top}>
@@ -70,7 +71,108 @@ export default function Ordercard({
 										{item?.schedule ? "Schedule" : "Normal delivery"}
 									</Typography>
 								</View>
- 
+
+								<View style={styles.status}>
+									<Typography type="text14" sx={{ color: colors.black }}>
+										{moment(item?.createdAt).format("h:mm a")}
+									</Typography>
+								</View>
+							</View>
+
+							<View style={{ flexDirection: "row", gap: 10 }}>
+								<RequesIcon height={hp("12%")} />
+								<View style={{ gap: 15 }}>
+									<View style={styles.direction}>
+										<Typography type="text14" sx={{ color: colors.white }}>
+											Pick up from
+										</Typography>
+										<Typography type="text16" sx={{ color: colors.white }}>
+											<Typography
+												type="text16"
+												fontfamily={font.DMSans_700Bold}
+												sx={{ color: colors.white }}
+											>
+												{item?.vendorId?.address}
+											</Typography>
+										</Typography>
+									</View>
+									<View style={styles.direction}>
+										<Typography type="text14" sx={{ color: colors.white }}>
+											Delivery to
+										</Typography>
+										<Typography type="text16" sx={{ color: colors.white }}>
+											{truncateString(item?.deliveryAddress, 40)}
+										</Typography>
+									</View>
+								</View>
+							</View>
+
+							{!cancel && <View style={styles.top}>
+								<View style={styles.single_order_banner}>
+									<Typography type="text14" sx={{ color: colors.white_1 }}>
+										Daily delivery times
+									</Typography>
+									<View
+										style={{
+											flexDirection: "row",
+											justifyContent: "space-between",
+
+										}}
+									>
+										{[{ time: "09:00am" }, { time: "12:00pm" }, { time: "04:00pm" }]?.map((i, index) => (
+											<View key={index} style={{ flexDirection: "row", gap: 5 }}>
+												<Clock />
+												<Typography
+													type="text14"
+													fontfamily={font.DMSans_700Bold}
+													sx={{ color: colors.white_1 }}
+												>
+													{i?.time}
+												</Typography>
+											</View>
+										))}
+									</View>
+								</View>
+							</View>
+							}
+
+							{type !== "completed" && cancel && (
+								<View style={styles.top}>
+									<View
+										style={{ ...styles.status, backgroundColor: colors.black }}
+									>
+										<Typography type="text24" sx={{ color: colors.yellow }}>
+											£ {item?.ridersFee}
+										</Typography>
+									</View>
+
+									<TouchableOpacity
+										onPress={cancel}
+										style={{ ...styles.status, backgroundColor: colors.black }}
+									>
+										<Entypo
+											name="dots-three-horizontal"
+											size={24}
+											color={colors.white}
+										/>
+									</TouchableOpacity>
+								</View>
+							)}
+						</View>
+					</Pressable>
+				</Show.When>
+				<Show.When isTrue={type === "orderStatus=ready&orderStatus=picked&orderStatus=arrived"}>
+					<Pressable onPress={onPress}>
+						<View style={styles.ongoing_card}>
+							<View style={styles.top}>
+								<View
+									style={{ ...styles.status, backgroundColor: colors.black }}
+								>
+									<Typography type="text16">
+										{item?.schedule ? "Schedule" : "Normal delivery"}
+									</Typography>
+								</View>
+
 								<View style={styles.status}>
 									<Typography type="text14" sx={{ color: colors.black }}>
 										{moment(item?.createdAt).format("h:mm a")}
@@ -361,5 +463,13 @@ const styles = StyleSheet.create({
 	direction: { gap: 5 },
 	time: {
 		gap: 5,
+	},
+	single_order_banner: {
+		width: "100%",
+		padding: 12,
+		backgroundColor: colors.grey_a,
+		borderRadius: 15,
+		gap: 10,
+		paddingHorizontal: 15,
 	},
 });

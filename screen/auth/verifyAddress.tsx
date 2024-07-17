@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -60,6 +60,10 @@ export default function VerifyAddress({ navigation }: any) {
 		mutate(formData);
 	};
 
+	useEffect(() => {
+		console.log(isPending);
+	}, [isPending])
+
 	return (
 		<View style={{ flex: 1 }}>
 			<Container>
@@ -92,7 +96,7 @@ export default function VerifyAddress({ navigation }: any) {
 						</View>
 						<ScrollContainer>
 							<View style={{ ...styles.inputContain }}>
-							<InputComponent
+								<InputComponent
 									label="Enter City"
 									type="text"
 									placeholder="Enter city"
@@ -152,7 +156,7 @@ export default function VerifyAddress({ navigation }: any) {
 												handelDelete={() => {
 													setValue("image", undefined);
 												}}
-												handelPreview={() => {}}
+												handelPreview={() => { }}
 											/>
 										</Show.When>
 									</Show>

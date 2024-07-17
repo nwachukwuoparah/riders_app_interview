@@ -14,34 +14,71 @@ const PickImage = ({
 	errors,
 	control,
 	clearErrors,
+	allowsMultipleSelection
 }: any) => {
+
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
-			allowsEditing: true,
+			allowsEditing: allowsMultipleSelection ? false : true,
+			allowsMultipleSelection: allowsMultipleSelection,
 			aspect: [4, 3],
 			quality: 1,
 		});
 
-		const prepFileForUpload = (file: ImagePickerAsset) => {
-			let uri = (file as ImagePicker.ImagePickerAsset).uri;
-			let name = uri.split("/").pop() as string;
-			let match = /\.(\w+)$/.exec(name);
-			let type = match ? `image/${match[1]}` : "image";
-			setValue(imageName, { uri, name, type });
+		const prepMultipleFileForUpload = (file: ImagePicker.ImagePickerResult) => {
+			// Initialize an array to store formatted images
+			const formattedImages: any[] = [];
+
+			file?.assets?.forEach((asset) => {
+				let uri = asset.uri;
+				let name = uri.split("/").pop() as string;
+				let match = /\.(\w+)$/.exec(name);
+				let type = match ? `image/${match[1]}` : "image";
+
+				// Prepare the image object
+				const image = { uri, name, type };
+
+				// Use unique key for each image to set in form data
+				setValue(`${imageName}_${name}`, image);
+
+				// Push the formatted image to the array
+				formattedImages.push(image);
+			});
+
+			// Clear any errors related to the image field
 			clearErrors(imageName);
-			// console.log("after", { uri, name, type });
+
+			// Use unique key for each image to set in form data
+			setValue(imageName, formattedImages);
 		};
-		if (!result.canceled) {
-			prepFileForUpload(result.assets[0]);
-			// console.log("before", result.assets[0]);
+
+		const prepSingleFileForUpload = (file: ImagePicker.ImagePickerResult) => {
+			file?.assets?.forEach((asset) => {
+				let uri = asset.uri;
+				let name = uri.split("/").pop() as string;
+				let match = /\.(\w+)$/.exec(name);
+				let type = match ? `image/${match[1]}` : "image";
+				// Use unique key for each image to set in form data
+				setValue(imageName, { uri, name, type });
+			});
+			clearErrors(imageName);
+		};
+
+		if (!result?.canceled && allowsMultipleSelection) {
+			prepMultipleFileForUpload(result);
+		} else {
+			prepSingleFileForUpload(result)
 		}
 	};
 
+
 	const requestPermission = async () => {
-		const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
 		if (status !== "granted") {
-			Alert.alert("Sorry, we need camera roll permissions to make this work!");
+			Alert.alert("Permission required", "Please grant access to the media library to pick images.");
+			return;
 		} else {
 			pickImage();
 		}
@@ -68,10 +105,3 @@ const PickImage = ({
 };
 
 export default PickImage;
-
-
-
-// before  "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540afrilish%252Fafrilish-riders/ImagePicker/188553e2-1540-4bfd-bdba-b95312f63c67.jpeg"
-// before  "uri": file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540afrilish%252Fafrilish-riders/Camera/c8b00d17-34ce-4134-ac94-71c973fbe4c0.jpg
-//  LOG  {"name": "c8b00d17-34ce-4134-ac94-71c973fbe4c0.jpg", "type": "image/jpg", "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540afrilish%252Fafrilish-riders/Camera/c8b00d17-34ce-4134-ac94-71c973fbe4c0.jpg"}
-// after {"name": "188553e2-1540-4bfd-bdba-b95312f63c67.jpeg", "type": "image/jpeg", "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540afrilish%252Fafrilish-riders/ImagePicker/188553e2-1540-4bfd-bdba-b95312f63c67.jpeg"}

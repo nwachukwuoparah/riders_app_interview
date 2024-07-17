@@ -47,7 +47,7 @@ export default function ChangePassword({ navigation }: any) {
 				clearErrors("confirmPassword");
 			}
 		})();
-	}, [watch("newPassword"), watch("confirmPassword")]);
+	}, [watch("confirmPassword")]);
 
 	const onSubmit = (data: changePasswordWithConfirmType) => {
 		const { confirmPassword, ...others } = data;
@@ -76,6 +76,7 @@ export default function ChangePassword({ navigation }: any) {
 						errors={errors}
 						placeholder="Old password"
 						watch={watch}
+						check={true}
 					/>
 					<InputComponent
 						label="Enter new password"

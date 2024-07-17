@@ -73,11 +73,7 @@ export const bankDetailsSchems = yup.object().shape({
 export const changePasswordSchems = yup.object().shape({
 	oldPassword: yup
 		.string()
-		.required("Password field is required")
-		.matches(
-			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-			"Should contain at least 8 characters, a number, upper case and special characters"
-		),
+		.required("Password field is required"),
 	newPassword: yup
 		.string()
 		.required("New password field is required")

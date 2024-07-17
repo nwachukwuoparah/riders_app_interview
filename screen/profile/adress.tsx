@@ -25,6 +25,7 @@ import {
 } from "@tanstack/react-query";
 import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
+import LoadingComponent from "../../components/loading";
 
 export default function Address({ navigation }: any) {
 	const { userData } = useContext(UserContext);
@@ -40,9 +41,10 @@ export default function Address({ navigation }: any) {
 	} = useForm<addressTypes | any>({
 		resolver: yupResolver(addressSchems),
 		defaultValues: {
-			currentAddress: userData?.currentAddress,
+			location: userData?.location,
 			addressDocType: userData?.addressDocType,
 			image: userData?.proofOfAddress,
+			postalCode: userData?.postalCode
 		},
 	});
 
@@ -59,13 +61,15 @@ export default function Address({ navigation }: any) {
 	const onSubmit = (data: addressTypes) => {
 		const formData = new FormData();
 		formData.append("image", data?.image as any);
-		formData.append("currentAddress", data?.currentAddress);
+		formData.append("location", data?.location);
+		formData.append("postalCode", data?.postalCode);
 		formData.append("addressDocType", data?.addressDocType);
 		mutate(formData);
 	};
 
 	return (
 		<Container>
+			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View
@@ -103,12 +107,20 @@ export default function Address({ navigation }: any) {
 					<ScrollContainer innerStyles={{ paddingBottom: 30 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
-								label="Enter post code"
+								label="Enter City"
 								type="text"
-								name="currentAddress"
+								placeholder="Enter city"
 								control={control}
 								errors={errors}
+								name="location"
+							/>
+							<InputComponent
+								label="Enter post code"
+								type="text"
 								placeholder="Enter * digit"
+								control={control}
+								errors={errors}
+								name="postalCode"
 							/>
 							<InputComponent
 								label="Upload your proof of address"
@@ -160,7 +172,7 @@ export default function Address({ navigation }: any) {
 										handelDelete={() => {
 											setValue("image", undefined);
 										}}
-										handelPreview={() => {}}
+										handelPreview={() => { }}
 									/>
 								</Show.When>
 							</Show>
@@ -180,6 +192,7 @@ const styles = StyleSheet.create({
 	inputContain: {
 		gap: 20,
 		flex: 1,
+		marginTop: "10%"
 	},
 	image_wrap: {
 		gap: 15,

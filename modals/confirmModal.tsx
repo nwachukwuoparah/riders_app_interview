@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import BottomModal from "./index";
 import {
 	Alert,
@@ -7,6 +7,7 @@ import {
 	Platform,
 	Pressable,
 	StyleSheet,
+	TouchableOpacity,
 	View,
 } from "react-native";
 import Typography from "../components/typography";
@@ -27,9 +28,11 @@ import {
 import { handleError } from "../helpers";
 import LoadingComponent from "../components/loading";
 import { KeyboardView } from "../components/container";
+import Show from "../components/show";
 
-export default function ConfirmModal({ closeModal, modalOpen, orderID }: any) {
+export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType }: any) {
 	const queryClient = useQueryClient();
+	const [period, setPeriod] = useState("")
 
 	const {
 		control,
@@ -49,7 +52,8 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID }: any) {
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
 		},
-	}); 
+	});
+
 
 	return (
 		<Modal
@@ -58,7 +62,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID }: any) {
 			transparent={true}
 		>
 			<Pressable
-				style={{ flex: 2.1, backgroundColor: "rgba(0, 0, 0, 0.3)" }}
+				style={{ flex: orderType ? 1.4 : 2.1, backgroundColor: "rgba(0, 0, 0, 0.3)" }}
 				onPress={closeModal}
 			></Pressable>
 
@@ -77,6 +81,28 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID }: any) {
 					<Typography type="text16" sx={{ color: colors.white }}>
 						Ask customer to give you 4-digit pick up code
 					</Typography>
+					<Show.When isTrue={orderType}>
+						<View style={{ flexDirection: "row", gap: 20 }}>
+							{[{ period: "Breskfast" }, { period: "Lunch" }, { period: "Dinner" }].map((i) => (
+								<TouchableOpacity onPress={() => {
+									setPeriod(i?.period)
+								}}>
+									<View style={{
+										padding: 10,
+										paddingHorizontal: 20,
+										borderRadius: 20,
+										borderWidth: 1,
+										borderColor: i?.period === period ? colors.yellow : colors.grey,
+										backgroundColor: colors.grey_a
+									}}>
+										<Typography type="text16" sx={{ color: colors.white }}>
+											{i.period}
+										</Typography>
+									</View>
+								</TouchableOpacity>
+							))}
+						</View>
+					</Show.When>
 					<View style={{ width: "90%", gap: 15 }}>
 						<InputComponent
 							type="otp"
@@ -87,11 +113,21 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID }: any) {
 						<CustButton
 							type="rounded"
 							onPress={handleSubmit((data) => {
-								mutate({
-									id: orderID,
-									pickUpCode: data?.otp,
-									schedule: false,
-								});
+								if (orderType) {
+									mutate({
+										id: orderID,
+										pickUpCode: data?.otp,
+										schedule: true,
+										day: "2024-07-18T15:54:08.794Z",
+										period: period
+									});
+								} else {
+									mutate({
+										id: orderID,
+										pickUpCode: data?.otp,
+										schedule: false,
+									});
+								}
 							})}
 							sx={{ width: "100%" }}
 						>

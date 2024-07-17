@@ -26,6 +26,7 @@ import {
 import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
 import LoadingComponent from "../../components/loading";
+import { handleError } from "../../helpers";
 
 export default function Vehicle_Details({ navigation }: any) {
 	const { userData } = useContext(UserContext);
@@ -52,13 +53,16 @@ export default function Vehicle_Details({ navigation }: any) {
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
+			console.log(data?.data?.data);
 		},
 		onError: (err) => {
-			console.error(JSON.stringify(err, null, 2));
+			handleError(err)
 		},
 	});
 
 	const onSubmit = (data: vehicleTypes) => {
+		console.log(JSON.stringify(data?.image, null, 2));
+
 		const formData = new FormData();
 		formData.append("image", data?.image as any);
 		formData.append("plateNumber", data?.plateNumber);
@@ -66,6 +70,10 @@ export default function Vehicle_Details({ navigation }: any) {
 		formData.append("vehicleType", data?.vehicleType);
 		mutate(formData);
 	};
+
+	useEffect(() => {
+		console.log(JSON.stringify(userData, null, 2));
+	}, [])
 
 	return (
 		<Container>
@@ -138,6 +146,7 @@ export default function Vehicle_Details({ navigation }: any) {
 								errors={errors}
 							/>
 							<PickImage
+								allowsMultipleSelection={true}
 								imageName="image"
 								errors={errors}
 								setValue={setValue}
@@ -158,7 +167,7 @@ export default function Vehicle_Details({ navigation }: any) {
 											source={require("../../assets/lottile/imageFile.json")}
 										/>
 										<Typography type="text14" sx={{ color: colors.black_1 }}>
-											Tap here to upload document
+											Tap here to upload document (front and back)
 										</Typography>
 										<Typography type="text14" sx={{ color: colors.grey }}>
 											Max 10mb file allowed
@@ -173,13 +182,16 @@ export default function Vehicle_Details({ navigation }: any) {
 										userData?.vehicleLicense !== undefined
 									}
 								>
-									<FilePreview
-										handelDelete={() => {
-											setValue("image", undefined);
-										}}
-										handelPreview={() => {}}
-										type="Driver's licence"
-									/>
+									{(userData?.vehicleLicense || watch("image"))?.map((i: any, index: number) => (
+										<FilePreview
+											key={index}
+											handelDelete={() => {
+												setValue("image", undefined);
+											}}
+											handelPreview={() => { }}
+											type="Driver's licence"
+										/>
+									))}
 								</Show.When>
 							</Show>
 						</View>

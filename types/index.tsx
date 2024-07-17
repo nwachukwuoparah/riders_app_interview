@@ -34,6 +34,7 @@ export interface textInputPropType {
 	errors: UseFormStateReturn<any>["errors"];
 	name: string;
 	watch?: any;
+	check?: boolean
 }
 
 export interface textInputMethodType {
@@ -206,7 +207,7 @@ export interface workingShiftType {
 	evening: periodDataType;
 }
 
-export interface bankDetailsType {}
+export interface bankDetailsType { }
 
 export interface changePasswordType {
 	oldPassword: string;

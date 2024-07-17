@@ -46,6 +46,11 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 	const aceptOrder = () => {
 		mutate({ id: item._id });
 	};
+
+	useEffect(() => {
+		console.log(JSON.stringify(item, null, 2));
+	}, []) 
+
 	return (
 		<View style={styles.card}>
 			<View style={styles.card_top}>
@@ -114,14 +119,14 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 							>
 								<View style={styles.schedule_order_distance}>
 									<Typography type="text12" sx={{ color: colors.white_1 }}>
-										From
+										Total time
 									</Typography>
 									<Typography
-										type="text16"
+										type="text14"
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										102m
+										0 m
 									</Typography>
 								</View>
 								<View style={styles.schedule_order_distance}>
@@ -132,7 +137,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 											alignSelf: "flex-start",
 										}}
 									>
-										To
+										No of trips
 									</Typography>
 									<Typography
 										type="text14"
@@ -142,7 +147,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 											alignSelf: "flex-start",
 										}}
 									>
-										11
+										0
 									</Typography>
 								</View>
 								<View style={styles.schedule_order_distance}>
@@ -157,13 +162,13 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 											alignSelf: "flex-start",
 										}}
 									>
-										20km
+										{item?.totalDistance} km
 									</Typography>
 								</View>
 							</View>
 							<View style={styles.single_order_banner}>
 								<Typography type="text14" sx={{ color: colors.white_1 }}>
-									Daily times
+									Daily delivery times
 								</Typography>
 								<View
 									style={{
@@ -171,7 +176,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 										justifyContent: "space-between",
 									}}
 								>
-									{[1, 2, 3]?.map((i, index) => (
+									{[{ time: "09:00am" }, { time: "12:00pm" }, { time: "04:00pm" }]?.map((i, index) => (
 										<View key={index} style={{ flexDirection: "row", gap: 5 }}>
 											<Clock />
 											<Typography
@@ -179,7 +184,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 												fontfamily={font.DMSans_700Bold}
 												sx={{ color: colors.white_1 }}
 											>
-												09:00am
+												{i?.time}
 											</Typography>
 										</View>
 									))}
@@ -282,7 +287,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 				{userUpdate || isPending ? (
 					<Lottile json={require("../../assets/lottile/imageFile.json")} />
 				) : (
-					<Typography type="text16" sx={{color:colors.black}} fontfamily={font.DMSans_700Bold}>
+					<Typography type="text16" sx={{ color: colors.black }} fontfamily={font.DMSans_700Bold}>
 						Accept order
 					</Typography>
 				)}

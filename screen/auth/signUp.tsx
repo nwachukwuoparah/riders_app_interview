@@ -140,6 +140,14 @@ export default function SignUp({ navigation }: any) {
 									name="password"
 									watch={watch}
 								/>
+								<View style={{ gap: 5 }}>
+									<Typography type="text12" sx={{ color: colors.white }}>
+										Should contain at least 6 characters
+									</Typography>
+									<Typography type="text12" sx={{ color: colors.white }}>
+										Should contain upper case and special characters
+									</Typography>
+								</View>
 							</View>
 						</ScrollContainer>
 					</>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getCachedAuthData } from "../utilities/storage";
-import {EXPO_PUBLIC_API } from "@env"
+import { EXPO_PUBLIC_API } from "@env"
 
 
 export const getProfile = async (): Promise<any> => {
@@ -40,9 +40,17 @@ export const getOverview = async (): Promise<any> => {
 };
 
 export const getOrders = async (data: any): Promise<any> => {
-	console.log(data?.queryKey?.[1]);
 	const { token } = await getCachedAuthData("user-data");
 	return await axios.get(`${EXPO_PUBLIC_API}/order${data?.queryKey?.[1]}`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const getDailyScheduleItem = async (data: any): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.get(`${EXPO_PUBLIC_API}/order/day-schedule/${data?.queryKey?.[1]}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},

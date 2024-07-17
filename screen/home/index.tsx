@@ -70,7 +70,20 @@ const Home = ({ navigation }: any) => {
 
 	useFocusEffect(
 		useCallback(() => {
-			(() => {
+			const startWatching = async () => {
+
+				const requestLocationPermission = () => {
+					let authorizationLevel: any = 'always'; // Default to 'always' for Android
+
+					if (Platform.OS === 'ios') {
+						authorizationLevel = 'whenInUse'; // Use 'whenInUse' for iOS
+					}
+
+					Geolocation.requestAuthorization(authorizationLevel);
+				};
+
+				// Call this function when you need to request location permission
+				requestLocationPermission();
 				watchId.current = Geolocation.watchPosition(
 					async (position) => {
 						const { latitude, longitude } = position.coords;
@@ -81,7 +94,7 @@ const Home = ({ navigation }: any) => {
 						}
 					},
 					(error) => {
-						console.error("error", error);
+						console.error("Error", error);
 					},
 					{
 						enableHighAccuracy: true,
@@ -90,23 +103,57 @@ const Home = ({ navigation }: any) => {
 						fastestInterval: 500,
 					}
 				);
-			})();
+			};
+
+			startWatching();
 
 			return () => {
 				if (watchId.current !== null) {
 					Geolocation.clearWatch(watchId.current);
 				}
 			};
-			// (async () => {
-			// 	try {
-			// 		const destination = await getCachedAuthData("destination");
-			// 		setDestination(destination);
-			// 	} catch (error) {
-			// 		console.error("Error fetching cached data:", error);
-			// 	}
-			// })();
 		}, [])
 	);
+
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		(() => {
+	// 			watchId.current = Geolocation.watchPosition(
+	// 				async (position) => {
+	// 					const { latitude, longitude } = position.coords;
+	// 					const location = await getCurrentLocation(latitude, longitude);
+	// 					setFromLatLng({ latitude, longitude });
+	// 					if (location) {
+	// 						setLocation(location);
+	// 					}
+	// 				},
+	// 				(error) => {
+	// 					console.error("error", error);
+	// 				},
+	// 				{
+	// 					enableHighAccuracy: true,
+	// 					distanceFilter: 0,
+	// 					interval: 1000,
+	// 					fastestInterval: 500,
+	// 				}
+	// 			);
+	// 		})();
+
+	// 		return () => {
+	// 			if (watchId.current !== null) {
+	// 				Geolocation.clearWatch(watchId.current);
+	// 			}
+	// 		};
+	// 		// (async () => {
+	// 		// 	try {
+	// 		// 		const destination = await getCachedAuthData("destination");
+	// 		// 		setDestination(destination);
+	// 		// 	} catch (error) {
+	// 		// 		console.error("Error fetching cached data:", error);
+	// 		// 	}
+	// 		// })();
+	// 	}, [])
+	// );
 
 	const initialRegion = useMemo(
 		() => ({
@@ -120,7 +167,7 @@ const Home = ({ navigation }: any) => {
 
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
-			{/* <MapView
+			{/* <MapView 
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
@@ -186,7 +233,7 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 		(async () => {
 			setActive(true);
 		})();
-		return () => {};
+		return () => { };
 	}, [location]);
 
 	useFocusEffect(
@@ -196,7 +243,7 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				console.log("Connection successful");
 				setConnected(true);
 				set_request_riders(false);
-			}; 
+			};
 
 			const handleAfrilishOrder = (data: any) => {
 				if (data?.msg === "No order available in your location") {
@@ -213,7 +260,7 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				handleConnect();
 				console.log("Socket disconnected. Attempting to reconnect...");
 			};
-
+ 
 			const handleError = (error: any) => {
 				console.error("Socket error:", error);
 			};
@@ -224,8 +271,8 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 					socket.emit("join", {
 						userId: userData?._id,
 						type: "Rider",
-						lng: 6.9995863,
-						lat: 5.379239699999999,
+						lng: -1.785035,
+						lat: 53.645792,
 					});
 				}, 40000);
 
@@ -241,22 +288,22 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				socket.on("error", handleError);
 				socket.on("disconnect", handleDisconnect);
 			}
-			return () => { 
+			return () => {
 				socket.off("connect", handleConnect);
 				socket.off("rider-message", handleAfrilishOrder);
 				socket.off("error", handleError);
 				socket.off("disconnect", handleDisconnect);
 				socket.disconnect();
-				if (intervalId) { 
+				if (intervalId) {
 					clearInterval(intervalId);
 					console.log("Interval cleared on cleanup");
 				}
-			}; 
+			};
 		}, [userData, rides, connected])
- 	);   
-  
+	);
+
 	return (
-		<> 
+		<>
 			<View style={styles.top}>
 				<View style={styles.search}>
 					<LocationIcon />
@@ -275,22 +322,22 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 								width: "100%",
 							}}
 							contentContainerStyle={{
-								gap: 30, 
+								gap: 30,
 								paddingTop: "2%",
 								paddingBottom: 150,
-							}}     
+							}}
 							data={rides}
 							renderItem={({ item }: any) => (
-						 		<RequestCard
+								<RequestCard
 									navigate={() => {
 										navigation.navigate("Orders");
-										setRiders([]); 
+										setRiders([]);
 									}}
-									item={item}  
+									item={item}
 								/>
 							)}
 							keyExtractor={(item) => item?._id}
-						/> 
+						/>
 					</Show.When>
 					<Show.When isTrue={userData === undefined}>
 						<></>

@@ -23,6 +23,7 @@ const HiddenInput = ({
 	errors,
 	name,
 	watch,
+	check
 }: textInputPropType) => {
 	const [hidden, sethidden] = useState<boolean>(true);
 	const [active, setActive] = useState(false);
@@ -73,7 +74,7 @@ const HiddenInput = ({
 				}}
 			>
 				{label && <Typography type="text16">{label}</Typography>}
-				<View style={{ flexDirection: "row", width: "35 %", gap: 3 }}>
+				{!check && <View style={{ flexDirection: "row", width: "35 %", gap: 3 }}>
 					{[1, 2, 3, 4, 5].map((i, index) => (
 						<View
 							key={index}
@@ -86,7 +87,7 @@ const HiddenInput = ({
 							}}
 						></View>
 					))}
-				</View>
+				</View>}
 			</View>
 			<View style={styles.inputWrapper}>
 				<Controller

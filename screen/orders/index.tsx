@@ -27,14 +27,15 @@ import { handleError } from "../../helpers";
 import Show from "../../components/show";
 
 export default function Order({ navigation }: any) {
-	const [type, setType] = useState("orderStatus=ready&orderStatus=picked");
+	const [type, setType] = useState("orderStatus=ready&orderStatus=picked&orderStatus=arrived");
 	const [cancel, setCancel] = useState(false);
 	const [displayFilter, setDisplayFilter] = useState(false);
 	const [confirm, setConfirm] = useState(false);
 	const [orderID, setOrderId] = useState<string>("");
 	const cancelRef = useRef(null);
 	const filterRef = useRef(null);
-	const [filter, setFilter] = useState(`?schedule=false&orderStatus=ready&orderStatus=picked`);
+	const [filter, setFilter] = useState(`?schedule=false&orderStatus=ready&orderStatus=picked&orderStatus=arrived`);
+	const [filterData, setFilterData] = useState({ status: false });
 
 	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-order", filter],
@@ -76,9 +77,9 @@ export default function Order({ navigation }: any) {
 		(async () => {
 			if (!displayFilter) {
 				const data = await getCachedAuthData("filter-data");
-				console.log(data);
-				if (data !== undefined && type === "orderStatus=ready&orderStatus=picked") {
-					setFilter(`?schedule=${data?.status}&orderStatus=ready&orderStatus=picked`); //&createdAt=${data?.date}
+				setFilterData(data);
+				if (data !== undefined && type === "orderStatus=ready&orderStatus=picked&orderStatus=arrived") {
+					setFilter(`?schedule=${data?.status}&orderStatus=ready&orderStatus=picked&orderStatus=arrived`); //&createdAt=${data?.date}
 				} else {
 					setFilter(
 						`?schedule=${data?.status}&orderStatus=${type}` //&createdAt=${data?.date}
@@ -122,17 +123,17 @@ export default function Order({ navigation }: any) {
 				<View style={styles.body}>
 					<TouchableOpacity
 						onPress={() => {
-							setType("orderStatus=ready&orderStatus=picked");
+							setType("orderStatus=ready&orderStatus=picked&orderStatus=arrived");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
-							borderColor: type === "orderStatus=ready&orderStatus=picked" ? colors.yellow : colors.grey_b,
+							borderColor: type === "orderStatus=ready&orderStatus=picked&orderStatus=arrived" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">Pending</Typography>
 					</TouchableOpacity>
-					<TouchableOpacity
+					{!filterData?.status && <TouchableOpacity
 						onPress={() => {
 							setType("in-transit");
 						}}
@@ -144,7 +145,7 @@ export default function Order({ navigation }: any) {
 						}}
 					>
 						<Typography type="text16">In transit</Typography>
-					</TouchableOpacity>
+					</TouchableOpacity>}
 					<TouchableOpacity
 						onPress={() => {
 							setType("completed");
@@ -160,7 +161,7 @@ export default function Order({ navigation }: any) {
 				</View>
 				<CustButton
 					onPress={toogleFilter}
-					type="rounded"
+					type="rounded" 
 					sx={{
 						width: "100%",
 						paddingVertical: "3.5%",
@@ -189,7 +190,7 @@ export default function Order({ navigation }: any) {
 					data={data?.data?.data}
 					renderItem={({ item }: any) => (
 						<Ordercard
-							onPress={() => navigation.navigate("orderDetails", item, type)}
+							onPress={() => navigation.navigate("orderDetails", item)}
 							type={type}
 							cancel={() => cancelOrder(item?._id)}
 							confirm={() => toogleConfirm(item?._id)}

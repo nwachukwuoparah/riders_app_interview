@@ -1,19 +1,35 @@
-import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import Ordercard from "../../components/orderCard";
+import ConfirmModal from "../../modals/confirmModal";
+import { useQuery } from "@tanstack/react-query";
+import { getDailyScheduleItem, getProfile } from "../../helpers/query";
 
 export default function Order({ navigation, route }: any) {
+	const [confirm, setConfirm] = useState(false);
+
+	const toogleConfirm = (id: string) => {
+		setConfirm(!confirm);
+	};
+
+	const { data, isFetching, error, refetch } = useQuery({
+		queryKey: ["get-DailyScheduleItem", route?.params?._id],
+		queryFn: getDailyScheduleItem,
+		staleTime: 600000
+	});
+
 	useEffect(() => {
-		console.log("call", route?.params);
-	}, []);
+		console.log("call", JSON.stringify(data?.data?.data, null, 2));
+		console.log(isFetching); 
+	}, [data, isFetching]); 
 
 	return (
 		<Container>
-			<InnerWrapper sx={{ gap: 30 }}>
+			<InnerWrapper sx={{ gap: 30, flex: 7 }}>
 				<View style={styles.title}>
 					<CustButton
 						type="back"
@@ -24,6 +40,21 @@ export default function Order({ navigation, route }: any) {
 				</View>
 				<Ordercard item={route?.params} navigation={navigation} />
 			</InnerWrapper>
+
+			<View style={styles.buttonCont}>
+				<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
+					<Typography type="text16" sx={{ color: colors.black }}>
+						Confirm drop off
+					</Typography>
+				</CustButton>
+			</View>
+
+			<ConfirmModal
+				closeModal={toogleConfirm}
+				modalOpen={confirm}
+				orderID={route?.params?._id}
+				orderType={route?.params.schedule}
+			/>
 		</Container>
 	);
 };
@@ -46,5 +77,22 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	filter: {},
+	buttonCont: {
+		width: "100%",
+		alignItems: "center",
+		backgroundColor: colors.black_1,
+		paddingTop: 20,
+		flex: 1,
+		...Platform.select({
+			ios: {
+				shadowOpacity: 0.1,
+				shadowRadius: 0.5,
+				shadowColor: "#6C6C6C",
+				shadowOffset: { height: -2, width: 0 },
+			},
+			android: {
+				elevation: 1,
+			},
+		}),
+	},
 });
