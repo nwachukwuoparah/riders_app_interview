@@ -24,7 +24,7 @@ export default function Order({ navigation, route }: any) {
 
 	useEffect(() => {
 		console.log("call", JSON.stringify(data?.data?.data, null, 2));
-		console.log(isFetching); 
+		console.log(isFetching);
 	}, [data, isFetching]); 
 
 	return (
