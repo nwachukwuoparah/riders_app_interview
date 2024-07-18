@@ -53,7 +53,7 @@ export default function Ordercard({
 		},
 	});
 
-	useEffect(() => {
+	useEffect(() => { 
 		console.log(JSON.stringify(item, null, 2));
 	}, []);
 

@@ -81,7 +81,7 @@ export default function Order({ navigation }: any) {
 				if (data !== undefined && type === "orderStatus=ready&orderStatus=picked&orderStatus=arrived") {
 					setFilter(`?schedule=${data?.status}&orderStatus=ready&orderStatus=picked&orderStatus=arrived`); //&createdAt=${data?.date}
 				} else {
-					setFilter(
+					setFilter( 
 						`?schedule=${data?.status}&orderStatus=${type}` //&createdAt=${data?.date}
 					);
 				}

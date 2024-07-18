@@ -21,16 +21,16 @@ export default function Order({ navigation, route }: any) {
 		queryKey: ["get-DailyScheduleItem", route?.params?._id],
 		queryFn: getDailyScheduleItem,
 		staleTime: 600000
-	});
+	}); 
 
 	useEffect(() => {
 		if (error) {
 			handleError(error)
 		}
-		console.log("call", JSON.stringify(data?.data?.data, null, 2));
+		console.log("call", JSON.stringify(data?.data?.day, null, 2));  
 		console.log(isFetching);
 	}, [data, isFetching]);
-
+ 
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 30, flex: 7 }}>
@@ -58,6 +58,7 @@ export default function Order({ navigation, route }: any) {
 				modalOpen={confirm}
 				orderID={route?.params?._id}
 				orderType={route?.params.schedule}
+				day={data?.data?.day}
 			/>
 		</Container>
 	);

@@ -61,8 +61,8 @@ export default function Wallet({ navigation }: any) {
 	};
 
 	useEffect(() => {
-		console.log(JSON.stringify(transa_data?.data, null, 2)); 
-	}, []); 
+		console.log(JSON.stringify(data?.data, null, 2));
+	}, []);
 
 	return (
 		<Container>
@@ -140,8 +140,8 @@ export default function Wallet({ navigation }: any) {
 									£{" "}
 									{data?.data?.data
 										? new Intl.NumberFormat("en-US").format(
-												data?.data?.data?.wallet
-										  )
+											data?.data?.data?.wallet
+										)
 										: "---"}
 								</Typography>
 							</View>
@@ -171,10 +171,10 @@ export default function Wallet({ navigation }: any) {
 									}}
 								>
 									£{" "}
-									{transa_data?.data
+									{data?.data
 										? new Intl.NumberFormat("en-US").format(
-												transa_data?.data?.pendingOrderAmount
-										  )
+											data?.data?.pendingOrderAmount
+										)
 										: "---"}
 								</Typography>
 							</View>

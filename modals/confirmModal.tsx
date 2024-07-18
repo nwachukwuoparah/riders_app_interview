@@ -30,7 +30,7 @@ import LoadingComponent from "../components/loading";
 import { KeyboardView } from "../components/container";
 import Show from "../components/show";
 
-export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType }: any) {
+export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType, day }: any) {
 	const queryClient = useQueryClient();
 	const [period, setPeriod] = useState("")
 
@@ -118,7 +118,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 										id: orderID,
 										pickUpCode: data?.otp,
 										schedule: true,
-										day: "2024-07-18T17:45:44.637Z",
+										day: day,
 										period: period
 									});
 								} else {
