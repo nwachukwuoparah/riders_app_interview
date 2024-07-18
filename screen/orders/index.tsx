@@ -89,14 +89,14 @@ export default function Order({ navigation }: any) {
 		})();
 	}, [displayFilter, type]);
 
-	useEffect(() => {
-		// console.log(JSON.stringify(data?.data?.data,null,2));
-		console.log(filter);
-	}, [filter]);
+	// useEffect(() => {
+	// 	console.log(JSON.stringify(data?.data?.data,null,2));
+	// 	console.log(filter);
+	// }, [filter]);
 
-	useEffect(() => {
-		console.log(JSON.stringify(data?.data?.data, null, 2));
-	}, [data]);
+	// useEffect(() => {
+	// 	console.log(JSON.stringify(data?.data?.data, null, 2));
+	// }, [data]);
 
 	return (
 		<Container>

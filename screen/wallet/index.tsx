@@ -61,7 +61,7 @@ export default function Wallet({ navigation }: any) {
 	};
 
 	useEffect(() => {
-		console.log(JSON.stringify(transa_data?.data?.data, null, 2));
+		console.log(JSON.stringify(transa_data?.data, null, 2)); 
 	}, []); 
 
 	return (

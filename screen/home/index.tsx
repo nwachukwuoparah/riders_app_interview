@@ -26,7 +26,7 @@ import {
 import Show from "../../components/show";
 import { font } from "../../utilities/loadFont";
 import RequestCard from "../../components/requestCard";
-import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import Geolocation from "react-native-geolocation-service";
 import io from "socket.io-client";
@@ -164,10 +164,11 @@ const Home = ({ navigation }: any) => {
 		}),
 		[]
 	);
+	
 
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
-			{/* <MapView 
+			<MapView
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
@@ -197,11 +198,11 @@ const Home = ({ navigation }: any) => {
 							}}
 							onError={(errorMessage) => {
 								console.error("GOT AN ERROR", errorMessage);
-							}} 
+							}}
 						/>
 					</>
-				)} 
-			</MapView> */}
+				)}
+			</MapView>
 			<SubHome
 				navigation={navigation}
 				destination={destination}
@@ -260,7 +261,7 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 				handleConnect();
 				console.log("Socket disconnected. Attempting to reconnect...");
 			};
- 
+
 			const handleError = (error: any) => {
 				console.error("Socket error:", error);
 			};

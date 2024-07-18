@@ -23,8 +23,7 @@
         "preview": {
             "ios": {
                 "simulator": true,
-                "resourceClass": "m1-medium",
-                "autoIncrement": true
+                "resourceClass": "m1-medium"
             },
             "android": {
                 "buildType": "apk"

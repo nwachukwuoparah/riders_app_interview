@@ -118,7 +118,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 										id: orderID,
 										pickUpCode: data?.otp,
 										schedule: true,
-										day: "2024-07-18T15:54:08.794Z",
+										day: "2024-07-17T15:54:08.794Z",
 										period: period
 									});
 								} else {

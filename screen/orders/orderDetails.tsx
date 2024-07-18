@@ -19,7 +19,7 @@ export default function Order({ navigation, route }: any) {
 	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-DailyScheduleItem", route?.params?._id],
 		queryFn: getDailyScheduleItem,
-		staleTime: 600000
+		staleTime: 600000 
 	});
 
 	useEffect(() => {
