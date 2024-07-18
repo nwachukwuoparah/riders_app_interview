@@ -37,7 +37,7 @@ export default function Ordercard({
 	cancel?: () => void;
 	confirm?: () => void;
 	item: any;
-	navigation: any;
+	navigation: any; 
 }) {
 	const queryClient = useQueryClient();
 

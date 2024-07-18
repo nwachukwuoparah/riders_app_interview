@@ -61,10 +61,8 @@ export default function Vehicle_Details({ navigation }: any) {
 	});
 
 	const onSubmit = (data: vehicleTypes) => {
-		console.log(JSON.stringify(data?.image, null, 2));
-
 		const formData = new FormData();
-		formData.append("image", data?.image as any);
+		formData.append("image", JSON.stringify(data?.image));
 		formData.append("plateNumber", data?.plateNumber);
 		formData.append("vehicleBrand", data?.vehicleBrand);
 		formData.append("vehicleType", data?.vehicleType);
@@ -116,18 +114,17 @@ export default function Vehicle_Details({ navigation }: any) {
 					<ScrollContainer innerStyles={{ paddingBottom: 20 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
-								label="Select vehicle type"
+								label="What is your vehicle type?"
 								type="dropdown"
 								data={[
+									{ label: "Bike", value: "Bike" },
 									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
-									{ label: "Car", value: "Car" },
+									{ label: "Bicycle", value: "Bicycle" },
 								]}
 								placeholder="Select vehicle type"
-								name="vehicleType"
 								control={control}
 								errors={errors}
-								defualtValue={userData?.vehicleType}
+								name="vehicleType"
 							/>
 							<InputComponent
 								label="What brand is your vehicle?"

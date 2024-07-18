@@ -83,16 +83,16 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 					</Typography>
 					<Show.When isTrue={orderType}>
 						<View style={{ flexDirection: "row", gap: 20 }}>
-							{[{ period: "Breskfast" }, { period: "Lunch" }, { period: "Dinner" }].map((i) => (
+							{[{ period: "Breskfast", value: "breskfast" }, { period: "Lunch", value: "lunch" }, { period: "Dinner", value: "dinner" }].map((i) => (
 								<TouchableOpacity onPress={() => {
-									setPeriod(i?.period)
+									setPeriod(i?.value)
 								}}>
 									<View style={{
 										padding: 10,
 										paddingHorizontal: 20,
 										borderRadius: 20,
 										borderWidth: 1,
-										borderColor: i?.period === period ? colors.yellow : colors.grey,
+										borderColor: i?.value === period ? colors.yellow : colors.grey,
 										backgroundColor: colors.grey_a
 									}}>
 										<Typography type="text16" sx={{ color: colors.white }}>
@@ -118,7 +118,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 										id: orderID,
 										pickUpCode: data?.otp,
 										schedule: true,
-										day: "2024-07-17T15:54:08.794Z",
+										day: "2024-07-18T17:45:44.637Z",
 										period: period
 									});
 								} else {

@@ -117,3 +117,19 @@ export const truncateString = (str: string, returnLength: number = 10) => {
 			: formattedString;
 	}
 };
+
+export const logOut = async (navigation: any, CommonActions: any) => {
+	navigation.dispatch(
+		CommonActions.reset({
+			index: 0,
+			routes: [
+				{
+					name: "AuthStack",
+					params: {
+						screen: "login",
+					},
+				},
+			],
+		})
+	);
+};

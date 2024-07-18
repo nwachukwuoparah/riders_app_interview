@@ -39,9 +39,6 @@ const PickImage = ({
 				// Prepare the image object
 				const image = { uri, name, type };
 
-				// Use unique key for each image to set in form data
-				setValue(`${imageName}_${name}`, image);
-
 				// Push the formatted image to the array
 				formattedImages.push(image);
 			});

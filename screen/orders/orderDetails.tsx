@@ -8,6 +8,7 @@ import Ordercard from "../../components/orderCard";
 import ConfirmModal from "../../modals/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { getDailyScheduleItem, getProfile } from "../../helpers/query";
+import { handleError } from "../../helpers";
 
 export default function Order({ navigation, route }: any) {
 	const [confirm, setConfirm] = useState(false);
@@ -19,13 +20,16 @@ export default function Order({ navigation, route }: any) {
 	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-DailyScheduleItem", route?.params?._id],
 		queryFn: getDailyScheduleItem,
-		staleTime: 600000 
+		staleTime: 600000
 	});
 
 	useEffect(() => {
+		if (error) {
+			handleError(error)
+		}
 		console.log("call", JSON.stringify(data?.data?.data, null, 2));
 		console.log(isFetching);
-	}, [data, isFetching]); 
+	}, [data, isFetching]);
 
 	return (
 		<Container>

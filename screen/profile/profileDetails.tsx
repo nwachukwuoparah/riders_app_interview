@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -23,10 +23,13 @@ import { updateProfile } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
 import { handleError } from "../../helpers";
+import DeleteAccountModal from "../../modals/deleteAccountModal";
+import { CommonActions } from "@react-navigation/native";
 
 export default function Profile_Details({ navigation }: any) {
 	const { userData } = useContext(UserContext);
 	const queryClient = useQueryClient();
+	const [modalOpen, setModalOpen] = useState(false)
 
 	const {
 		control,
@@ -68,7 +71,7 @@ export default function Profile_Details({ navigation }: any) {
 							flexDirection: "row",
 							alignItems: "center",
 							justifyContent: "space-between",
-							width:"100%",
+							width: "100%",
 						}}
 					>
 						<View style={styles.title}>
@@ -147,13 +150,21 @@ export default function Profile_Details({ navigation }: any) {
 				<CustButton
 					sx={{ width: "100%", backgroundColor: colors.tint_a }}
 					type="rounded"
-					onPress={() => navigation.navigate("login")}
+					onPress={() => setModalOpen(!modalOpen)}
 				>
 					<Typography type="text16" sx={{ color: colors.red }}>
 						Delete account
 					</Typography>
 				</CustButton>
 			</View>
+			<DeleteAccountModal
+				closeModal={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				navigation={navigation}
+				CommonActions={CommonActions}
+			/>
 		</Container>
 	);
 }
@@ -168,7 +179,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	buttonCont: {
-		flex:1,
-		width: "90%",paddingTop:"5%"
+		flex: 1,
+		width: "90%", paddingTop: "5%"
 	},
 });

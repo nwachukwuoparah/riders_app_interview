@@ -50,6 +50,9 @@ export const getOrders = async (data: any): Promise<any> => {
 
 export const getDailyScheduleItem = async (data: any): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
+	console.log(data?.queryKey?.[1]);
+	console.log(token);
+	
 	return await axios.get(`${EXPO_PUBLIC_API}/order/day-schedule/${data?.queryKey?.[1]}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,

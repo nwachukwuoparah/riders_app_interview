@@ -165,10 +165,9 @@ const Home = ({ navigation }: any) => {
 		[]
 	);
 	
-
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
-			<MapView
+			{/* <MapView
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
@@ -202,7 +201,7 @@ const Home = ({ navigation }: any) => {
 						/>
 					</>
 				)}
-			</MapView>
+			</MapView> */}
 			<SubHome
 				navigation={navigation}
 				destination={destination}

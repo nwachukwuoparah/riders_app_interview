@@ -24,30 +24,15 @@ import { UserContext } from "../../components/contex/userContex";
 import Rating from "../../components/rating";
 import { clearAuthData } from "../../utilities/storage";
 import Show from "../../components/show";
+import { logOut } from "../../helpers";
 
 export default function Profile({ navigation }: any) {
 	const { userData, isFetching, refetch } = useContext(UserContext);
 
-	const logOut = async () => {
-		navigation.dispatch(
-			CommonActions.reset({
-				index: 0,
-				routes: [
-					{
-						name: "AuthStack",
-						params: {
-							screen: "login",
-						},
-					},
-				],
-			})
-		);
-	};
+	useEffect(() => {
+		console.log(JSON.stringify(userData, null, 2));
 
-useEffect(()=>{
-console.log(JSON.stringify( userData,null,2));
-
-},[])
+	}, [])
 
 	return (
 		<Container>
@@ -140,8 +125,8 @@ console.log(JSON.stringify( userData,null,2));
 								value: "Payment details",
 								route:
 									!userData?.bankName &&
-									!userData?.accountName &&
-									!userData?.sortCode
+										!userData?.accountName &&
+										!userData?.sortCode
 										? "bankInfo"
 										: "bankDetails",
 								type: "routh",
@@ -170,7 +155,7 @@ console.log(JSON.stringify( userData,null,2));
 										navigation.navigate(i?.route);
 									} else if (i?.type && i.type === "log-out") {
 										await clearAuthData("user-data");
-										logOut();
+										logOut(navigation, CommonActions)
 									} else if (i?.type && i.type === "web") {
 										openBrowserAsync("https://afrilish.com/legalpage");
 									}

@@ -14,7 +14,6 @@ import {
 	heightPercentageToDP as hp,
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import moment from "moment";
 import Share from "../../assets/svg/share.svg";
 import PointStar from "../../assets/svg/pointStar.svg";
 import Show from "../../components/show";
@@ -23,7 +22,8 @@ import ProfileCard from "../../components/profile";
 import { openShareModal } from "../../helpers";
 import { useQuery } from "@tanstack/react-query";
 import { getPointHistory } from "../../helpers/query";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
+import { openBrowserAsync } from "expo-web-browser";
 import { UserContext } from "../../components/contex/userContex";
 
 const Referal = ({ navigation }: any) => {
@@ -112,7 +112,7 @@ const Referal = ({ navigation }: any) => {
 						style={{
 							...styles.point_shear,
 							backgroundColor: colors.grey_a,
-							borderWidth: 0.2,
+							borderWidth: 1,
 							borderColor: colors.yellow,
 						}}
 					>
@@ -150,14 +150,29 @@ const Referal = ({ navigation }: any) => {
 							<Share />
 						</TouchableOpacity>
 					</View>
-				</View>
 
+				</View>
+				<TouchableOpacity onPress={() => {
+					openBrowserAsync(
+						"https://www.afrilish.com/referrals-terms/referral-v1"
+					)
+				}} style={{ width: "30%", alignSelf: "center", alignItems: "center", paddingVertical: "5%" }}>
+					<Typography
+						type="text12"
+						sx={{
+							color: colors.yellow_1,
+							textDecorationLine: 'underline'
+						}}
+					>
+						Read referral rules
+					</Typography>
+				</TouchableOpacity>
 				<View style={styles.body}>
 					<Typography
 						type="text16"
 						sx={{
 							color: colors.white,
-							marginVertical: 10,
+							marginBottom: 10,
 						}}
 					>
 						Point history
@@ -170,7 +185,7 @@ const Referal = ({ navigation }: any) => {
 						contentContainerStyle={{ gap: 20, paddingBottom: 150 }}
 						refreshControl={
 							<RefreshControl
-								refreshing={false}
+								refreshing={isFetching}
 								onRefresh={onRefresh}
 								colors={[colors.yellow]}
 								tintColor={colors.yellow}
@@ -191,7 +206,6 @@ const Referal = ({ navigation }: any) => {
 											loading...
 										</Typography>
 									</>
-									{/* <Load title="Fetching vendor" /> */}
 								</Show.When>
 								<Show.Else>
 									<EmptyState

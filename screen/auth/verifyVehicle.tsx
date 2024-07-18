@@ -52,17 +52,14 @@ export default function VerifyVehicle({ navigation }: any) {
 	});
 
 	const onSubmit = (data: vehicleTypes) => {
-		const formData = new FormData();
-		formData.append("image", data?.image as any);
-		formData.append("plateNumber", data?.plateNumber);
-		formData.append("vehicleBrand", data?.vehicleBrand);
-		formData.append("vehicleType", data?.vehicleType);
-		mutate(formData);
+		console.log(data);
+		// const formData = new FormData();
+		// formData.append("image", JSON.stringify(data?.image));
+		// formData.append("plateNumber", data?.plateNumber);
+		// formData.append("vehicleBrand", data?.vehicleBrand);
+		// formData.append("vehicleType", data?.vehicleType);
+		// mutate(formData);
 	};
-
-	// useEffect(() => {
-	// 	console.log(isPending);
-	// }, [isPending]);
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -126,7 +123,7 @@ export default function VerifyVehicle({ navigation }: any) {
 									name="plateNumber"
 								/>
 								<PickImage
-									// allowsMultipleSelection={true}
+									allowsMultipleSelection={true}
 									imageName="image"
 									errors={errors}
 									setValue={setValue}

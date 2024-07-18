@@ -29,6 +29,23 @@ export default function Notification() {
 		staleTime: 600000,
 	});
 
+	const formatTimestamp = (timestamp: Date) => {
+		const now = moment();
+		const createdAt = moment(timestamp);
+		const diffMinutes = now.diff(createdAt, 'minutes');
+		const diffHours = now.diff(createdAt, 'hours');
+
+		if (diffMinutes < 1) {
+			return 'just now';
+		} else if (diffMinutes < 60) {
+			return `${diffMinutes}min ago`;
+		} else if (diffHours < 5) {
+			return `${diffHours}h ago`;
+		} else {
+			return createdAt.format('hh:mma');
+		}
+	};
+
 	useEffect(() => {
 		(() => {
 			const today = moment().startOf("day");
@@ -44,13 +61,17 @@ export default function Notification() {
 				) => {
 					const date = moment(notification?.createdAt).startOf("day");
 					let dateTitle;
+					console.log(notification?.createdAt);
+
+					// Custom date formatting based on conditions
 					if (date.isSame(today, "day")) {
-						dateTitle = "Today";
+						dateTitle = `Today, ${date.format("Do MMM YYYY")}`;
 					} else if (date.isSame(yesterday, "day")) {
-						dateTitle = "Yesterday";
+						dateTitle = `Yesterday, ${date.format("Do MMM YYYY")}`;
 					} else {
-						dateTitle = date.format("dddd, Do MMM YYYY");
+						dateTitle = `${date.format("dddd")}, ${date.format("Do MMM YYYY")}`;
 					}
+
 					if (!acc[dateTitle]) {
 						acc[dateTitle] = [];
 					}
@@ -71,35 +92,38 @@ export default function Notification() {
 
 	return (
 		<Container>
-			<View style={styles.title}>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						justifyContent: "space-between",
-						width: "100%",
-						paddingVertical:"10%"
-					}}
-				>
-					<CustButton
-						type="back"
-						onPress={() => {
-							navigation.goBack();
-						}}
-						color={colors.white}
-					/>
-					<Typography type="text20" sx={{ color: colors.white }}>
-						Notifications
-					</Typography>
-					<CustButton type="back" color={colors.black} sx={{ opacity: 0 }} />
-				</View>
-			</View>
 			<InnerWrapper>
+				<View style={styles.title}>
+					<View
+						style={{
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+							width: "100%",
+						}}
+					>
+						<CustButton
+							type="back"
+							onPress={() => {
+								navigation.goBack();
+							}}
+							color={colors.white}
+						/>
+						<Typography type="text20" sx={{ color: colors.white }}>
+							Notifications
+						</Typography>
+						<CustButton
+							type="back"
+							color={colors.white}
+							sx={{ opacity: 0 }}
+						/>
+					</View>
+				</View>
 				<SectionList
 					style={styles.flatlist}
 					sections={notification}
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={{ paddingBottom: "5%" }}
+					contentContainerStyle={{ paddingBottom: "20%" }}
 					refreshControl={
 						<RefreshControl
 							refreshing={isFetching}
@@ -111,7 +135,7 @@ export default function Notification() {
 						/>
 					}
 					renderSectionHeader={({ section: { title } }) => (
-						<BlurView intensity={100}>
+						<BlurView intensity={10}>
 							<View
 								style={{
 									paddingVertical: "3%",
@@ -120,7 +144,7 @@ export default function Notification() {
 								<Typography
 									type="text16"
 									sx={{
-										color: colors.black,
+										color: colors.white,
 									}}
 								>
 									{title}
@@ -138,7 +162,7 @@ export default function Notification() {
 					ItemSeparatorComponent={() => (
 						<View
 							style={{
-								paddingVertical: "0.5%",
+								paddingVertical: "0.9%",
 							}}
 						></View>
 					)}
@@ -148,10 +172,12 @@ export default function Notification() {
 								flexDirection: "row",
 								alignItems: "center",
 								justifyContent: "space-between",
-								borderBottomWidth: 1,
+								borderWidth: 0.5,
 								borderColor: colors.grey,
-								paddingBottom: 5,
-								// backgroundColor:"red"
+								paddingVertical: 10,
+								paddingHorizontal: 10,
+								backgroundColor: colors.grey_a,
+								borderRadius: 10
 							}}
 						>
 							<View
@@ -163,31 +189,26 @@ export default function Notification() {
 								}}
 							>
 								<Bell width={wp("10%")} height={hp("3.5%")} />
-								<View style={{ gap: 10 }}>
+								<View style={{ gap: 10, width: "85%" }}>
 									<Typography type="text14" fontfamily={font.DMSans_700Bold}>
 										{item?.item?.message}
 									</Typography>
 									<Typography
 										type="text14"
 										sx={{
-											color: colors.black,
+											color: colors.white,
 										}}
 									>
-										{moment(item?.item?.createdAt)?.format(
-											"DD/MM/YYYY HH:mm:ss"
-										)}
+										{formatTimestamp(item?.item?.createdAt)}
 									</Typography>
 								</View>
 							</View>
 						</View>
 					)}
-					// keyExtractor={({ _id }) => _id}
+					keyExtractor={({ _id }) => _id
+					}
 					ListEmptyComponent={() => (
 						<Show>
-							<Show.When isTrue={isFetching}>
-								<></>
-								{/* <Loading title="Fetching notifications" /> */}
-							</Show.When>
 							<Show.Else>
 								<View
 									style={{
@@ -213,11 +234,9 @@ export default function Notification() {
 
 const styles = StyleSheet.create({
 	title: {
-		width: "90%",
-		gap: 15,
-		paddingBottom: 5,
+		width: "100%",
 		flexDirection: "row",
-		alignItems: "center",
+		paddingBottom: "5%"
 	},
 	flatlist: {
 		width: "100%",
