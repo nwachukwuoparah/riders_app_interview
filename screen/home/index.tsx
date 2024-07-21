@@ -62,7 +62,7 @@ const Home = ({ navigation }: any) => {
 
 	useFocusEffect(
 		useCallback(() => {
-			
+
 			(async () => {
 				const destination = await getCachedAuthData("destination")
 				setToLatLng(destination?.to);
@@ -153,7 +153,7 @@ const Home = ({ navigation }: any) => {
 				{fromLatLng && toLatLng && (
 					<>
 						<Marker coordinate={fromLatLng} >
-							<LocationIcon/>
+							<LocationIcon />
 						</Marker>
 						<Marker coordinate={toLatLng} />
 						<MapViewDirections
@@ -218,15 +218,27 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 	useEffect(() => {
 		setActive(true);
 	}, []);
+
 	const handleConnect = () => {
 		console.log("Connection successful");
 		setConnected(true);
 		set_request_riders(false);
 	};
+
+useEffect(()=>{
+	if (request_rides) {
+		// Set request_riders to false after 10 seconds if it hasn't been set to true again
+		const timeoutId = setTimeout(() => {
+			set_request_riders(false);
+			console.log('set_request_riders');
+		}, 10000);
+
+		return () => clearTimeout(timeoutId);
+	}
+},[request_rides])
+
 	useFocusEffect(
 		useCallback(() => {
-			console.log(location);
-
 			let intervalId: any = null;
 
 			const handleAfrilishOrder = (data: any) => {
@@ -241,7 +253,7 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 
 			const handleDisconnect = () => {
 				setConnected(false);
-				handleConnect();
+				socket.connect();
 				console.log("Socket disconnected. Attempting to reconnect...");
 			};
 
@@ -327,7 +339,7 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 							)}
 							keyExtractor={(item) => item?._id}
 						/>
-					</Show.When> 
+					</Show.When>
 					<Show.When isTrue={userData === undefined || toLatLng !== undefined}>
 						<></>
 					</Show.When>
