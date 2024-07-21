@@ -86,9 +86,9 @@ export default function Ordercard({
 					step: 1,
 					to: {
 						longitude:
-							item?.vendorId?.locationCoord?.coordinates[0],
+							item?.locationCoord?.coordinates[0],
 						latitude:
-							item?.vendorId?.locationCoord?.coordinates[1],
+							item?.locationCoord?.coordinates[1],
 					},
 				});
 				navigation.navigate("Home");
