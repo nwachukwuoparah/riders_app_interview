@@ -196,6 +196,7 @@ export interface filePreviewType {
 	type?: string;
 	handelPreview: () => void;
 	handelDelete: () => void;
+	setDelete?: boolean
 }
 
 export interface periodDataType {

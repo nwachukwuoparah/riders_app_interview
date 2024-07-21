@@ -5,13 +5,14 @@ import File from "../../assets/svg/file.svg";
 import Delete from "../../assets/svg/delete.svg";
 import Preview from "../../assets/svg/preview.svg";
 import colors from "../../constant/theme";
-import { filePreview } from "../../types";
+import { filePreviewType } from "../../types";
 
 export default function FilePreview({
 	handelPreview,
 	handelDelete,
 	type,
-}: filePreview) {
+	setDelete
+}: filePreviewType) {
 	return (
 		<View style={styles.doc_list}>
 			<View style={{ flexDirection: "row", gap: 10 }}>
@@ -24,9 +25,9 @@ export default function FilePreview({
 				<TouchableOpacity onPress={handelPreview}>
 					<Preview />
 				</TouchableOpacity>
-				<TouchableOpacity onPress={handelDelete}>
+				{setDelete&&<TouchableOpacity onPress={handelDelete}>
 					<Delete />
-				</TouchableOpacity>
+				</TouchableOpacity>}
 			</View>
 		</View>
 	);

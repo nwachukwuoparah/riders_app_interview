@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from "react";
-import { StyleSheet, View, Platform } from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { StyleSheet, View, Platform, Alert } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -26,10 +26,16 @@ import {
 import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
 import LoadingComponent from "../../components/loading";
+import { handleError } from "../../helpers";
+import PreviewModal from "../../modals/previewModal";
 
 export default function Address({ navigation }: any) {
 	const { userData } = useContext(UserContext);
 	const queryClient = useQueryClient();
+	const previewRef = useRef(null)
+	const [modalOpen, setModalOpen] = useState(false)
+	const [image, setImage] = useState()
+
 
 	const {
 		control,
@@ -52,9 +58,10 @@ export default function Address({ navigation }: any) {
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
-			console.error(err);
+			handleError(err);
 		},
 	});
 
@@ -66,6 +73,10 @@ export default function Address({ navigation }: any) {
 		formData.append("addressDocType", data?.addressDocType);
 		mutate(formData);
 	};
+
+	useEffect(() => {
+		console.log("call", JSON.stringify(userData, null, 2));
+	}, [userData])
 
 	return (
 		<Container>
@@ -135,36 +146,9 @@ export default function Address({ navigation }: any) {
 								name="addressDocType"
 								defualtValue={userData?.addressDocType}
 							/>
-							<PickImage
-								imageName="image"
-								errors={errors}
-								setValue={setValue}
-								control={control}
-								clearErrors={clearErrors}
-							>
-								<View style={styles.image_wrap}>
-									<View style={styles.image_placeholder}>
-										<LottieView
-											autoPlay
-											style={{
-												width: 100,
-												height: 50,
-											}}
-											source={require("../../assets/lottile/imageFile.json")}
-										/>
-										<Typography type="text14" sx={{ color: colors.black_1 }}>
-											Tap here to upload document
-										</Typography>
-										<Typography type="text14" sx={{ color: colors.grey }}>
-											Max 10mb file allowed
-										</Typography>
-									</View>
-								</View>
-							</PickImage>
 							<Show>
 								<Show.When
 									isTrue={
-										watch("image") !== undefined ||
 										userData?.proofOfAddress !== undefined
 									}
 								>
@@ -172,14 +156,68 @@ export default function Address({ navigation }: any) {
 										handelDelete={() => {
 											setValue("image", undefined);
 										}}
-										handelPreview={() => { }}
+										handelPreview={() => {
+											setModalOpen(!modalOpen)
+											setImage(userData?.proofOfAddress)
+										}}
 									/>
 								</Show.When>
+								<Show.Else>
+									<PickImage
+										imageName="image"
+										errors={errors}
+										setValue={setValue}
+										control={control}
+										clearErrors={clearErrors}
+									>
+										<View style={styles.image_wrap}>
+											<View style={styles.image_placeholder}>
+												<LottieView
+													autoPlay
+													style={{
+														width: 100,
+														height: 50,
+													}}
+													source={require("../../assets/lottile/imageFile.json")}
+												/>
+												<Typography type="text14" sx={{ color: colors.black_1 }}>
+													Tap here to upload document
+												</Typography>
+												<Typography type="text14" sx={{ color: colors.grey }}>
+													Max 10mb file allowed
+												</Typography>
+											</View>
+										</View>
+									</PickImage>
+									<Show.When isTrue={
+										userData?.proofOfAddress !== undefined
+										|| watch("image") !== undefined
+									}>
+										<FilePreview
+											handelDelete={() => {
+												setValue("image", undefined);
+											}}
+											handelPreview={() => {
+												setModalOpen(!modalOpen)
+												setImage(watch("image")?.uri)
+											}}
+											type="Driver's licence"
+										/>
+									</Show.When>
+								</Show.Else>
 							</Show>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
 			</InnerWrapper>
+			<PreviewModal
+				previewRef={previewRef}
+				close={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				image={image}
+			/>
 		</Container>
 	);
 }

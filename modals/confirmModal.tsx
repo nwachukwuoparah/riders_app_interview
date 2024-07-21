@@ -29,6 +29,7 @@ import { handleError } from "../helpers";
 import LoadingComponent from "../components/loading";
 import { KeyboardView } from "../components/container";
 import Show from "../components/show";
+import { clearAuthData } from "../utilities/storage";
 
 export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType, day }: any) {
 	const queryClient = useQueryClient();
@@ -48,6 +49,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 			queryClient.invalidateQueries("get-order" as QueryFilters);
 			Alert.alert("Message", data?.data?.msg);
 			closeModal();
+			clearAuthData("destination")
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);

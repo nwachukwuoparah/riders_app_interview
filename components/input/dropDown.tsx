@@ -26,7 +26,7 @@ const DropdownInput = ({
 		dropdown: {
 			width: "100%",
 			paddingHorizontal: "5%",
-			paddingVertical: "2.5%",
+			paddingVertical: "4%",
 			borderRadius: 30,
 			backgroundColor: colors.grey_a,
 			marginTop: 15,
@@ -47,7 +47,7 @@ const DropdownInput = ({
 		},
 
 		itemTextStyle: {
-			color: colors.white,
+			color: colors.black,
 			fontFamily: font.DMSans_400Regular,
 			textAlign: "center",
 			borderBottomWidth: 1,
@@ -62,9 +62,10 @@ const DropdownInput = ({
 		},
 
 		containerStyle: {
-			backgroundColor: colors.grey_a,
+			backgroundColor: colors.grey_d,
 			borderRadius: 20,
 			borderColor: colors.grey,
+			overflow:"hidden",
 			...(containerStyle as object),
 		},
 	});

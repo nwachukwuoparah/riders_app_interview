@@ -57,7 +57,7 @@ export default function Order({ navigation }: any) {
 		setCancel(false);
 		setConfirm(false);
 	};
-
+ 
 	const toogleConfirm = (id: string) => {
 		setConfirm(!confirm);
 		setDisplayFilter(false);
@@ -198,7 +198,7 @@ export default function Order({ navigation }: any) {
 							navigation={navigation}
 						/>
 					)}
-					keyExtractor={(item) => item?._id}
+					// keyExtractor={(item) => item?._id}
 					refreshControl={
 						<RefreshControl
 							refreshing={isFetching}

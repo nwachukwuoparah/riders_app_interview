@@ -7,8 +7,10 @@ import colors from "../../constant/theme";
 import Ordercard from "../../components/orderCard";
 import ConfirmModal from "../../modals/confirmModal";
 import { useQuery } from "@tanstack/react-query";
-import { getDailyScheduleItem, getProfile } from "../../helpers/query";
+import { getDailyScheduleItem } from "../../helpers/query";
 import { handleError } from "../../helpers";
+import Show from "../../components/show";
+import OrderClock from "../../assets/svg/orderClock.svg"
 
 export default function Order({ navigation, route }: any) {
 	const [confirm, setConfirm] = useState(false);
@@ -20,17 +22,19 @@ export default function Order({ navigation, route }: any) {
 	const { data, isFetching, error, refetch } = useQuery({
 		queryKey: ["get-DailyScheduleItem", route?.params?._id],
 		queryFn: getDailyScheduleItem,
-		staleTime: 600000
-	}); 
+		staleTime: 600000,
+		enabled: route?.params?.schedule === true
+	});
 
-	useEffect(() => {
+	useEffect(() => { 
 		if (error) {
 			handleError(error)
+			console.log("call");
 		}
-		console.log("call", JSON.stringify(data?.data?.day, null, 2));  
-		console.log(isFetching);
+		// console.log("call", JSON.stringify(data?.data, null, 2));
+		// console.log(isFetching);
 	}, [data, isFetching]);
- 
+
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 30, flex: 7 }}>
@@ -42,24 +46,82 @@ export default function Order({ navigation, route }: any) {
 					/>
 					<Typography type="text24">Order details</Typography>
 				</View>
-				<Ordercard item={route?.params} navigation={navigation} />
+				 
+				<Show>
+					<Show.When isTrue={data !== undefined}>
+						<Ordercard item={route?.params} navigation={navigation} />
+						<ConfirmModal
+							closeModal={toogleConfirm}
+							modalOpen={confirm}
+							orderID={route?.params?._id}
+							orderType={route?.params.schedule}
+							day={data?.data?.day}
+						/>
+					</Show.When>
+					<Show.Else>
+						<View style={{ flex: 1, alignItems: "center", marginTop: "20%" }}>
+							<OrderClock />
+							<Typography type="text24" sx={{ color: colors.white }}>
+								Not yet time for this order
+							</Typography>
+							<Typography type="text14" sx={{ color: colors.white, textAlign: "center" }}>
+								This delivery is scheduled for{" "}
+								<Typography type="text16" sx={{ color: colors.yellow }}>
+									01:00pm{"  "}
+									<Typography type="text16" sx={{ color: colors.white }}>
+										on{"  "}
+									</Typography>
+									25th March, 2024.
+								</Typography>
+							</Typography>
+						</View>
+					</Show.Else>
+				</Show>
+
 			</InnerWrapper>
 
-			<View style={styles.buttonCont}>
-				<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
-					<Typography type="text16" sx={{ color: colors.black }}>
-						Confirm drop off
-					</Typography>
-				</CustButton>
-			</View>
+			<Show.When isTrue={route?.params?.schedule}>
+				<Show.When isTrue={true}>
+					<View style={styles.buttonCont}>
+						<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
+							<Typography type="text16" sx={{ color: colors.black }}>
+								I’ve arrived at the restaurant
+							</Typography>
+						</CustButton>
+					</View>
+				</Show.When>
 
-			<ConfirmModal
-				closeModal={toogleConfirm}
-				modalOpen={confirm}
-				orderID={route?.params?._id}
-				orderType={route?.params.schedule}
-				day={data?.data?.day}
-			/>
+				<Show.When isTrue={true}>
+					<View style={styles.buttonCont}>
+						<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
+							<Typography type="text16" sx={{ color: colors.black }}>
+								I’ve picked order up
+							</Typography>
+						</CustButton>
+					</View>
+				</Show.When>
+
+				<Show.When isTrue={true}>
+					<View style={styles.buttonCont}>
+						<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
+							<Typography type="text16" sx={{ color: colors.black }}>
+								I’ve arrived to deliver order
+							</Typography>
+						</CustButton>
+					</View>
+				</Show.When>
+
+				<Show.When isTrue={true}>
+					<View style={styles.buttonCont}>
+						<CustButton type="rounded" onPress={() => setConfirm(!confirm)}>
+							<Typography type="text16" sx={{ color: colors.black }}>
+								Confirm drop off
+							</Typography>
+						</CustButton>
+					</View>
+				</Show.When>
+			</Show.When>
+
 		</Container>
 	);
 };

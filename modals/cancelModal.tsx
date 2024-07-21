@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import BottomModal from "./index";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import Typography from "../components/typography";
 import colors from "../constant/theme";
 import CustButton from "../components/button";
@@ -12,6 +12,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { rejectOrder } from "../helpers/mutate";
+import { clearAuthData } from "../utilities/storage";
 
 export default function CancelModal({
 	cancelRef,
@@ -25,12 +26,14 @@ export default function CancelModal({
 		mutationFn: rejectOrder,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-order" as QueryFilters);
-			console.log(data?.data?.data);
+			Alert.alert("Message", data?.data?.data?.msg);
+			clearAuthData("destination");
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
 		},
 	});
+
 	return (
 		<>
 			<BottomModal

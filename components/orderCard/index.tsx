@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, StyleSheet, Pressable, TouchableOpacity, Alert } from "react-native";
 import Typography from "../typography";
 import colors from "../../constant/theme";
 import OngoingIcon from "../../assets/svg/ongoingIcon.svg";
@@ -20,9 +20,10 @@ import {
 } from "@tanstack/react-query";
 import { rejectOrder, updateOrder } from "../../helpers/mutate";
 import LoadingComponent from "../loading";
-import { cacheAuthData, clearAuthData } from "../../utilities/storage";
+import { cacheAuthData, clearAuthData, getCachedAuthData } from "../../utilities/storage";
 import { font } from "../../utilities/loadFont";
 import moment from "moment";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function Ordercard({
 	onPress,
@@ -37,15 +38,15 @@ export default function Ordercard({
 	cancel?: () => void;
 	confirm?: () => void;
 	item: any;
-	navigation: any; 
+	navigation: any;
 }) {
 	const queryClient = useQueryClient();
-
+	const [toLatLng, setToLatLng] = useState<any>();
+	
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateOrder,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-order" as QueryFilters);
-			console.log(data?.data);
 		},
 		onError: (err: { msg: string; success: boolean }) => {
 			handleError(err);
@@ -53,9 +54,47 @@ export default function Ordercard({
 		},
 	});
 
-	useEffect(() => { 
-		console.log(JSON.stringify(item, null, 2));
-	}, []);
+	const { isPending: riderStatusPending, mutate: riderStatusMutate } = useMutation({
+		mutationFn: updateOrder,
+		onSuccess: async (data) => {
+			queryClient.invalidateQueries("get-order" as QueryFilters);
+			Alert.alert("Message", data?.data?.msg);
+			clearAuthData("destination")
+		},
+		onError: (err: { msg: string; success: boolean }) => {
+			handleError(err);
+		},
+	});
+
+	// useEffect(() => {
+	// 	console.log(JSON.stringify(item?.riderStatus, null, 2));
+	// }, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			(async () => {
+				const destination = await getCachedAuthData("destination")
+				setToLatLng(destination);
+			})();
+		}, [])
+	);
+
+	useEffect(() => {
+		if (item.orderStatus === "in-transit") {
+			(async () => {
+				await cacheAuthData("destination", {
+					step: 1,
+					to: {
+						longitude:
+							item?.vendorId?.locationCoord?.coordinates[0],
+						latitude:
+							item?.vendorId?.locationCoord?.coordinates[1],
+					},
+				});
+				navigation.navigate("Home");
+			})()
+		}
+	}, [item.orderStatus])
 
 	return (
 		<>
@@ -229,70 +268,52 @@ export default function Ordercard({
 								</View>
 							)}
 							<Show>
-								<Show.When isTrue={true}>
-									<View style={{ gap: 10 }}>
-										<CustButton
-											type="rounded"
-											onPress={async () => {
-												mutate({
-													id: item?._id,
-													orderStatus: "in-transit",
-													isAfrilish: true,
-												});
-												// await cacheAuthData("destination", {
-												// 	step: 2,
-												// 	to: {
-												// 		longitude: item?.locationCoord?.coordinates[0],
-												// 		latitude: item?.locationCoord?.coordinates[1],
-												// 	},
-												// });
-												// navigation.navigate("Home");
-											}}
-											sx={{
-												//  opacity: isPending ? 0.5 : 1,
-												width: "100%",
-											}}
-										>
-											<Typography type="text16" sx={{ color: colors.black }}>
-												{/* Proceede to pick up */}
-												I’ve picked order up
-											</Typography>
-										</CustButton>
-									</View>
+								<Show.When isTrue={item?.riderStatus === "arrived"}>
+									<CatButton
+										onPress={async () => {
+											mutate({
+												id: item?._id,
+												orderStatus: "in-transit",
+												isAfrilish: true,
+											});
+										}}
+										buttonText="I’ve picked order up"
+									/>
 								</Show.When>
-								<Show.When isTrue={!true}>
-									<View style={{ gap: 10 }}>
-										<CustButton
-											type="rounded"
-											onPress={async () => {
-												await cacheAuthData("destination", {
-													step: 1,
-													to: {
-														longitude:
-															item?.vendorId?.locationCoord?.coordinates[0],
-														latitude:
-															item?.vendorId?.locationCoord?.coordinates[1],
-													},
-												});
-												navigation.navigate("Home");
-											}}
-											sx={{
-												width: "100%",
-											}}
-										>
-											<Typography type="text16" sx={{ color: colors.black }}>
-												Proceed to pick up
-											</Typography>
-										</CustButton>
 
-										<Typography
-											type="text14"
-											sx={{ color: colors.white, textAlign: "center" }}
-										>
-											If you don’t pick up in 10 mins, this order will be
-											re-assigned to a different rider2333
-										</Typography>
-									</View>
+								<Show.When isTrue={!toLatLng}>
+									<CatButton
+										onPress={async () => {
+											console.log("call");
+											await cacheAuthData("destination", {
+												step: 1,
+												to: {
+													longitude:
+														item?.vendorId?.locationCoord?.coordinates[0],
+													latitude:
+														item?.vendorId?.locationCoord?.coordinates[1],
+												},
+											});
+											navigation.navigate("Home");
+										}}
+										buttonText="Proceed to pick up"
+										text="If you don’t pick up in 10 mins, this order will be
+											re-assigned to a different rider"
+									/>
+								</Show.When>
+
+								<Show.When isTrue={toLatLng?.step === 1}>
+									<CatButton onPress={
+										async () => {
+											riderStatusMutate({
+												id: item?._id,
+												riderStatus: "arrived",
+											});
+										}
+									}
+										buttonText="I’ve arrived at the restaurant"
+										text="Let the seller know when you’ve reached their destination"
+									/>
 								</Show.When>
 							</Show>
 						</View>
@@ -437,9 +458,34 @@ export default function Ordercard({
 					</Pressable>
 				</Show.Else>
 			</Show>
-			<LoadingComponent display={isPending} />
+			<LoadingComponent display={isPending || riderStatusPending} />
 		</>
 	);
+}
+
+
+const CatButton = ({ onPress, buttonText, text }: any) => {
+	return (
+		<View style={{ gap: 10 }}>
+			<CustButton
+				type="rounded"
+				onPress={onPress}
+				sx={{
+					width: "100%",
+				}}
+			>
+				<Typography type="text16" sx={{ color: colors.black }}>
+					{buttonText}
+				</Typography>
+			</CustButton>
+			{text && <Typography
+				type="text14"
+				sx={{ color: colors.white, textAlign: "center" }}
+			>
+				{text}
+			</Typography>}
+		</View>
+	)
 }
 
 const styles = StyleSheet.create({

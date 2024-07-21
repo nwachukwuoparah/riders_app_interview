@@ -53,44 +53,60 @@ const socket = io(EXPO_PUBLIC_API, {
 const GOOGLE_MAPS_APIKEY = "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA";
 
 const Home = ({ navigation }: any) => {
-	const [destination, setDestination] = useState<any>();
+	// const [destination, setDestination] = useState<any>();
 	const mapRef = useRef<MapView>(null);
 	const watchId = useRef<number | null>(null);
 	const [location, setLocation] = useState<any>();
-
-	const [fromLatLng, setFromLatLng] = useState({
-		latitude: 5.475,
-		longitude: 7.025,
-	});
-
-	const [toLatLng, setToLatLng] = useState({
-		latitude: 5.485,
-		longitude: 7.035,
-	});
+	const [fromLatLng, setFromLatLng] = useState<any>(null);
+	const [toLatLng, setToLatLng] = useState<any>(null);
 
 	useFocusEffect(
 		useCallback(() => {
+			
+			(async () => {
+				const destination = await getCachedAuthData("destination")
+				setToLatLng(destination?.to);
+			})();
+
 			const startWatching = async () => {
-
-				const requestLocationPermission = () => {
-					let authorizationLevel: any = 'always'; // Default to 'always' for Android
-
-					if (Platform.OS === 'ios') {
-						authorizationLevel = 'whenInUse'; // Use 'whenInUse' for iOS
+				const requestLocationPermission = () => new Promise(async (resolve, reject) => {
+					try {
+						if (Platform.OS === 'ios') {
+							// let authorizationLevel: any = 'always'; // Default to 'always' for Android
+							// authorizationLevel = 'whenInUse'; // Use 'whenInUse' for iOS
+							const permission = await Geolocation.requestAuthorization('whenInUse');
+							if (permission === "granted") {
+								return resolve("granted")
+							}
+							reject("Permission to access loction not granted")
+						}
+					} catch (error) {
+						console.log("Ask location error===>", error);
+						return reject(error)
 					}
-
-					Geolocation.requestAuthorization(authorizationLevel);
-				};
+					return PermissionsAndroid.request(
+						PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+					).then((granted) => {
+						if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+							resolve(granted)
+						}
+						reject("Permission to access loction not granted")
+					}).catch((error) => {
+						console.log("Ask location error===>", error);
+						return reject(error)
+					})
+				})
 
 				// Call this function when you need to request location permission
 				requestLocationPermission();
+
 				watchId.current = Geolocation.watchPosition(
 					async (position) => {
 						const { latitude, longitude } = position.coords;
 						const location = await getCurrentLocation(latitude, longitude);
 						setFromLatLng({ latitude, longitude });
 						if (location) {
-							setLocation(location);
+							setLocation({ ...location, latitude, longitude });
 						}
 					},
 					(error) => {
@@ -115,46 +131,6 @@ const Home = ({ navigation }: any) => {
 		}, [])
 	);
 
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		(() => {
-	// 			watchId.current = Geolocation.watchPosition(
-	// 				async (position) => {
-	// 					const { latitude, longitude } = position.coords;
-	// 					const location = await getCurrentLocation(latitude, longitude);
-	// 					setFromLatLng({ latitude, longitude });
-	// 					if (location) {
-	// 						setLocation(location);
-	// 					}
-	// 				},
-	// 				(error) => {
-	// 					console.error("error", error);
-	// 				},
-	// 				{
-	// 					enableHighAccuracy: true,
-	// 					distanceFilter: 0,
-	// 					interval: 1000,
-	// 					fastestInterval: 500,
-	// 				}
-	// 			);
-	// 		})();
-
-	// 		return () => {
-	// 			if (watchId.current !== null) {
-	// 				Geolocation.clearWatch(watchId.current);
-	// 			}
-	// 		};
-	// 		// (async () => {
-	// 		// 	try {
-	// 		// 		const destination = await getCachedAuthData("destination");
-	// 		// 		setDestination(destination);
-	// 		// 	} catch (error) {
-	// 		// 		console.error("Error fetching cached data:", error);
-	// 		// 	}
-	// 		// })();
-	// 	}, [])
-	// );
-
 	const initialRegion = useMemo(
 		() => ({
 			latitude: 5.485,
@@ -164,10 +140,10 @@ const Home = ({ navigation }: any) => {
 		}),
 		[]
 	);
-	
+
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
-			{/* <MapView
+			<MapView
 				ref={mapRef}
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
@@ -176,22 +152,31 @@ const Home = ({ navigation }: any) => {
 			>
 				{fromLatLng && toLatLng && (
 					<>
-						<Marker coordinate={fromLatLng} />
+						<Marker coordinate={fromLatLng} >
+							<LocationIcon/>
+						</Marker>
 						<Marker coordinate={toLatLng} />
 						<MapViewDirections
-							// origin={destination?.from}
-							// destination={destination?.to}
 							origin={fromLatLng}
 							destination={toLatLng}
 							apikey={GOOGLE_MAPS_APIKEY}
 							strokeWidth={5}
 							strokeColor={colors.yellow_2}
+							optimizeWaypoints={true}
 							onStart={(params) => {
 								console.log(
 									`Started routing between "${params.origin}" and "${params.destination}"`
 								);
 							}}
 							onReady={(result) => {
+								mapRef.current?.fitToCoordinates(result.coordinates, {
+									edgePadding: {
+										right: 30,
+										left: 30,
+										bottom: 300,
+										top: 100
+									}
+								})
 								console.log(`Distance: ${result.distance} km`);
 								console.log(`Duration: ${result.duration} min.`);
 							}}
@@ -201,17 +186,18 @@ const Home = ({ navigation }: any) => {
 						/>
 					</>
 				)}
-			</MapView> */}
+			</MapView>
 			<SubHome
 				navigation={navigation}
-				destination={destination}
+				// destination={destination}
 				location={location}
+				toLatLng={toLatLng}
 			/>
 		</Container>
 	);
 };
 
-const SubHome = React.memo(({ navigation, destination, location }: any) => {
+const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any) => {
 	const queryClient = useQueryClient();
 	const { userData, setActive } = useContext(UserContext);
 	const [rides, setRiders] = useState<any>([]);
@@ -230,20 +216,18 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 	});
 
 	useEffect(() => {
-		(async () => {
-			setActive(true);
-		})();
-		return () => { };
-	}, [location]);
-
+		setActive(true);
+	}, []);
+	const handleConnect = () => {
+		console.log("Connection successful");
+		setConnected(true);
+		set_request_riders(false);
+	};
 	useFocusEffect(
 		useCallback(() => {
+			console.log(location);
+
 			let intervalId: any = null;
-			const handleConnect = () => {
-				console.log("Connection successful");
-				setConnected(true);
-				set_request_riders(false);
-			};
 
 			const handleAfrilishOrder = (data: any) => {
 				if (data?.msg === "No order available in your location") {
@@ -267,27 +251,32 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 
 			if (rides?.length > 0 && connected) {
 				intervalId = setInterval(() => {
-					console.log("call");
-					socket.emit("join", {
+					console.log('Emitting "rider" event');
+					socket.emit("rider", {
 						userId: userData?._id,
-						type: "Rider",
-						lng: -1.785035,
-						lat: 53.645792,
+						type: 'Rider',
+						lat: location?.latitude,
+						lng: location?.longitude
+						// lng: -1.785035,
+						// lat: 53.645792,
 					});
 				}, 40000);
 
 				setTimeout(() => {
 					clearInterval(intervalId);
-					console.log("Interval cleared");
+					console.log('Interval cleared');
 				}, 60000);
 			}
 
-			if (userData?.status === "on-line" && userData?._id) {
-				socket.on("connect", handleConnect);
-				socket.on("rider-message", handleAfrilishOrder);
-				socket.on("error", handleError);
-				socket.on("disconnect", handleDisconnect);
+			if (userData?.status === 'on-line' && userData?._id && !connected) {
+				console.log('Starting socket connection...');
+				socket.connect();
 			}
+
+			socket.on("connect", handleConnect);
+			socket.on("rider-message", handleAfrilishOrder);
+			socket.on("error", handleError);
+			socket.on("disconnect", handleDisconnect);
 			return () => {
 				socket.off("connect", handleConnect);
 				socket.off("rider-message", handleAfrilishOrder);
@@ -338,8 +327,8 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 							)}
 							keyExtractor={(item) => item?._id}
 						/>
-					</Show.When>
-					<Show.When isTrue={userData === undefined}>
+					</Show.When> 
+					<Show.When isTrue={userData === undefined || toLatLng !== undefined}>
 						<></>
 					</Show.When>
 					<Show.When isTrue={userData?.status !== "on-line"}>
@@ -368,10 +357,14 @@ const SubHome = React.memo(({ navigation, destination, location }: any) => {
 												console.log("Fetching ride");
 												socket.emit("rider", {
 													userId: userData?._id,
-													lng: -1.785035,
-													lat: 53.645792,
+													lat: location?.latitude,
+													lng: location?.longitude
+													// lng: -1.785035,
+													// lat: 53.645792,
 												});
 												set_request_riders(!request_rides);
+											} else {
+												socket.on("connect", handleConnect);
 											}
 										}}
 										type="rounded"

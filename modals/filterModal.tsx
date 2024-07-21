@@ -19,10 +19,10 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 		status: false,
 		date: new Date(),
 	});
-	const [isFilterChanged, setIsFilterChanged] = useState(false);
-	const [status, setStatus] = useState<boolean>(false);
+	const [isFilterChanged, setIsFilterChanged] = useState<any>();
+	const [status, setStatus] = useState<any>();
 	const [filter, setFilter] = useState<{ status: boolean; date: any }>({
-		status: false,
+		status,
 		date: new Date(),
 	});
 
@@ -46,7 +46,18 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 
 	useEffect(() => {
 		(async () => {
+			setFilter((pre) => ({
+				...pre,
+				status: status,
+			}));
+		})();
+		console.log("status", status);
+	}, [status]);
+
+	useEffect(() => {
+		(async () => {
 			const filterData = await getCachedAuthData("filter-data");
+			console.log(filterData);
 			if (filterData !== undefined) {
 				setFilter(filterData);
 				setStatus(filter.status);
@@ -55,27 +66,22 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 		})();
 	}, []);
 
-	useEffect(() => {
-		(async () => {
-			setFilter((pre) => ({
-				...pre,
-				status: status,
-			}));
-		})();
-	}, [status]);
+	// useEffect(() => {
+	// 	let result = JSON.stringify(filter) === JSON.stringify(filterRef.current);
+	// 	// console.log("resuly",result); 
+	// 	setIsFilterChanged(result);
+	// }, [filter]);
 
-	const onSubmit = async () => {
+
+	// useEffect(() => {
+	// 	console.log("isFilterChanged", isFilterChanged);
+	// }, [isFilterChanged])
+
+	const onSubmit = async () => { 
 		await cacheAuthData("filter-data", filter);
 		filterRef.current = filter;
 		closeFilter();
 	};
-
-	useEffect(() => {
-		(() => {
-			let result = JSON.stringify(filter) === JSON.stringify(filterRef.current);
-			setIsFilterChanged(!result);
-		})();
-	}, [filter]);
 
 	return (
 		<BottomModal
@@ -90,12 +96,13 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 					Apply filters
 				</Typography>
 				<TouchableOpacity
-					onPress={() => {
-						clearAuthData("filter-data");
-						setFilter({
+					onPress={async () => {
+						await cacheAuthData("filter-data", {
 							status: false,
 							date: new Date(),
 						});
+						filterRef.current = filter;
+						closeFilter();
 					}}
 				>
 					<Typography type="text16" sx={{ color: colors.yellow }}>
@@ -120,6 +127,7 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 								key={index}
 								onPress={() => {
 									setStatus(i?.status);
+									console.log(i?.status);
 								}}
 							>
 								<View
@@ -158,7 +166,7 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 					<CustButton
 						onPress={onSubmit}
 						type="rounded"
-						sx={{ width: "100%", opacity: isFilterChanged ? 1 : 0.4 }}
+						sx={{ width: "100%"}}
 					>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Apply filters

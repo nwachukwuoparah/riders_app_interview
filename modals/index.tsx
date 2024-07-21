@@ -11,6 +11,7 @@ const BottomModal = ({
 	snapMin,
 	snapMax,
 	bottomSheetModalRef,
+	sx
 }: any) => {
 	const snapPoints = useMemo(() => [snapMin, snapMax], []);
 	const [checkIndex, setCheckIndex] = useState(-1);
@@ -49,7 +50,7 @@ const BottomModal = ({
 				stackBehavior="replace"
 				snapPoints={snapPoints}
 				onChange={handleSheetChanges}
-				backgroundStyle={styles.bottomSheet}
+				backgroundStyle={{ ...styles.bottomSheet, ...sx }}
 			>
 				{children}
 			</BottomSheetModal>

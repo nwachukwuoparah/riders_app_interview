@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from "react";
-import { StyleSheet, View, Platform } from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { StyleSheet, View, Platform, Alert } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -27,10 +27,14 @@ import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
 import LoadingComponent from "../../components/loading";
 import { handleError } from "../../helpers";
+import PreviewModal from "../../modals/previewModal";
 
 export default function Vehicle_Details({ navigation }: any) {
 	const { userData } = useContext(UserContext);
 	const queryClient = useQueryClient();
+	const previewRef = useRef(null)
+	const [modalOpen, setModalOpen] = useState(false)
+	const [image, setImage] = useState()
 
 	const {
 		control,
@@ -53,16 +57,22 @@ export default function Vehicle_Details({ navigation }: any) {
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			console.log(data?.data?.data);
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
 			handleError(err)
-		},
+		}
 	});
+
+	useEffect(() => {
+		console.log(isPending);
+	}, [isPending])
 
 	const onSubmit = (data: vehicleTypes) => {
 		const formData = new FormData();
-		formData.append("image", JSON.stringify(data?.image));
+		data?.image.forEach((image: any, index: number) => {
+			formData.append('image', image);
+		});
 		formData.append("plateNumber", data?.plateNumber);
 		formData.append("vehicleBrand", data?.vehicleBrand);
 		formData.append("vehicleType", data?.vehicleType);
@@ -71,12 +81,15 @@ export default function Vehicle_Details({ navigation }: any) {
 
 	useEffect(() => {
 		console.log(JSON.stringify(userData, null, 2));
+	}, [userData])
+
+	useEffect(() => {
+		console.log(userData?.vehicleLicense)
 	}, [])
 
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />
-
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View
@@ -125,6 +138,7 @@ export default function Vehicle_Details({ navigation }: any) {
 								control={control}
 								errors={errors}
 								name="vehicleType"
+								defualtValue={userData?.vehicleType}
 							/>
 							<InputComponent
 								label="What brand is your vehicle?"
@@ -142,50 +156,82 @@ export default function Vehicle_Details({ navigation }: any) {
 								control={control}
 								errors={errors}
 							/>
-							<PickImage
-								allowsMultipleSelection={true}
-								imageName="image"
-								errors={errors}
-								setValue={setValue}
-								control={control}
-								clearErrors={clearErrors}
-							>
-								<View style={styles.image_wrap}>
-									<Typography type="text16" sx={{ color: colors.white_1 }}>
-										Upload your drivers license
-									</Typography>
-									<View style={styles.image_placeholder}>
-										<LottieView
-											autoPlay
-											style={{
-												width: 100,
-												height: 50,
-											}}
-											source={require("../../assets/lottile/imageFile.json")}
-										/>
-										<Typography type="text14" sx={{ color: colors.black_1 }}>
-											Tap here to upload document (front and back)
-										</Typography>
-										<Typography type="text14" sx={{ color: colors.grey }}>
-											Max 10mb file allowed
-										</Typography>
-									</View>
-								</View>
-							</PickImage>
 							<Show>
 								<Show.When
 									isTrue={
-										watch("image") !== undefined ||
-										userData?.vehicleLicense !== undefined
+										userData?.vehicleLicense?.[0] === null
+										|| userData?.vehicleLicense?.[1] === null
+										|| userData?.vehicleLicense?.[0] === undefined
 									}
 								>
-									{(userData?.vehicleLicense || watch("image"))?.map((i: any, index: number) => (
+									<PickImage
+										allowsMultipleSelection={true}
+										imageName="image"
+										errors={errors}
+										setValue={setValue}
+										control={control}
+										clearErrors={clearErrors}
+									>
+										<View style={styles.image_wrap}>
+											<Typography type="text16" sx={{ color: colors.white_1 }}>
+												Upload your drivers license
+											</Typography>
+											<View style={styles.image_placeholder}>
+												<LottieView
+													autoPlay
+													style={{
+														width: 100,
+														height: 50,
+													}}
+													source={require("../../assets/lottile/imageFile.json")}
+												/>
+												<Typography type="text14" sx={{ color: colors.black_1 }}>
+													Tap here to upload document (front and back)
+												</Typography>
+												<Typography type="text14" sx={{ color: colors.grey }}>
+													Max 10mb file allowed
+												</Typography>
+											</View>
+										</View>
+									</PickImage>
+									{(userData?.vehicleLicense)?.map((i: any, index: number) => (
 										<FilePreview
 											key={index}
 											handelDelete={() => {
 												setValue("image", undefined);
 											}}
-											handelPreview={() => { }}
+											handelPreview={() => {
+												setModalOpen(!modalOpen)
+												if (i?.uri) {
+													console.log(i?.uri);
+													setImage(i?.uri)
+												} else {
+													console.log(i);
+													setImage(i)
+												}
+											}}
+											type="Driver's licence"
+										/>
+									))}
+								</Show.When>
+								<Show.When
+									isTrue={
+										userData?.vehicleLicense?.[0] !== null
+										|| userData?.vehicleLicense?.[1] !== null
+										|| userData?.vehicleLicense?.[0] !== undefined
+									}
+								>
+									{userData?.vehicleLicense?.map((i: any, index: number) => (
+										<FilePreview
+											key={index}
+											setDelete={false}
+											handelDelete={() => {
+												setValue("image", undefined);
+											}}
+											handelPreview={() => {
+												setModalOpen(!modalOpen)
+												setImage(i)
+											}}
 											type="Driver's licence"
 										/>
 									))}
@@ -195,6 +241,14 @@ export default function Vehicle_Details({ navigation }: any) {
 					</ScrollContainer>
 				</KeyboardView>
 			</InnerWrapper>
+			<PreviewModal
+				previewRef={previewRef}
+				close={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				image={image}
+			/>
 		</Container>
 	);
 }
@@ -230,3 +284,10 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 });
+
+
+// {
+// 	"uri": "file:///Users/oparahnkume/Library/Developer/CoreSimulator/Devices/B38FA0A3-5E26-47CB-94D4-6DEDD95633BE/data/Containers/Data/Application/30050105-85B4-4246-ADCF-73BFAC92C7B5/Library/Caches/ImagePicker/96312384-E778-419D-90A4-E6F995BE3839.jpg",
+// 	"name": "96312384-E778-419D-90A4-E6F995BE3839.jpg",
+// 	"type": "image/jpg"
+//   }
