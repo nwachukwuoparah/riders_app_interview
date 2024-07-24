@@ -28,7 +28,6 @@ export default function ChangePassword({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: changePassword,
 		onSuccess: async (data) => {
-			console.log(data?.data);
 			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {

@@ -74,10 +74,6 @@ export default function Address({ navigation }: any) {
 		mutate(formData);
 	};
 
-	useEffect(() => {
-		console.log("call", JSON.stringify(userData, null, 2));
-	}, [userData])
-
 	return (
 		<Container>
 			<LoadingComponent display={isPending} />

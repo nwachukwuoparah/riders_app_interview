@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { forgotPassword } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
 import { useEffect, useState } from "react";
+import { handleError } from "../../helpers";
 
 export default function ForgotPassword({ navigation }: any) {
 	const {
@@ -31,8 +32,7 @@ export default function ForgotPassword({ navigation }: any) {
 			navigation.navigate("resetPassword");
 		},
 		onError: async (err: { msg: string; success: boolean }) => {
-			// Alert.alert("Message", `${err?.msg}`);
-			console.log(JSON.stringify(err, null, 2));
+			handleError(err)
 			await clearAuthData("reset-email");
 		},
 	});

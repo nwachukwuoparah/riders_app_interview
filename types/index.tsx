@@ -126,6 +126,7 @@ export interface otpProps {
 	errors: UseFormStateReturn<any>["errors"];
 	inputCount?: number;
 	name: string;
+	secureTextEntry?: boolean
 }
 
 export interface signUpTypes {
@@ -138,6 +139,10 @@ export interface signUpTypes {
 
 export interface riderOtpType {
 	otp: string;
+}
+
+export interface deleteAccountType {
+	password: string;
 }
 
 export interface verifyRiderType extends riderOtpType {

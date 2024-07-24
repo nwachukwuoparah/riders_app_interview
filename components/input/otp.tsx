@@ -15,6 +15,7 @@ export const OtpInput = ({
 	inputCount,
 	name,
 	label,
+	secureTextEntry,
 }: otpProps) => {
 	const styles = StyleSheet.create({
 		otpComp: {
@@ -27,7 +28,7 @@ export const OtpInput = ({
 			width: hp("8%"),
 			borderRadius: 10,
 			backgroundColor: colors.grey_a,
-			color:  colors.white,
+			color: colors.white,
 		},
 	});
 
@@ -50,6 +51,7 @@ export const OtpInput = ({
 							field.onChange(text);
 						}}
 						autoFocus={true}
+						secureTextEntry={secureTextEntry} // Add this line
 					/>
 				)}
 			/>

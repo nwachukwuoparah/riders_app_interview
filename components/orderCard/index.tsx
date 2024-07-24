@@ -66,10 +66,6 @@ export default function Ordercard({
 		},
 	});
 
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(item?.riderStatus, null, 2));
-	// }, []);
-
 	useFocusEffect(
 		useCallback(() => {
 			(async () => {
@@ -284,7 +280,6 @@ export default function Ordercard({
 								<Show.When isTrue={!toLatLng}>
 									<CatButton
 										onPress={async () => {
-											console.log("call");
 											await cacheAuthData("destination", {
 												step: 1,
 												to: {

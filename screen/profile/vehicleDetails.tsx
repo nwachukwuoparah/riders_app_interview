@@ -64,10 +64,6 @@ export default function Vehicle_Details({ navigation }: any) {
 		}
 	});
 
-	useEffect(() => {
-		console.log(isPending);
-	}, [isPending])
-
 	const onSubmit = (data: vehicleTypes) => {
 		const formData = new FormData();
 		data?.image.forEach((image: any, index: number) => {
@@ -78,14 +74,6 @@ export default function Vehicle_Details({ navigation }: any) {
 		formData.append("vehicleType", data?.vehicleType);
 		mutate(formData);
 	};
-
-	useEffect(() => {
-		console.log(JSON.stringify(userData, null, 2));
-	}, [userData])
-
-	useEffect(() => {
-		console.log(userData?.vehicleLicense)
-	}, [])
 
 	return (
 		<Container>
@@ -194,7 +182,7 @@ export default function Vehicle_Details({ navigation }: any) {
 											</View>
 										</View>
 									</PickImage>
-									{(userData?.vehicleLicense)?.map((i: any, index: number) => (
+									{watch("image")?.map((i: any, index: number) => (
 										<FilePreview
 											key={index}
 											handelDelete={() => {
@@ -203,10 +191,8 @@ export default function Vehicle_Details({ navigation }: any) {
 											handelPreview={() => {
 												setModalOpen(!modalOpen)
 												if (i?.uri) {
-													console.log(i?.uri);
 													setImage(i?.uri)
 												} else {
-													console.log(i);
 													setImage(i)
 												}
 											}}

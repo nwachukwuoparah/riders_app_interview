@@ -32,21 +32,16 @@ export default function Camera_({
 		if (cameraRef.current) {
 			try {
 				const { uri } = await cameraRef.current.takePictureAsync();
-				// console.log(uri);
 				let name = uri.split("/").pop() as string;
 				let match = /\.(\w+)$/.exec(name);
 				let type = match ? `image/${match[1]}` : "image";
 				capture({ uri, name, type });
-				// console.log({ uri, name, type });
 			} catch (error) {
 				console.error("Error taking picture:", error);
 			}
 		}
 	};
 
-	useEffect(() => {
-		console.log(type);
-	}, [type])
 	return (
 		<View style={styles.container}>
 			<Camera style={styles.camera} type={type} ref={cameraRef}>

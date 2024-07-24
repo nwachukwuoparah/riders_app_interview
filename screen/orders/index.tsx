@@ -22,12 +22,12 @@ import FilterModal from "../../modals/filterModal";
 import ConfirmModal from "../../modals/confirmModal";
 import { useQuery } from "@tanstack/react-query";
 import { getOrders } from "../../helpers/query";
-import { getCachedAuthData } from "../../utilities/storage";
+import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
 import { handleError } from "../../helpers";
 import Show from "../../components/show";
 
 export default function Order({ navigation }: any) {
-	const [type, setType] = useState("orderStatus=ready&orderStatus=picked&orderStatus=arrived");
+	const [type, setType] = useState("orderStatus=ready&orderStatus=picked&orderStatus=arrived")
 	const [cancel, setCancel] = useState(false);
 	const [displayFilter, setDisplayFilter] = useState(false);
 	const [confirm, setConfirm] = useState(false);
@@ -57,7 +57,7 @@ export default function Order({ navigation }: any) {
 		setCancel(false);
 		setConfirm(false);
 	};
- 
+
 	const toogleConfirm = (id: string) => {
 		setConfirm(!confirm);
 		setDisplayFilter(false);
@@ -71,32 +71,26 @@ export default function Order({ navigation }: any) {
 		if (error) {
 			handleError(error);
 		}
-	}, [error]);
+		if (filterData?.status) {
+			setType("orderStatus=ready&orderStatus=picked&orderStatus=arrived")
+		}
+	}, [error, filterData]);
 
 	useEffect(() => {
 		(async () => {
 			if (!displayFilter) {
 				const data = await getCachedAuthData("filter-data");
 				setFilterData(data);
-				if (data !== undefined && type === "orderStatus=ready&orderStatus=picked&orderStatus=arrived") {
-					setFilter(`?schedule=${data?.status}&orderStatus=ready&orderStatus=picked&orderStatus=arrived`); //&createdAt=${data?.date}
+				if (data !== undefined) {
+					setFilter(`?schedule=${data?.status}&${type}`); //&createdAt=${data?.date}
 				} else {
-					setFilter( 
-						`?schedule=${data?.status}&orderStatus=${type}` //&createdAt=${data?.date}
+					setFilter(
+						`?schedule=false&${type}` //&createdAt=${data?.date}
 					);
 				}
 			}
 		})();
 	}, [displayFilter, type]);
-
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(data?.data?.data,null,2));
-	// 	console.log(filter);
-	// }, [filter]);
-
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(data?.data?.data, null, 2));
-	// }, [data]);
 
 	return (
 		<Container>
@@ -120,6 +114,8 @@ export default function Order({ navigation }: any) {
 						onPress={() => navigation.navigate("notification")}
 					/>
 				</View>
+
+
 				<View style={styles.body}>
 					<TouchableOpacity
 						onPress={() => {
@@ -133,35 +129,40 @@ export default function Order({ navigation }: any) {
 					>
 						<Typography type="text16">Pending</Typography>
 					</TouchableOpacity>
+
 					{!filterData?.status && <TouchableOpacity
 						onPress={() => {
-							setType("in-transit");
+							setType("orderStatus=in-transit");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
 							borderColor:
-								type === "in-transit" ? colors.yellow : colors.grey_b,
+								type === "orderStatus=in-transit" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">In transit</Typography>
 					</TouchableOpacity>}
+
 					<TouchableOpacity
 						onPress={() => {
-							setType("completed");
+							setType("orderStatus=completed");
 						}}
 						style={{
 							...styles.button,
 							borderBottomWidth: 1,
-							borderColor: type === "completed" ? colors.yellow : colors.grey_b,
+							borderColor: type === "orderStatus=completed" ? colors.yellow : colors.grey_b,
 						}}
 					>
 						<Typography type="text16">Completed</Typography>
 					</TouchableOpacity>
 				</View>
+
+
+
 				<CustButton
 					onPress={toogleFilter}
-					type="rounded" 
+					type="rounded"
 					sx={{
 						width: "100%",
 						paddingVertical: "3.5%",
@@ -190,7 +191,10 @@ export default function Order({ navigation }: any) {
 					data={data?.data?.data}
 					renderItem={({ item }: any) => (
 						<Ordercard
-							onPress={() => navigation.navigate("orderDetails", item)}
+							onPress={() => {
+								item.schedule ? navigation.navigate("scheduleOrderDetails", item) :
+									navigation.navigate("orderDetails", item)
+							}}
 							type={type}
 							cancel={() => cancelOrder(item?._id)}
 							confirm={() => toogleConfirm(item?._id)}

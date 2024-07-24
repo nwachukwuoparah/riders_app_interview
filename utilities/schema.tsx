@@ -19,6 +19,10 @@ export const verifySchems = yup.object().shape({
 	otp: yup.string().required("Otp field is required"),
 });
 
+export const deleteAccountSchems = yup.object().shape({
+	password: yup.string().required("Password field is required"),
+});
+
 export const loginSchems = yup.object().shape({
 	email: yup.string().email("Invalid email").required("Email is required"),
 	password: yup
@@ -68,6 +72,8 @@ export const bankDetailsSchems = yup.object().shape({
 	bankName: yup.string().required("Bank name is required"),
 	accountName: yup.string().required("Account name is required"),
 	sortCode: yup.string().required("Sort code is required"),
+	postalCode: yup.string().required("Postal code code is required"),
+	location: yup.string().required("Location code code is required"),
 });
 
 export const changePasswordSchems = yup.object().shape({

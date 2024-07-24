@@ -39,18 +39,14 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 			navigate()
 		},
 		onError: (err: { msg: string; success: boolean }) => {
-			console.log(JSON.stringify(err, null, 2));
+			handleError(err)
 		},
 	});
 
 	const aceptOrder = () => {
 		mutate({ id: item._id });
 	};
-
-	useEffect(() => {
-		console.log(JSON.stringify(item, null, 2));
-	}, []) 
-
+	
 	return (
 		<View style={styles.card}>
 			<View style={styles.card_top}>

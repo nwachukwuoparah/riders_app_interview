@@ -46,7 +46,7 @@ export default function GuarantorForm({ navigation }: any) {
 	});
 
 	const onSubmit = (data: guarantorTypes) => {
-		mutate(data);
+		mutate(data); 
 	};
 
 	return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -14,7 +14,6 @@ import LottieView from "lottie-react-native";
 import { useForm } from "react-hook-form";
 import PickImage from "../../components/input/imagePicker";
 import { vehicleTypes } from "../../types";
-import { toFormData } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../helpers/mutate";
 import { cacheAuthData } from "../../utilities/storage";
@@ -25,6 +24,7 @@ import FilePreview from "../../components/filePreview";
 import LoadingComponent from "../../components/loading";
 import Set_upModal from "../../modals/setupModal";
 import { handleError } from "../../helpers";
+import PreviewModal from "../../modals/previewModal";
 
 export default function VerifyVehicle({ navigation }: any) {
 	const {
@@ -38,27 +38,34 @@ export default function VerifyVehicle({ navigation }: any) {
 		resolver: yupResolver(vehicleSchems),
 	});
 	const setupRef = useRef(null);
+	const previewRef = useRef(null)
 	const [display, setDiaplay] = useState(false);
+	const [image, setImage] = useState()
+	const [modalOpen, setModalOpen] = useState(false)
+
 
 	const { isPending, mutate } = useMutation({
 		mutationFn: updateUser,
 		onSuccess: async (data) => {
 			cacheAuthData("step", 3);
 			navigation.navigate("verifyAddress");
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
 			handleError(err);
 		},
 	});
 
+
 	const onSubmit = (data: vehicleTypes) => {
-		console.log(data);
-		// const formData = new FormData();
-		// formData.append("image", JSON.stringify(data?.image));
-		// formData.append("plateNumber", data?.plateNumber);
-		// formData.append("vehicleBrand", data?.vehicleBrand);
-		// formData.append("vehicleType", data?.vehicleType);
-		// mutate(formData);
+		const formData = new FormData();
+		data?.image.forEach((image: any, index: number) => {
+			formData.append('image', image);
+		});
+		formData.append("plateNumber", data?.plateNumber);
+		formData.append("vehicleBrand", data?.vehicleBrand);
+		formData.append("vehicleType", data?.vehicleType);
+		mutate(formData);
 	};
 
 	return (
@@ -105,6 +112,7 @@ export default function VerifyVehicle({ navigation }: any) {
 									control={control}
 									errors={errors}
 									name="vehicleType"
+									defualtValue={watch("vehicleType")}
 								/>
 								<InputComponent
 									label="What brand is your vehicle?"
@@ -154,16 +162,19 @@ export default function VerifyVehicle({ navigation }: any) {
 								</PickImage>
 								<Show>
 									<Show.When isTrue={watch("image") !== undefined}>
-										{/* {(watch("image"))?.map((i: any, index: number) => ( */}
-										<FilePreview
-											// key={index}
-											handelDelete={() => {
-												setValue("image", undefined);
-											}}
-											handelPreview={() => { }}
-											type="Driver's licence"
-										/>
-										{/* ))} */}
+										{watch("image")?.map((i: any, index: number) => (
+											<FilePreview
+												key={index}
+												handelDelete={() => {
+													setValue("image", undefined);
+												}}
+												handelPreview={() => {
+													setModalOpen(!modalOpen)
+													setImage(i?.uri)
+												}}
+												type="Driver's licence"
+											/>
+										))}
 									</Show.When>
 								</Show>
 							</View>
@@ -187,6 +198,14 @@ export default function VerifyVehicle({ navigation }: any) {
 				setupRef={setupRef}
 				close={() => setDiaplay(!display)}
 				modalOpen={display}
+			/>
+			<PreviewModal
+				previewRef={previewRef}
+				close={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				image={image}
 			/>
 		</View>
 	);

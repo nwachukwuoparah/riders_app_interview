@@ -20,9 +20,7 @@ export default function PreviewModal({
 	image
 }: any) {
 	const queryClient = useQueryClient();
-	useEffect(() => {
-		console.log(image);
-	}, [image])
+
 	return (
 		<BottomModal
 			bottomSheetModalRef={previewRef}

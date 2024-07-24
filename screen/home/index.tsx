@@ -81,7 +81,7 @@ const Home = ({ navigation }: any) => {
 							reject("Permission to access loction not granted")
 						}
 					} catch (error) {
-						console.log("Ask location error===>", error);
+						// console.log("Ask location error===>", error);
 						return reject(error)
 					}
 					return PermissionsAndroid.request(
@@ -92,7 +92,7 @@ const Home = ({ navigation }: any) => {
 						}
 						reject("Permission to access loction not granted")
 					}).catch((error) => {
-						console.log("Ask location error===>", error);
+						// console.log("Ask location error===>", error);
 						return reject(error)
 					})
 				})
@@ -149,6 +149,7 @@ const Home = ({ navigation }: any) => {
 				style={styles.map}
 				customMapStyle={darkModeStyle}
 				initialRegion={initialRegion}
+			// travelMode= 'DRIVING'
 			>
 				{fromLatLng && toLatLng && (
 					<>
@@ -164,9 +165,9 @@ const Home = ({ navigation }: any) => {
 							strokeColor={colors.yellow_2}
 							optimizeWaypoints={true}
 							onStart={(params) => {
-								console.log(
-									`Started routing between "${params.origin}" and "${params.destination}"`
-								);
+								// console.log(
+								// 	`Started routing between "${params.origin}" and "${params.destination}"`
+								// );
 							}}
 							onReady={(result) => {
 								mapRef.current?.fitToCoordinates(result.coordinates, {
@@ -177,11 +178,11 @@ const Home = ({ navigation }: any) => {
 										top: 100
 									}
 								})
-								console.log(`Distance: ${result.distance} km`);
-								console.log(`Duration: ${result.duration} min.`);
+								// console.log(`Distance: ${result.distance} km`);
+								// console.log(`Duration: ${result.duration} min.`);
 							}}
 							onError={(errorMessage) => {
-								console.error("GOT AN ERROR", errorMessage);
+								// console.error("GOT AN ERROR", errorMessage);
 							}}
 						/>
 					</>
@@ -220,22 +221,21 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 	}, []);
 
 	const handleConnect = () => {
-		console.log("Connection successful");
+		// console.log("Connection successful");
 		setConnected(true);
 		set_request_riders(false);
 	};
 
-useEffect(()=>{
-	if (request_rides) {
-		// Set request_riders to false after 10 seconds if it hasn't been set to true again
-		const timeoutId = setTimeout(() => {
-			set_request_riders(false);
-			console.log('set_request_riders');
-		}, 10000);
+	useEffect(() => {
+		if (request_rides) {
+			// Set request_riders to false after 10 seconds if it hasn't been set to true again
+			const timeoutId = setTimeout(() => {
+				set_request_riders(false);
+			}, 10000);
 
-		return () => clearTimeout(timeoutId);
-	}
-},[request_rides])
+			return () => clearTimeout(timeoutId);
+		}
+	}, [request_rides])
 
 	useFocusEffect(
 		useCallback(() => {
@@ -247,14 +247,14 @@ useEffect(()=>{
 					Alert.alert("Message", data?.msg);
 				} else {
 					setRiders(data?.data);
-					console.log("Received order:", data);
+					// console.log("Received order:", data);
 				}
 			};
 
 			const handleDisconnect = () => {
 				setConnected(false);
 				socket.connect();
-				console.log("Socket disconnected. Attempting to reconnect...");
+				// console.log("Socket disconnected. Attempting to reconnect...");
 			};
 
 			const handleError = (error: any) => {
@@ -263,7 +263,7 @@ useEffect(()=>{
 
 			if (rides?.length > 0 && connected) {
 				intervalId = setInterval(() => {
-					console.log('Emitting "rider" event');
+					// console.log('Emitting "rider" event');
 					socket.emit("rider", {
 						userId: userData?._id,
 						type: 'Rider',
@@ -276,12 +276,11 @@ useEffect(()=>{
 
 				setTimeout(() => {
 					clearInterval(intervalId);
-					console.log('Interval cleared');
 				}, 60000);
 			}
 
 			if (userData?.status === 'on-line' && userData?._id && !connected) {
-				console.log('Starting socket connection...');
+				// console.log('Starting socket connection...');
 				socket.connect();
 			}
 
@@ -297,7 +296,7 @@ useEffect(()=>{
 				socket.disconnect();
 				if (intervalId) {
 					clearInterval(intervalId);
-					console.log("Interval cleared on cleanup");
+					// console.log("Interval cleared on cleanup");
 				}
 			};
 		}, [userData, rides, connected])
@@ -366,13 +365,15 @@ useEffect(()=>{
 									<CustButton
 										onPress={async () => {
 											if (connected && userData?._id) {
-												console.log("Fetching ride");
+												console.log({
+													lat: location?.latitude,
+													lng: location?.longitude
+												});
+												
 												socket.emit("rider", {
 													userId: userData?._id,
 													lat: location?.latitude,
 													lng: location?.longitude
-													// lng: -1.785035,
-													// lat: 53.645792,
 												});
 												set_request_riders(!request_rides);
 											} else {

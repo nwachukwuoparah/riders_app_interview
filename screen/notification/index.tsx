@@ -61,8 +61,6 @@ export default function Notification() {
 				) => {
 					const date = moment(notification?.createdAt).startOf("day");
 					let dateTitle;
-					console.log(notification?.createdAt);
-
 					// Custom date formatting based on conditions
 					if (date.isSame(today, "day")) {
 						dateTitle = `Today, ${date.format("Do MMM YYYY")}`;

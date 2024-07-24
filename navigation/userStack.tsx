@@ -13,6 +13,7 @@ import BankInfo from "../screen/profile/bankInfo";
 import bank_details from "../screen/profile/bankDetails";
 import Notification from "../screen/notification";
 import Update_capture from "../screen/profile/updateCapture";
+import ScheduleOrderDetails from "../screen/orders/scheduleOrderDetails";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ const UserStack = () => {
 		>
 			<Stack.Screen name="dashboard" component={BottomTab} />
 			<Stack.Screen name="orderDetails" component={OrderDetails} />
+			<Stack.Screen name="scheduleOrderDetails" component={ScheduleOrderDetails} />
 			<Stack.Screen name="profileDetails" component={Profile_Details} />
 			<Stack.Screen name="vehicleDetails" component={Vehicle_Details} />
 			<Stack.Screen name="address" component={Address} />

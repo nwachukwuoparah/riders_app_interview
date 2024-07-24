@@ -31,7 +31,7 @@ export default function Bank_details({ navigation }: any) {
 						<CustButton
 							type="back"
 							sx={{ color: colors.white }}
-							// onPress={() => navigation.goBack()}
+							onPress={() => navigation.navigate("Profile")}
 						/>
 						<Typography type="text24">Payment details</Typography>
 					</View>
@@ -70,8 +70,7 @@ export default function Bank_details({ navigation }: any) {
 				</View>
 			</InnerWrapper>
 			<ConfirmModal
-				cancelRef={confirmRef}
-				cancelOrder={toogleConfirm}
+				closeModal={toogleConfirm}
 				modalOpen={confirm}
 			/>
 		</Container>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -24,10 +24,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingComponent from "../../components/loading";
 import { handleError } from "../../helpers";
 import Set_upModal from "../../modals/setupModal";
+import PreviewModal from "../../modals/previewModal";
 
 export default function VerifyAddress({ navigation }: any) {
 	const setupRef = useRef(null);
 	const [display, setDiaplay] = useState(false);
+	const previewRef = useRef(null)
+	const [modalOpen, setModalOpen] = useState(false)
+	const [image, setImage] = useState()
+
 
 	const {
 		control,
@@ -45,6 +50,7 @@ export default function VerifyAddress({ navigation }: any) {
 		onSuccess: async (data) => {
 			cacheAuthData("step", 4);
 			navigation.navigate("guarantorForm");
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
 			handleError(err);
@@ -52,6 +58,7 @@ export default function VerifyAddress({ navigation }: any) {
 	});
 
 	const onSubmit = (data: addressTypes) => {
+		// console.log("call", JSON.stringify(data, null, 2));
 		const formData = new FormData();
 		formData.append("image", data?.image as any);
 		formData.append("location", data?.location);
@@ -60,9 +67,7 @@ export default function VerifyAddress({ navigation }: any) {
 		mutate(formData);
 	};
 
-	useEffect(() => {
-		console.log(isPending);
-	}, [isPending])
+
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -124,6 +129,7 @@ export default function VerifyAddress({ navigation }: any) {
 										control={control}
 										errors={errors}
 										name="addressDocType"
+										defualtValue={watch("addressDocType")}
 									/>
 									<PickImage
 										imageName="image"
@@ -156,7 +162,10 @@ export default function VerifyAddress({ navigation }: any) {
 												handelDelete={() => {
 													setValue("image", undefined);
 												}}
-												handelPreview={() => { }}
+												handelPreview={() => {
+													setModalOpen(!modalOpen)
+													setImage(watch("image")?.uri)
+												}}
 											/>
 										</Show.When>
 									</Show>
@@ -182,6 +191,14 @@ export default function VerifyAddress({ navigation }: any) {
 				setupRef={setupRef}
 				close={() => setDiaplay(!display)}
 				modalOpen={display}
+			/>
+			<PreviewModal
+				previewRef={previewRef}
+				close={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				image={image}
 			/>
 		</View>
 	);

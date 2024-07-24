@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
+	Alert,
 	Modal,
 	Pressable,
 	StyleSheet,
@@ -11,32 +12,34 @@ import { InputComponent } from "../components/input";
 import CustButton from "../components/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { riderOtpType } from "../types";
-import { verifySchems } from "../utilities/schema";
+import { deleteAccountType, riderOtpType } from "../types";
+import { deleteAccountSchems, verifySchems } from "../utilities/schema";
 import { KeyboardView } from "../components/container";
 import { clearAuthData } from "../utilities/storage";
-import { logOut } from "../helpers";
+import { handleError, logOut } from "../helpers";
+import { useMutation } from "@tanstack/react-query";
+import { deleteAccount } from "../helpers/mutate";
+import LoadingComponent from "../components/loading";
+import { UserContext } from "../components/contex/userContex";
 
-export default function DeleteAccountModal({ closeModal, modalOpen,navigation, CommonActions }: any) {
-	const {
-		control,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<riderOtpType>({
-		resolver: yupResolver(verifySchems),
+export default function DeleteAccountModal({ closeModal, modalOpen, navigation, CommonActions }: any) {
+	const { userData } = useContext(UserContext);
+	const { isPending, mutate } = useMutation({
+		mutationFn: deleteAccount,
+		onSuccess: async (data) => {
+			await clearAuthData("user-data");
+			logOut(navigation, CommonActions)
+			Alert.alert("Message", data?.data?.msg)
+		},
+		onError: (err: { msg: string; success: boolean }) => {
+			handleError(err);
+		},
 	});
 
-	// const { isPending, mutate } = useMutation({
-	// 	mutationFn: confirmOrder,
-	// 	onSuccess: async (data) => {
-	// 		queryClient.invalidateQueries("get-order" as QueryFilters);
-	// 		Alert.alert("Message", data?.data?.msg);
-	// 		closeModal();
-	// 	},
-	// 	onError: (err: { msg: string; success: boolean }) => {
-	// 		handleError(err);
-	// 	},
-	// });
+
+	const onSubmit = () => {
+		mutate();
+	}
 
 	return (
 		<Modal
@@ -45,7 +48,7 @@ export default function DeleteAccountModal({ closeModal, modalOpen,navigation, C
 			transparent={true}
 		>
 			<Pressable
-				style={{ flex: 1.5, backgroundColor: "rgba(0, 0, 0, 0.3)" }}
+				style={{ flex: 2.4, backgroundColor: "rgba(0, 0, 0, 0.3)" }}
 				onPress={closeModal}
 			></Pressable>
 
@@ -60,28 +63,22 @@ export default function DeleteAccountModal({ closeModal, modalOpen,navigation, C
 						onPress={closeModal}
 					/>
 				</View>
+				{/* nwachukwuoparah+test@gmail.com */}
+				Grace/1225
 				<View style={styles.body}>
 					<View style={{ alignItems: "center", width: "70%", gap: 5 }}>
 						<Typography type="text16" sx={{ color: colors.white }}>
-							Enter your app pin
+							Enter your account password
 						</Typography>
 						<Typography type="text14" sx={{ color: colors.white, textAlign: "center" }}>
 							You are totally erasing your data and account by deleting your account
 						</Typography>
 					</View>
-					<View style={{ width: "90%", gap: 15 }}>
-						<InputComponent
-							type="otp"
-							name="otp"
-							control={control}
-							errors={errors}
-						/>
+					<View style={{ width: "90%", gap: 40 }}>
 						<View style={{ gap: 5 }}>
 							<CustButton
 								type="rounded"
-								onPress={handleSubmit((data) => {
-									console.log(data);
-								})}
+								onPress={onSubmit}
 								sx={{ width: "100%", backgroundColor: colors.red }}
 								color={colors.red}
 							>
@@ -106,7 +103,7 @@ export default function DeleteAccountModal({ closeModal, modalOpen,navigation, C
 					</View>
 				</View>
 			</KeyboardView>
-			{/* <LoadingComponent display={isPending} /> */}
+			<LoadingComponent display={isPending} />
 		</Modal>
 	);
 }

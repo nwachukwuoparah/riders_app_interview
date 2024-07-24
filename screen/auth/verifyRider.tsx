@@ -119,6 +119,7 @@ export default function VerifyRider({ navigation }: any) {
 							name="otp"
 							control={control}
 							errors={errors}
+							secureTextEntry={true}
 						/>
 						<TouchableOpacity
 							onPress={async () => {

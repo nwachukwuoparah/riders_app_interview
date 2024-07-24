@@ -36,6 +36,7 @@ const DropdownInput = ({
 		placeholder: {
 			fontSize: hp("2%"),
 			color: colors.grey_d,
+			fontFamily: font.DMSans_400Regular,
 			...(placeholderStyle as object),
 		},
 

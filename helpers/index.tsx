@@ -97,7 +97,6 @@ export const handleError = (err: any, navigation?: any) => {
 			})();
 			return;
 		} else {
-			console.log(axiosError.response?.data);
 			Alert.alert("Error", axiosError.response?.data?.message);
 			return axiosError.response?.data;
 		}

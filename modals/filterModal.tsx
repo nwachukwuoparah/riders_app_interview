@@ -51,13 +51,11 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 				status: status,
 			}));
 		})();
-		console.log("status", status);
 	}, [status]);
 
 	useEffect(() => {
 		(async () => {
 			const filterData = await getCachedAuthData("filter-data");
-			console.log(filterData);
 			if (filterData !== undefined) {
 				setFilter(filterData);
 				setStatus(filter.status);
@@ -65,17 +63,6 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 			}
 		})();
 	}, []);
-
-	// useEffect(() => {
-	// 	let result = JSON.stringify(filter) === JSON.stringify(filterRef.current);
-	// 	// console.log("resuly",result); 
-	// 	setIsFilterChanged(result);
-	// }, [filter]);
-
-
-	// useEffect(() => {
-	// 	console.log("isFilterChanged", isFilterChanged);
-	// }, [isFilterChanged])
 
 	const onSubmit = async () => { 
 		await cacheAuthData("filter-data", filter);
@@ -127,7 +114,6 @@ export default function FilterModal({ filterRe, closeFilter, modalOpen }: any) {
 								key={index}
 								onPress={() => {
 									setStatus(i?.status);
-									console.log(i?.status);
 								}}
 							>
 								<View

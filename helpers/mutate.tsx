@@ -108,8 +108,6 @@ export const getNotification = async (): Promise<any> => {
 
 export const acceptOrder = async (data: { id: string }): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-	console.log(token);
-	console.log(data);
 	return await axios.patch(
 		`${EXPO_PUBLIC_API}/rider/accept-order/${data?.id}`,
 		{},
@@ -123,8 +121,6 @@ export const acceptOrder = async (data: { id: string }): Promise<any> => {
 
 export const rejectOrder = async (data: { id: string }): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
-	console.log(token);
-	console.log("id", data);
 	return await axios.patch(
 		`${EXPO_PUBLIC_API}/rider/cancel-order/${data?.id}`,
 		{},
@@ -158,11 +154,18 @@ export const updateOrder = async (data: any): Promise<any> => {
 export const confirmOrder = async (data: any): Promise<any> => {
 	let { id, ...others } = data;
 	const { token } = await getCachedAuthData("user-data");
-	console.log(id); 
-	
 	return await axios.patch(`${EXPO_PUBLIC_API}/rider/deliver-order/${id}`, others, {
 		headers: {
 			Authorization: `Bearer ${token}`,
+		},
+	});
+};
+
+export const deleteAccount = async (): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.delete(`${EXPO_PUBLIC_API}/rider/delete`, {
+		headers: {
+			Authorization: `Bearer ${token}`
 		},
 	});
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Alert, Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -38,9 +38,10 @@ export default function BankInfo({ navigation }: any) {
 		onSuccess: async (data) => {
 			navigation.navigate("bankDetails");
 			queryClient.invalidateQueries("get-profile" as QueryFilters);
+			Alert.alert("Message", data?.data?.msg);
 		},
 		onError: (err) => {
-		handleError(err)
+			handleError(err)
 		},
 	});
 
@@ -61,7 +62,7 @@ export default function BankInfo({ navigation }: any) {
 						/>
 						<Typography type="text24">Set up payment details</Typography>
 					</View>
-					<ScrollContainer>
+					<ScrollContainer innerStyles={{ paddingBottom: 100 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Bank name"
@@ -90,6 +91,22 @@ export default function BankInfo({ navigation }: any) {
 								errors={errors}
 								keyboardType="numeric"
 							/>
+							<InputComponent
+								label="Postal code"
+								type="text"
+								placeholder="Enter here"
+								name="postalCode"
+								control={control}
+								errors={errors}
+							/>
+								<InputComponent
+								label="Location code"
+								type="text"
+								placeholder="Enter here"
+								name="location"
+								control={control}
+								errors={errors}
+							/>
 						</View>
 					</ScrollContainer>
 				</KeyboardView>
@@ -109,6 +126,7 @@ const styles = StyleSheet.create({
 	title: {
 		gap: 5,
 		width: "100%",
+		paddingBottom: "5%"
 	},
 	inputContain: {
 		gap: 20,

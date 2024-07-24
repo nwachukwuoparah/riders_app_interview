@@ -29,11 +29,6 @@ import { logOut } from "../../helpers";
 export default function Profile({ navigation }: any) {
 	const { userData, isFetching, refetch } = useContext(UserContext);
 
-	useEffect(() => {
-		console.log(JSON.stringify(userData, null, 2));
-
-	}, [])
-
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />

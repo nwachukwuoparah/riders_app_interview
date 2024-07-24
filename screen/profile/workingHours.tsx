@@ -58,7 +58,6 @@ export default function WorkingHours({ navigation }: any) {
 	const { isPending, mutate } = useMutation({
 		mutationFn: workingHours,
 		onSuccess: async (data) => {
-			console.log(data?.data?.msg);
 			Alert.alert("Message", data?.data?.msg);
 			queryClient.invalidateQueries("get-working-hours" as QueryFilters);
 		},

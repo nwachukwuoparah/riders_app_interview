@@ -60,10 +60,6 @@ export default function Wallet({ navigation }: any) {
 		setModal(!openModal);
 	};
 
-	useEffect(() => {
-		console.log(JSON.stringify(data?.data, null, 2));
-	}, []);
-
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 25 }}>
@@ -221,13 +217,7 @@ export default function Wallet({ navigation }: any) {
 									/>
 								}
 								renderItem={(item: any) => (
-									<Pressable
-										onPress={() => {
-											console.log(item);
-										}}
-									>
 										<ProfileCard {...item?.item} />
-									</Pressable>
 								)}
 								keyExtractor={({ _id }) => _id}
 								ListEmptyComponent={() => (
