@@ -14,10 +14,10 @@ import {
 	verifyRiderType,
 } from "../types";
 import { getCachedAuthData } from "../utilities/storage";
-import { EXPO_PUBLIC_API } from "@env";
+import { EXPO_PUBLIC_API,BASE_PATH } from "@env";
 
 export const createUser = async (data: signUpTypes): Promise<any> => {
-	return await axios.post(`${EXPO_PUBLIC_API}/rider`, data);
+	return await axios.post(`${EXPO_PUBLIC_API}/${BASE_PATH}/rider`, data);
 };
 
 export const verifyUser = async (data: verifyRiderType): Promise<any> => {

@@ -7,4 +7,5 @@ declare module "*.svg" {
 
 declare module '@env' {
     export const EXPO_PUBLIC_API: string;
+    export const BASE_PATH: string
 }

@@ -39,11 +39,8 @@ import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
 import { getCurrentLocation, handleError, truncateString } from "../../helpers";
 import { useFocusEffect } from "@react-navigation/native";
-import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
-// import { EXPO_PUBLIC_API } from "@env";
-
-let EXPO_PUBLIC_API =
-	"https://aftilish-development-server-e7f09cb1463d.herokuapp.com";
+import { getCachedAuthData } from "../../utilities/storage";
+import { EXPO_PUBLIC_API } from "@env";
 
 const socket = io(EXPO_PUBLIC_API, {
 	reconnectionAttempts: Infinity,
@@ -62,7 +59,6 @@ const Home = ({ navigation }: any) => {
 
 	useFocusEffect(
 		useCallback(() => {
-
 			(async () => {
 				const destination = await getCachedAuthData("destination")
 				setToLatLng(destination?.to);
@@ -369,7 +365,7 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 													lat: location?.latitude,
 													lng: location?.longitude
 												});
-												
+
 												socket.emit("rider", {
 													userId: userData?._id,
 													lat: location?.latitude,
