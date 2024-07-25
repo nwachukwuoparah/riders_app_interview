@@ -48,13 +48,13 @@ export const vehicleSchems = yup.object().shape({
 export const addressSchems = yup.object().shape({
 	location: yup.string().required("City is required"),
 	postalCode: yup.string().required("Postal code is required"),
-	addressDocType: yup.string().required("Document type  is required"),
+	type: yup.string().required("Document type  is required"),
 	image: yup.mixed().required("Drivers liscense is required"),
 });
 
 export const garantorsSchems = yup.object().shape({
-	guarantorName: yup.string().required("Current address is required"),
-	guarantorPhone: yup.string().required("Document type  is required"),
+	name: yup.string().required("Current address is required"),
+	phone: yup.string().required("Document type  is required"),
 	nextOfKin: yup.string().required("Document type  is required"),
 	kinRelationship: yup.string().required("Document type  is required"),
 	kinPhone: yup.string().required("Document type  is required"),

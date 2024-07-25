@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -36,11 +36,11 @@ export default function Guarantors({ navigation }: any) {
 	} = useForm<guarantorTypes | any>({
 		resolver: yupResolver(garantorsSchems),
 		defaultValues: {
-			guarantorName: userData?.guarantorName,
-			guarantorPhone: userData?.guarantorPhone,
-			nextOfKin: userData?.nextOfKin,
-			kinRelationship: userData?.kinRelationship,
-			kinPhone: userData?.kinPhone,
+			name: userData?.guarantor?.name,
+			phone: userData?.guarantor?.guarantorPhone,
+			nextOfKin: userData?.guarantor?.nextOfKin,
+			kinRelationship: userData?.guarantor?.kinRelationship,
+			kinPhone: userData?.guarantor?.kinPhone,
 		},
 	});
 
@@ -56,7 +56,7 @@ export default function Guarantors({ navigation }: any) {
 	});
 
 	const onSubmit = (data: guarantorTypes) => {
-		mutate(data);
+		mutate({ ...data, updateType: "guarantor" });
 	};
 
 	return (
@@ -69,7 +69,7 @@ export default function Guarantors({ navigation }: any) {
 							flexDirection: "row",
 							alignItems: "center",
 							justifyContent: "space-between",
-							width:"100%"
+							width: "100%"
 						}}
 					>
 						<View style={styles.title}>
@@ -96,23 +96,31 @@ export default function Guarantors({ navigation }: any) {
 							</CustButton>
 						</View>
 					</View>
-					<ScrollContainer innerStyles={{ paddingBottom:60 }}>
+					<ScrollContainer innerStyles={{ paddingBottom: 60 }}>
 						<View style={{ ...styles.inputContain }}>
 							<InputComponent
 								label="Your guarantor’s full name"
 								type="text"
-								name="guarantorName"
+								name="name"
 								control={control}
 								errors={errors}
 								placeholder="e.g John Doe"
+								editable={
+									(userData?.guarantor?.status === "in-progress" ||
+										userData?.guarantor?.status === "approved") ? false : true
+								}
 							/>
 							<InputComponent
 								label="Your guarantor’s phone number"
 								type="phone"
-								name="guarantorPhone"
+								name="phone"
 								control={control}
 								errors={errors}
-								defaultValue={userData?.guarantorPhone}
+								defaultValue={userData?.guarantor?.guarantorPhone}
+								disabled={
+									userData?.guarantor?.status === "in-progress" ||
+									userData?.guarantor?.status === "approved"
+								}
 							/>
 							<InputComponent
 								label="Your next of kin’s full name"
@@ -121,6 +129,10 @@ export default function Guarantors({ navigation }: any) {
 								control={control}
 								errors={errors}
 								placeholder="e.g John Doe"
+								editable={
+									(userData?.guarantor?.status === "in-progress" ||
+										userData?.guarantor?.status === "approved") ? false : true
+								}
 							/>
 							<InputComponent
 								label="Your next of kin’s relationship"
@@ -135,7 +147,11 @@ export default function Guarantors({ navigation }: any) {
 									{ label: "Dad", value: "Dad" },
 								]}
 								placeholder="Select relationship"
-								defualtValue={userData?.kinRelationship}
+								defualtValue={userData?.guarantor?.kinRelationship}
+								disable={
+									userData?.guarantor?.status === "in-progress" ||
+									userData?.guarantor?.status === "approved"
+								}
 							/>
 							<InputComponent
 								label="Your next of kin’s phone number"
@@ -143,7 +159,11 @@ export default function Guarantors({ navigation }: any) {
 								name="kinPhone"
 								control={control}
 								errors={errors}
-								defaultValue={userData?.kinPhone}
+								defaultValue={userData?.guarantor?.kinPhone}
+								disabled={ 
+									userData?.guarantor?.status === "in-progress" ||
+									userData?.guarantor?.status === "approved"
+								}
 							/>
 						</View>
 					</ScrollContainer>

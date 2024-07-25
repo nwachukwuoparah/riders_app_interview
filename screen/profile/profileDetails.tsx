@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
@@ -23,11 +23,12 @@ import { updateProfile } from "../../helpers/mutate";
 import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
 import { handleError } from "../../helpers";
-import DeleteAccountModal from "../../modals/deleteAccountModal";
 import { CommonActions } from "@react-navigation/native";
+import DeleteModal from "../../modals/deleteModal";
 
 export default function Profile_Details({ navigation }: any) {
 	const { userData } = useContext(UserContext);
+	const deleteRef = useRef(null)
 	const queryClient = useQueryClient();
 	const [modalOpen, setModalOpen] = useState(false)
 
@@ -157,7 +158,8 @@ export default function Profile_Details({ navigation }: any) {
 					</Typography>
 				</CustButton>
 			</View>
-			<DeleteAccountModal
+			<DeleteModal
+				deleteRef={deleteRef}
 				closeModal={() => {
 					setModalOpen(!modalOpen)
 				}}

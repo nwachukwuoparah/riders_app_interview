@@ -164,6 +164,16 @@ export const confirmOrder = async (data: any): Promise<any> => {
 	});
 };
 
+export const deleteBankAccount = async (): Promise<any> => {
+	const { token } = await getCachedAuthData("user-data");
+	return await axios.delete(`${EXPO_PUBLIC_API}/api/v1/rider/delete-payment`, {
+		headers: {
+			Authorization: `Bearer ${token}`
+		},
+	});
+};
+
+
 export const deleteAccount = async (): Promise<any> => {
 	const { token } = await getCachedAuthData("user-data");
 	return await axios.delete(`${EXPO_PUBLIC_API}/api/v1/rider/delete`, {

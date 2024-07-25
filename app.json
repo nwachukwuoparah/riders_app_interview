@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.afrilish.rider",
-      "buildNumber": "28",
+      "buildNumber": "29",
       "config": {
         "googleMapsApiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
       }

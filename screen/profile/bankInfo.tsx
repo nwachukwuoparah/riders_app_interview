@@ -46,7 +46,7 @@ export default function BankInfo({ navigation }: any) {
 	});
 
 	const onSubmit = (data: bankDetailsType) => {
-		mutate(data);
+		mutate({ ...data, updateType: "bankDetails" });
 	};
 
 	return (
@@ -99,7 +99,7 @@ export default function BankInfo({ navigation }: any) {
 								control={control}
 								errors={errors}
 							/>
-								<InputComponent
+							<InputComponent
 								label="Location code"
 								type="text"
 								placeholder="Enter here"

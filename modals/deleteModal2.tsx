@@ -22,7 +22,7 @@ import { deleteAccount } from "../helpers/mutate";
 import LoadingComponent from "../components/loading";
 import { UserContext } from "../components/contex/userContex";
 
-export default function DeleteAccountModal({ closeModal, modalOpen, navigation, CommonActions }: any) {
+export default function DeleteAccountModal1({ closeModal, modalOpen, navigation, CommonActions }: any) {
 	const { userData } = useContext(UserContext);
 	const { isPending, mutate } = useMutation({
 		mutationFn: deleteAccount,
@@ -63,8 +63,6 @@ export default function DeleteAccountModal({ closeModal, modalOpen, navigation, 
 						onPress={closeModal}
 					/>
 				</View>
-				{/* nwachukwuoparah+test@gmail.com */}
-				Grace/1225
 				<View style={styles.body}>
 					<View style={{ alignItems: "center", width: "70%", gap: 5 }}>
 						<Typography type="text16" sx={{ color: colors.white }}>

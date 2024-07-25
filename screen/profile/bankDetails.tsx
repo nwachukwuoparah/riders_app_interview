@@ -1,22 +1,25 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
-import ConfirmModal from "../../modals/confirmModal";
 import { UserContext } from "../../components/contex/userContex";
+import { CommonActions } from "@react-navigation/native";
+import DeleteModal from "../../modals/deleteModal";
 
 export default function Bank_details({ navigation }: any) {
-	const confirmRef = useRef(null);
-	const [confirm, setConfirm] = useState(false);
+	const [modalOpen, setModalOpen] = useState(false)
 	const { userData } = useContext(UserContext);
-
-	const toogleConfirm = () => {
-		setConfirm(!confirm);
+	const deleteRef = useRef(null)
+	const toogleDelete = () => {
+		setModalOpen(!modalOpen);
 	};
 
+	useEffect(() => {
+		console.log(JSON.stringify(userData?.bankDetails, null, 2));
+	}, [userData]) 
 	return (
 		<Container>
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
@@ -35,43 +38,34 @@ export default function Bank_details({ navigation }: any) {
 						/>
 						<Typography type="text24">Payment details</Typography>
 					</View>
-					<View style={{ width: "22%" }}>
-						<CustButton
-							sx={{
-								width: "100%",
-								backgroundColor: colors.white,
-								paddingVertical: 13,
-							}}
-							type="rounded"
-							onPress={toogleConfirm}
-						>
-							<Typography type="text16" sx={{ color: colors.black }}>
-								Edit
-							</Typography>
-						</CustButton>
-					</View>
 				</View>
 				<View style={{ ...styles.card }}>
 					<View style={{ gap: 10 }}>
 						<Typography type="text16" sx={{ color: colors.white }}>
-							{userData?.bankName}
+							{userData?.bankDetails?.bankName}
 						</Typography>
 						<Typography type="text14" sx={{ color: colors.white }}>
-							{userData?.accountName}
+							{userData?.bankDetails?.accountName}
 						</Typography>
 					</View>
-					<View style={styles.delete}>
+					<TouchableOpacity style={styles.delete} onPress={toogleDelete}>
 						<MaterialCommunityIcons
 							name="delete-outline"
 							size={24}
 							color={colors.red}
 						/>
-					</View>
+					</TouchableOpacity>
 				</View>
 			</InnerWrapper>
-			<ConfirmModal
-				closeModal={toogleConfirm}
-				modalOpen={confirm}
+			<DeleteModal
+			deleteRef={deleteRef}
+				closeModal={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				navigation={navigation}
+				CommonActions={CommonActions}
+				type="bank"
 			/>
 		</Container>
 	);

@@ -29,6 +29,9 @@ import { logOut } from "../../helpers";
 export default function Profile({ navigation }: any) {
 	const { userData, isFetching, refetch } = useContext(UserContext);
 
+	useEffect(() => {
+		console.log(JSON.stringify(userData?.bankDetails?.status, null, 2));
+	}, [userData])
 	return (
 		<Container>
 			<LoadingComponent display={isFetching} />
@@ -119,11 +122,10 @@ export default function Profile({ navigation }: any) {
 							{
 								value: "Payment details",
 								route:
-									!userData?.bankName &&
-										!userData?.accountName &&
-										!userData?.sortCode
-										? "bankInfo"
-										: "bankDetails",
+									userData?.bankDetails?.status === "approved" ||
+										userData?.bankDetails?.status === "in-progress"
+										? "bankDetails"
+										: "bankInfo",
 								type: "routh",
 							},
 							{
@@ -181,3 +183,63 @@ const styles = StyleSheet.create({
 	},
 	list: {},
 });
+
+
+// const scheduleData = {
+// 	selectedWeek: null, // This will hold the selected week object
+// 	weeks: [
+// 	  {
+// 		id: 1,
+// 		name: "Week 1",
+// 		days: [
+// 		  {
+// 			id: 1,
+// 			name: "Monday",
+// 			selected: false,
+// 			meals: {
+// 			  morning: [
+// 				{ id: 1, name: "Breakfast", details: "Toast and Coffee" },
+// 				{ id: 2, name: "Snack", details: "Fruit" }
+// 			  ],
+// 			  afternoon: [
+// 				{ id: 3, name: "Lunch", details: "Salad and Sandwich" },
+// 				{ id: 4, name: "Snack", details: "Nuts" }
+// 			  ],
+// 			  evening: [
+// 				{ id: 5, name: "Dinner", details: "Steak, Vegetables, and Rice" },
+// 				{ id: 6, name: "Dessert", details: "Ice Cream" }
+// 			  ]
+// 			}
+// 		  },
+// 		  {
+// 			id: 2,
+// 			name: "Tuesday",
+// 			selected: false,
+// 			meals: {
+// 			  morning: [
+// 				{ id: 7, name: "Breakfast", details: "Yogurt and Fruit" },
+// 				{ id: 8, name: "Snack", details: "Granola Bar" }
+// 			  ],
+// 			  afternoon: [
+// 				{ id: 9, name: "Lunch", details: "Soup and Bread" },
+// 				{ id: 10, name: "Snack", details: "Smoothie" }
+// 			  ],
+// 			  evening: [
+// 				{ id: 11, name: "Dinner", details: "Pasta, Chicken, and Salad" },
+// 				{ id: 12, name: "Dessert", details: "Cake" }
+// 			  ]
+// 			}
+// 		  },
+// 		  // Repeat similar structure for remaining days of the week
+// 		]
+// 	  },
+// 	  {
+// 		id: 2,
+// 		name: "Week 2",
+// 		days: [
+// 		  // Days with meal information for Week 2
+// 		]
+// 	  },
+// 	  // Repeat similar structure for remaining weeks of the month
+// 	]
+//   };

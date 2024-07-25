@@ -36,7 +36,6 @@ export default function Address({ navigation }: any) {
 	const [modalOpen, setModalOpen] = useState(false)
 	const [image, setImage] = useState()
 
-
 	const {
 		control,
 		handleSubmit,
@@ -47,10 +46,10 @@ export default function Address({ navigation }: any) {
 	} = useForm<addressTypes | any>({
 		resolver: yupResolver(addressSchems),
 		defaultValues: {
-			location: userData?.location,
-			addressDocType: userData?.addressDocType,
-			image: userData?.proofOfAddress,
-			postalCode: userData?.postalCode
+			location: userData?.proofOfAddress?.location,
+			type: userData?.proofOfAddress?.type,
+			image: userData?.proofOfAddress?.address,
+			postalCode: userData?.proofOfAddress?.postalCode
 		},
 	});
 
@@ -70,7 +69,8 @@ export default function Address({ navigation }: any) {
 		formData.append("image", data?.image as any);
 		formData.append("location", data?.location);
 		formData.append("postalCode", data?.postalCode);
-		formData.append("addressDocType", data?.addressDocType);
+		formData.append("type", data?.type);
+		formData.append("updateType", "proofOfAddress");
 		mutate(formData);
 	};
 
@@ -120,6 +120,10 @@ export default function Address({ navigation }: any) {
 								control={control}
 								errors={errors}
 								name="location"
+								editable={
+									(userData?.vehicle?.status === "in-progress" ||
+										userData?.vehicle?.status === "approved") ? false : true
+								}
 							/>
 							<InputComponent
 								label="Enter post code"
@@ -128,6 +132,10 @@ export default function Address({ navigation }: any) {
 								control={control}
 								errors={errors}
 								name="postalCode"
+								editable={
+									(userData?.vehicle?.status === "in-progress" ||
+										userData?.vehicle?.status === "approved") ? false : true
+								}
 							/>
 							<InputComponent
 								label="Upload your proof of address"
@@ -139,13 +147,18 @@ export default function Address({ navigation }: any) {
 								placeholder="Select document type"
 								control={control}
 								errors={errors}
-								name="addressDocType"
-								defualtValue={userData?.addressDocType}
+								name="type"
+								defualtValue={userData?.proofOfAddress?.type} 
+								disable={
+									userData?.proofOfAddress?.status === "in-progress" ||
+									userData?.proofOfAddress?.status === "approved"
+								}
 							/>
 							<Show>
 								<Show.When
 									isTrue={
-										userData?.proofOfAddress !== undefined
+										userData?.proofOfAddress?.status === "in-progress" ||
+										userData?.proofOfAddress?.status === "approved"
 									}
 								>
 									<FilePreview
@@ -154,7 +167,7 @@ export default function Address({ navigation }: any) {
 										}}
 										handelPreview={() => {
 											setModalOpen(!modalOpen)
-											setImage(userData?.proofOfAddress)
+											setImage(userData?.proofOfAddress?.address)
 										}}
 									/>
 								</Show.When>

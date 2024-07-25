@@ -83,6 +83,7 @@ export interface phoneInputProps {
 	control: any;
 	errors: UseFormStateReturn<any>["errors"];
 	name: string;
+	disabled?:boolean
 }
 
 export interface DropdownInputProps {
@@ -100,6 +101,7 @@ export interface DropdownInputProps {
 	control: any;
 	errors: UseFormStateReturn<any>["errors"];
 	name: string;
+	disable?: boolean
 }
 
 export type dropDownDataType = {
@@ -181,13 +183,13 @@ export interface vehicleTypes {
 export interface addressTypes {
 	location: string;
 	postalCode: string;
-	addressDocType: string;
+	type: string;
 	image: any;
 }
 
 export interface guarantorTypes {
-	guarantorName: string;
-	guarantorPhone: string;
+	name: string;
+	phone: string;
 	nextOfKin: string;
 	kinPhone: string;
 	kinRelationship: string;

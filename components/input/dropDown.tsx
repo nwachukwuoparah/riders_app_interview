@@ -21,6 +21,7 @@ const DropdownInput = ({
 	name,
 	errors,
 	control,
+	disable
 }: DropdownInputProps) => {
 	const styles = StyleSheet.create({
 		dropdown: {
@@ -85,6 +86,7 @@ const DropdownInput = ({
 						itemTextStyle={styles.itemTextStyle}
 						containerStyle={styles.containerStyle}
 						iconStyle={styles.iconStyle}
+						disable={disable}
 						data={data}
 						labelField="label"
 						valueField="value"

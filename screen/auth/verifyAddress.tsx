@@ -58,12 +58,12 @@ export default function VerifyAddress({ navigation }: any) {
 	});
 
 	const onSubmit = (data: addressTypes) => {
-		// console.log("call", JSON.stringify(data, null, 2));
 		const formData = new FormData();
 		formData.append("image", data?.image as any);
 		formData.append("location", data?.location);
 		formData.append("postalCode", data?.postalCode);
-		formData.append("addressDocType", data?.addressDocType);
+		formData.append("type", data?.type);
+		formData.append("updateType", "proofOfAddress");
 		mutate(formData);
 	};
 
@@ -128,8 +128,8 @@ export default function VerifyAddress({ navigation }: any) {
 										placeholder="Select document type"
 										control={control}
 										errors={errors}
-										name="addressDocType"
-										defualtValue={watch("addressDocType")}
+										name="type"
+										defualtValue={watch("type")}
 									/>
 									<PickImage
 										imageName="image"
@@ -158,7 +158,7 @@ export default function VerifyAddress({ navigation }: any) {
 									<Show>
 										<Show.When isTrue={watch("image") !== undefined}>
 											<FilePreview
-												type={watch("addressDocType")}
+												type={watch("type")}
 												handelDelete={() => {
 													setValue("image", undefined);
 												}}

@@ -14,7 +14,8 @@ const CustPhoneInput = ({
 	label,
 	control,
 	errors,
-	name,
+	name, 
+	disabled
 }: phoneInputProps) => {
 	const phoneNumInput = useRef<PhoneInput>();
 
@@ -66,14 +67,15 @@ const CustPhoneInput = ({
 							onChange(formattedText);
 						}}
 						value={value}
+						disabled={disabled}
 					/>
 				)}
 			/>
-				{errors?.[name] && (
-					<Typography type="text14" sx={{ color: colors.red }}>
-						{errors?.[name]?.message}
-					</Typography>
-				)}
+			{errors?.[name] && (
+				<Typography type="text14" sx={{ color: colors.red }}>
+					{errors?.[name]?.message}
+				</Typography>
+			)}
 		</View>
 	);
 };

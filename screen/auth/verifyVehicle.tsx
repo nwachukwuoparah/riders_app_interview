@@ -65,6 +65,7 @@ export default function VerifyVehicle({ navigation }: any) {
 		formData.append("plateNumber", data?.plateNumber);
 		formData.append("vehicleBrand", data?.vehicleBrand);
 		formData.append("vehicleType", data?.vehicleType);
+		formData.append("updateType", "vehicle");
 		mutate(formData);
 	};
 

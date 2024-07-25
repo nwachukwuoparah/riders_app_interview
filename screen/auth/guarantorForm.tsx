@@ -46,7 +46,7 @@ export default function GuarantorForm({ navigation }: any) {
 	});
 
 	const onSubmit = (data: guarantorTypes) => {
-		mutate(data); 
+		mutate({ ...data, updateType: "guarantor" });
 	};
 
 	return (
@@ -87,14 +87,14 @@ export default function GuarantorForm({ navigation }: any) {
 									placeholder="e.g John Doe"
 									control={control}
 									errors={errors}
-									name="guarantorName"
+									name="name"
 								/>
 								<InputComponent
 									label="Your guarantor’s phone number"
 									type="phone"
 									control={control}
 									errors={errors}
-									name="guarantorPhone"
+									name="phone"
 								/>
 								<InputComponent
 									label="Your next of kin’s full name"

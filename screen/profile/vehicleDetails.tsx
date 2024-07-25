@@ -46,10 +46,10 @@ export default function Vehicle_Details({ navigation }: any) {
 	} = useForm<vehicleTypes | any>({
 		resolver: yupResolver(vehicleSchems),
 		defaultValues: {
-			vehicleType: userData?.vehicleType,
-			vehicleBrand: userData?.vehicleBrand,
-			plateNumber: userData?.plateNumber,
-			image: userData?.vehicleLicense,
+			vehicleType: userData?.vehicle?.vehicleType,
+			vehicleBrand: userData?.vehicle?.vehicleBrand,
+			plateNumber: userData?.vehicle?.plateNumber,
+			image: userData?.vehicle?.vehicleLicense,
 		},
 	});
 
@@ -72,6 +72,7 @@ export default function Vehicle_Details({ navigation }: any) {
 		formData.append("plateNumber", data?.plateNumber);
 		formData.append("vehicleBrand", data?.vehicleBrand);
 		formData.append("vehicleType", data?.vehicleType);
+		formData.append("updateType", "vehicle");
 		mutate(formData);
 	};
 
@@ -126,7 +127,11 @@ export default function Vehicle_Details({ navigation }: any) {
 								control={control}
 								errors={errors}
 								name="vehicleType"
-								defualtValue={userData?.vehicleType}
+								defualtValue={userData?.vehicle?.vehicleType}
+								disable={
+									userData?.vehicle?.status === "in-progress" ||
+									userData?.vehicle?.status === "approved"
+								}
 							/>
 							<InputComponent
 								label="What brand is your vehicle?"
@@ -135,6 +140,10 @@ export default function Vehicle_Details({ navigation }: any) {
 								name="vehicleBrand"
 								control={control}
 								errors={errors}
+								editable={
+									(userData?.vehicle?.status === "in-progress" ||
+										userData?.vehicle?.status === "approved") ? false : true
+								}
 							/>
 							<InputComponent
 								label="What is your vehicle plate number?"
@@ -143,13 +152,16 @@ export default function Vehicle_Details({ navigation }: any) {
 								name="plateNumber"
 								control={control}
 								errors={errors}
+								editable={
+									(userData?.vehicle?.status === "in-progress" ||
+										userData?.vehicle?.status === "approved") ? false : true
+								}
 							/>
 							<Show>
 								<Show.When
 									isTrue={
-										userData?.vehicleLicense?.[0] === null
-										|| userData?.vehicleLicense?.[1] === null
-										|| userData?.vehicleLicense?.[0] === undefined
+										userData?.vehicle?.status === "rejected" ||
+										userData?.vehicle?.status === undefined
 									}
 								>
 									<PickImage
@@ -192,8 +204,6 @@ export default function Vehicle_Details({ navigation }: any) {
 												setModalOpen(!modalOpen)
 												if (i?.uri) {
 													setImage(i?.uri)
-												} else {
-													setImage(i)
 												}
 											}}
 											type="Driver's licence"
@@ -202,12 +212,11 @@ export default function Vehicle_Details({ navigation }: any) {
 								</Show.When>
 								<Show.When
 									isTrue={
-										userData?.vehicleLicense?.[0] !== null
-										|| userData?.vehicleLicense?.[1] !== null
-										|| userData?.vehicleLicense?.[0] !== undefined
+										userData?.vehicle?.status === "in-progress" ||
+										userData?.vehicle?.status === "approved"
 									}
 								>
-									{userData?.vehicleLicense?.map((i: any, index: number) => (
+									{userData?.vehicle?.vehicleLicense?.map((i: any, index: number) => (
 										<FilePreview
 											key={index}
 											setDelete={false}
