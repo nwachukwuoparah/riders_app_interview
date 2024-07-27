@@ -28,7 +28,6 @@ export default function GuarantorForm({ navigation }: any) {
 	const {
 		control,
 		handleSubmit,
-		watch,
 		formState: { errors },
 	} = useForm<guarantorTypes>({
 		resolver: yupResolver(garantorsSchems),

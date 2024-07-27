@@ -34,6 +34,7 @@ import { handleError, truncateString } from "../../helpers";
 export default function VerifyRider({ navigation }: any) {
 	const [resend, setResend] = useState<number>(30);
 	const [email, setEmail] = useState<string>("");
+
 	const {
 		control,
 		handleSubmit,
@@ -62,6 +63,7 @@ export default function VerifyRider({ navigation }: any) {
 			mutationFn: resendOtp,
 			onSuccess: async (data) => {
 				Alert.alert("Message", `${data?.data?.msg}`);
+				setResend(30)
 			},
 			onError: async (err: { msg: string; success: boolean }) => {
 				handleError(err);
@@ -100,6 +102,7 @@ export default function VerifyRider({ navigation }: any) {
 						<TouchableOpacity
 							onPress={async () => {
 								await clearAuthData("verify-email");
+								await clearAuthData("step");
 								navigation.goBack();
 							}}
 						>

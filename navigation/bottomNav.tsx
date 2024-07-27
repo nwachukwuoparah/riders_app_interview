@@ -15,10 +15,13 @@ import Overview from "../screen/overview";
 import Order from "../screen/orders";
 import Wallet from "../screen/wallet";
 import Profile from "../screen/profile";
+import { UserContext } from "../components/contex/userContex";
+import { useContext } from "react";
 
 const Tab = createBottomTabNavigator();
 
 const BottomTab = () => {
+	const { userData } = useContext(UserContext);
 	return (
 		<Tab.Navigator
 			backBehavior="initialRoute"
@@ -133,7 +136,24 @@ const BottomTab = () => {
 									borderBlockColor: focused ? colors.yellow : "transparent",
 								}}
 							>
-								<ProfileIcon />
+								<Show>
+									<Show.When isTrue={userData?.image !== undefined}>
+										<Image
+											source={{ uri: userData?.image }}
+											style={{
+												width: 25,
+												height: 25,
+												borderRadius: 100,
+												borderWidth: 1,
+												borderColor: colors.yellow,
+											}}
+											resizeMode="cover"
+										/>
+									</Show.When>
+									<Show.Else>
+										<ProfileIcon />
+									</Show.Else>
+								</Show>
 							</View>
 						);
 					},
