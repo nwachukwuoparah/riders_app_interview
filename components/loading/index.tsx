@@ -27,9 +27,9 @@ const LoadingComponent = ({ display }: { display: boolean }) => {
 				{/* <LottieView
 					autoPlay
 					style={{
-						// width: 250,
-						// height: 250,
-						// backgroundColor: '#eee',
+						width: 250,
+						height: 250,
+						backgroundColor: '#eee',
 					}}
 					source={require("../../assets/loader.json")}
 				/> */}

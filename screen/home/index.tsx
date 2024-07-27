@@ -361,11 +361,6 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 									<CustButton
 										onPress={async () => {
 											if (connected && userData?._id) {
-												console.log({
-													lat: location?.latitude,
-													lng: location?.longitude
-												});
-
 												socket.emit("rider", {
 													userId: userData?._id,
 													lat: location?.latitude,
