@@ -8,45 +8,22 @@ import { font } from "../../utilities/loadFont";
 import Clock from "../../assets/svg/clock.svg";
 import RequesIcon from "../../assets/svg/requesIcon.svg";
 import { requestCardType } from "../../types";
-import { handleError, truncateString } from "../../helpers";
+import { truncateString } from "../../helpers";
 import {
 	QueryFilters,
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { acceptOrder, updateUser } from "../../helpers/mutate";
 import { Lottile } from "../lottile";
 
 export default function RequestCard({ item, navigate }: requestCardType) {
 	const queryClient = useQueryClient();
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: acceptOrder,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			userMutate({ status: "off-line" });
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
-	});
-
-	const { isPending: userUpdate, mutate: userMutate } = useMutation({
-		mutationFn: updateUser,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Success", "Status updated successfuly");
-			navigate()
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err)
-		},
-	});
 
 	const aceptOrder = () => {
-		mutate({ id: item._id });
+		console.log({ id: item._id });
 	};
-	
+
 	return (
 		<View style={styles.card}>
 			<View style={styles.card_top}>
@@ -56,18 +33,9 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 					</Typography>
 					<View style={styles.price_tag}>
 						<Typography type="text24" sx={{ color: colors.black }}>
-							{`£ ${item?.ridersFee}`}
+							£ 50
 						</Typography>
 					</View>
-				</View>
-				<View
-					style={{
-						backgroundColor: colors.grey_a,
-						borderRadius: 25,
-						padding: 6,
-					}}
-				>
-					<CustButton type="close" color={colors.white} />
 				</View>
 			</View>
 			<Show>
@@ -208,10 +176,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										{`${truncateString(
-											item?.["vendorDetails"]?.[0]?.address,
-											40
-										)}`}
+										29th street, nothingham
 									</Typography>
 								</View>
 								<View style={styles.single_order_banner}>
@@ -223,7 +188,7 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										{`${truncateString(item?.deliveryAddress, 40)}`}
+										2th street, nothingstreet
 									</Typography>
 								</View>
 								<View style={styles.single_order_banner}>
@@ -235,58 +200,18 @@ export default function RequestCard({ item, navigate }: requestCardType) {
 										fontfamily={font.DMSans_700Bold}
 										sx={{ color: colors.white_1 }}
 									>
-										{`${item?.totalDistance} km`}
+										5 km
 									</Typography>
 								</View>
 							</View>
-							{/* <View
-								style={{
-									flexDirection: "row",
-									justifyContent: "space-between",
-									// gap: 10,
-									width: "25%",
-								}}
-							>
-								<View style={styles.single_order_distance}>
-									<Typography type="text12" sx={{ color: colors.white_1 }}>
-										From
-									</Typography>
-									<Typography
-										type="text16"
-										fontfamily={font.DMSans_700Bold}
-										sx={{ color: colors.white_1 }}
-									>
-										102m
-									</Typography>
-								</View>
-								<View style={styles.single_order_distance}>
-									<Typography type="text12" sx={{ color: colors.white_1 }}>
-										Distance
-									</Typography>
-									<Typography
-										type="text16"
-										fontfamily={font.DMSans_700Bold}
-										sx={{
-											color: colors.white_1,
-											alignSelf: "flex-start",
-										}}
-									>
-										20km
-									</Typography>
-								</View> 
-							</View>*/}
 						</View>
 					</View>
 				</Show.Else>
 			</Show>
-			<CustButton type="rounded" sx={{ width: "100%" }} onPress={aceptOrder}>
-				{userUpdate || isPending ? (
-					<Lottile json={require("../../assets/lottile/imageFile.json")} />
-				) : (
-					<Typography type="text16" sx={{ color: colors.black }} fontfamily={font.DMSans_700Bold}>
-						Accept order
-					</Typography>
-				)}
+			<CustButton type="rounded" sx={{ width: "100%" }} onPress={navigate}>
+				<Typography type="text16" sx={{ color: colors.black }} fontfamily={font.DMSans_700Bold}>
+					Accept order
+				</Typography>
 			</CustButton>
 		</View>
 	);

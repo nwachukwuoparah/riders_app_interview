@@ -13,10 +13,10 @@ import WalletIcon from "../assets/svg/wallet.svg";
 import ProfileIcon from "../assets/svg/profile.svg";
 import Overview from "../screen/overview";
 import Order from "../screen/orders";
-import Wallet from "../screen/wallet";
 import Profile from "../screen/profile";
 import { UserContext } from "../components/contex/userContex";
 import { useContext } from "react";
+import { ROUTE } from "../constant/route";
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +37,7 @@ const BottomTab = () => {
 			}}
 		>
 			<Tab.Screen
-				name="Home"
+				name={ROUTE.HOME}
 				options={{
 					tabBarIcon: ({ focused }: { focused: boolean }) => {
 						return (
@@ -59,29 +59,7 @@ const BottomTab = () => {
 				component={Home}
 			/>
 			<Tab.Screen
-				name="Overview"
-				options={{
-					tabBarIcon: ({ focused }: { focused: boolean }) => {
-						return (
-							<View
-								style={{
-									...styles.active,
-									paddingTop: 6,
-									borderBlockColor: focused ? colors.yellow : "transparent",
-								}}
-							>
-								<OverviewIcon />
-							</View>
-						);
-					},
-					tabBarLabel: ({ focused, children }) => {
-						return <Typography type="text12">{children}</Typography>;
-					},
-				}}
-				component={Overview}
-			/>
-			<Tab.Screen
-				name="Orders"
+				name={ROUTE.ORDERS}
 				options={{
 					tabBarIcon: ({ focused }: { focused: boolean }) => {
 						return (
@@ -103,29 +81,7 @@ const BottomTab = () => {
 				component={Order}
 			/>
 			<Tab.Screen
-				name="Wallet"
-				options={{
-					tabBarIcon: ({ focused }: { focused: boolean }) => {
-						return (
-							<View
-								style={{
-									...styles.active,
-									paddingTop: 6,
-									borderBlockColor: focused ? colors.yellow : "transparent",
-								}}
-							>
-								<WalletIcon />
-							</View>
-						);
-					},
-					tabBarLabel: ({ focused, children }) => {
-						return <Typography type="text12">{children}</Typography>;
-					},
-				}}
-				component={Wallet}
-			/>
-			<Tab.Screen
-				name="Profile"
+				name={ROUTE.PROFILE}
 				options={{
 					tabBarIcon: ({ focused }: { focused: boolean }) => {
 						return (

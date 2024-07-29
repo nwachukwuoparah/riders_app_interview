@@ -9,8 +9,21 @@ import {
 } from "react-native-responsive-screen";
 import colors from "../../constant/theme";
 import CustButton from "../../components/button";
+import { ROUTE } from "../../constant/route";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from "../../types";
 
-export default function Option({ navigation }: any) {
+
+type OptionScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type OptionScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: OptionScreenNavigationProp;
+	route: OptionScreenRouteProp;
+};
+
+export default function Option({ navigation }: Props) {
 	return (
 		<Container>
 			<InnerWrapper sx={{ alignItems: "center", gap: 20 }}>
@@ -31,13 +44,13 @@ export default function Option({ navigation }: any) {
 				<View style={styles.button_contain}>
 					<CustButton
 						type="rounded"
-						onPress={() => navigation.navigate("signUp")}
+						onPress={() => navigation.navigate(ROUTE.SIGN_UP)}
 					>
 						<Typography type="text16" sx={{ color: colors.black }}>
 							Sign up as a new rider
 						</Typography>
 					</CustButton>
-					<CustButton onPress={() => navigation.navigate("login")}>
+					<CustButton onPress={() => navigation.navigate(ROUTE.LOGIN)}>
 						<Typography type="text16">Login as existing rider</Typography>
 					</CustButton>
 				</View>

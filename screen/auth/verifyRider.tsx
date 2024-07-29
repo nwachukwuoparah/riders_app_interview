@@ -17,63 +17,41 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation } from "@tanstack/react-query";
 import { verifySchems } from "../../utilities/schema";
-import { resendOtp, verifyUser } from "../../helpers/mutate";
-import { riderOtpType } from "../../types";
-import LoadingComponent from "../../components/loading";
+import { riderOtpType, RootStackParamList } from "../../types";
 import {
-	cacheAuthData,
 	clearAuthData,
 	getCachedAuthData,
 } from "../../utilities/storage";
 import { font } from "../../utilities/loadFont";
-import Set_upModal from "../../modals/setupModal";
-import { handleError, truncateString } from "../../helpers";
+import { truncateString } from "../../helpers";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RouteProp } from "@react-navigation/native";
+import { ROUTE } from "../../constant/route";
 
-export default function VerifyRider({ navigation }: any) {
+type VerifyScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type VerifyScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: VerifyScreenNavigationProp;
+	route: VerifyScreenRouteProp;
+};
+
+export default function VerifyRider({ navigation }: Props) {
 	const [resend, setResend] = useState<number>(30);
 	const [email, setEmail] = useState<string>("");
 
 	const {
 		control,
 		handleSubmit,
-		watch,
-		setError,
-		clearErrors,
 		formState: { errors },
 	} = useForm<riderOtpType>({
 		resolver: yupResolver(verifySchems),
 	});
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: verifyUser,
-		onSuccess: async (data) => {
-			await cacheAuthData("step", 2);
-			navigation.navigate("verifyVehicle");
-			Alert.alert("Message", `${data?.data?.msg}`);
-		},
-		onError: (err) => {
-			handleError(err);
-		},
-	});
-
-	const { isPending: resend_otp_pending, mutate: resend_otp_mutate } =
-		useMutation({
-			mutationFn: resendOtp,
-			onSuccess: async (data) => {
-				Alert.alert("Message", `${data?.data?.msg}`);
-				setResend(30)
-			},
-			onError: async (err: { msg: string; success: boolean }) => {
-				handleError(err);
-				setResend(30);
-			},
-		});
-
 	const onSubmit = async (data: riderOtpType) => {
-		const email: string = await getCachedAuthData("verify-email");
-		mutate({ ...data, email });
+		console.log(data);
+		navigation.navigate(ROUTE.USER_STACK)
 	};
 
 	useEffect(() => {
@@ -89,7 +67,6 @@ export default function VerifyRider({ navigation }: any) {
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending || resend_otp_pending} />
 			<InnerWrapper sx={{ flex: 6 }}>
 				<KeyboardView sx={{ width: "100%" }} style={{ gap: 20 }}>
 					<View style={styles.title}>
@@ -127,8 +104,8 @@ export default function VerifyRider({ navigation }: any) {
 						<TouchableOpacity
 							onPress={async () => {
 								if (resend === 0) {
-									const email = await getCachedAuthData("verify-email");
-									resend_otp_mutate({ email });
+									Alert.alert("Success", "Otp sent to example@gmail.com")
+									setResend(30)
 								}
 							}}
 							style={{
@@ -161,7 +138,6 @@ export default function VerifyRider({ navigation }: any) {
 					</Typography>
 				</CustButton>
 			</View>
-			<Set_upModal />
 		</Container>
 	);
 }

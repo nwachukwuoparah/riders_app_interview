@@ -10,8 +10,6 @@ import CustButton from "../components/button";
 import {
 	useQueryClient,
 } from "@tanstack/react-query";
-import { handleError } from "../helpers";
-import LoadingComponent from "../components/loading";
 
 export default function PreviewModal({
 	previewRef,

@@ -1,11 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import Ordercard from "../../components/orderCard";
-export default function OrderDetails({ navigation, route }: any) {
+
+import { RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
+
+
+type OrderDetailsNavigationProp = StackNavigationProp<RootStackParamList>;
+type OrderDetailsRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: OrderDetailsNavigationProp;
+	route: OrderDetailsRouteProp;
+};
+
+export default function OrderDetails({ navigation, route }: Props) {
 
 	return (
 		<Container>

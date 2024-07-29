@@ -7,13 +7,22 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation } from "@tanstack/react-query";
 import { changePasswordSchems } from "../../utilities/schema";
-import { changePassword } from "../../helpers/mutate";
-import { changePasswordWithConfirmType, changePasswordType } from "../../types";
-import LoadingComponent from "../../components/loading";
+import { changePasswordWithConfirmType, } from "../../types";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
+import { RouteProp } from "@react-navigation/native";
 
-export default function ChangePassword({ navigation }: any) {
+
+type ChangePasswordScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type ChangePasswordScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: ChangePasswordScreenNavigationProp;
+	route: ChangePasswordScreenRouteProp;
+};
+
+export default function ChangePassword({ navigation }: Props) {
 	const {
 		control,
 		handleSubmit,
@@ -23,16 +32,6 @@ export default function ChangePassword({ navigation }: any) {
 		formState: { errors },
 	} = useForm<changePasswordWithConfirmType>({
 		resolver: yupResolver(changePasswordSchems),
-	});
-
-	const { isPending, mutate } = useMutation({
-		mutationFn: changePassword,
-		onSuccess: async (data) => {
-			Alert.alert("Message", data?.data?.msg);
-		},
-		onError: (err) => {
-			console.error(JSON.stringify(err, null, 2));
-		},
 	});
 
 	useEffect(() => {
@@ -50,13 +49,11 @@ export default function ChangePassword({ navigation }: any) {
 
 	const onSubmit = (data: changePasswordWithConfirmType) => {
 		const { confirmPassword, ...others } = data;
-		mutate(others);
-		// console.log(others);
+		console.log(others);
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 6 }}>
 				<View style={styles.title}>
 					<CustButton

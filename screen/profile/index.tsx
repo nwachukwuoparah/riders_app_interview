@@ -1,8 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
 import {
-	Image,
 	Pressable,
-	RefreshControl,
 	StyleSheet,
 	TouchableOpacity,
 	View,
@@ -17,24 +14,107 @@ import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import User from "../../assets/svg/user.svg";
 import ProfileCard from "../../components/profile";
-import { openBrowserAsync } from "expo-web-browser";
-import { CommonActions } from "@react-navigation/native";
-import LoadingComponent from "../../components/loading";
-import { UserContext } from "../../components/contex/userContex";
+import { CommonActions, RouteProp } from "@react-navigation/native";
 import Rating from "../../components/rating";
-import { clearAuthData } from "../../utilities/storage";
 import Show from "../../components/show";
-import { logOut } from "../../helpers";
+import { ROUTE } from "../../constant/route";
+import DeleteModal from "../../modals/deleteModal";
+import { useRef, useState } from "react";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 
-export default function Profile({ navigation }: any) {
-	const { userData, isFetching, refetch } = useContext(UserContext);
+type OrderScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type OrderScreenRouteProp = RouteProp<RootStackParamList>;
 
-	useEffect(() => {
-		console.log(JSON.stringify(userData?.bankDetails?.status, null, 2));
-	}, [userData])
+type Props = {
+	navigation: OrderScreenNavigationProp;
+	route: OrderScreenRouteProp;
+};
+
+const order = [
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			name: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 5.3877004,
+				longitude: 6.999366699999999
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	},
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			nam: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 5.3877004,
+				longitude: 6.999366699999999
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	},
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			name: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 5.3877004,
+				longitude: 6.999366699999999
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	}
+]
+
+export default function Profile({ navigation }: Props) {
+	const deleteRef = useRef(null)
+	const [modalOpen, setModalOpen] = useState<boolean>(false)
+
 	return (
 		<Container>
-			<LoadingComponent display={isFetching} />
 			<InnerWrapper sx={{ gap: 25 }}>
 				<View
 					style={{
@@ -50,98 +130,42 @@ export default function Profile({ navigation }: any) {
 					<CustButton
 						type="bell"
 						color={colors.white}
-						onPress={() => navigation.navigate("notification")}
+						onPress={() => navigation.navigate(ROUTE.NOTIFICATION)}
 					/>
 				</View>
 				<ScrollContainer
 					sx={{ height: "100%" }}
 					innerStyles={{ gap: 15, paddingBottom: "30%" }}
-					refreshControl={
-						<RefreshControl
-							refreshing={isFetching}
-							onRefresh={refetch}
-							colors={[colors.yellow]}
-							tintColor={colors.yellow}
-						/>
-					}
+
 				>
 					<View style={styles.user}>
-						<Pressable
-							onPress={() => {
-								navigation.navigate("updatecapture");
-							}}
-						>
-							<Show>
-								<Show.When isTrue={userData?.image !== undefined}>
-									<View
-										style={{
-											width: "100%",
-											alignItems: "center",
-										}}
-									>
-										<Image
-											source={{ uri: userData?.image }}
-											style={{
-												width: 120,
-												height: 120,
-												borderRadius: 100,
-												borderWidth: 1,
-												borderColor: colors.yellow,
-											}}
-											resizeMode="cover"
-										/>
-									</View>
-								</Show.When>
-								<Show.Else>
-									<User />
-								</Show.Else>
-							</Show>
-						</Pressable>
+						<Show.Else>
+							<User />
+						</Show.Else>
 
-						<Typography type="text24">{userData?.firstName}</Typography>
+						<Typography type="text24">John</Typography>
 						<Typography type="text16">
-							{userData?.totalRides} rides done
+							0 rides done
 						</Typography>
-						<Rating maxStars={5} defaultRating={userData?.ratingAverage} />
+						<Rating maxStars={5} defaultRating={3} />
 					</View>
 					<View style={{ gap: 5 }}>
 						{[
 							{
 								value: "My account details",
-								route: "profileDetails",
+								route: ROUTE.PROFILE_DETAILS,
 								type: "routh",
 							},
-							{ value: "Working hours", route: "workingHours", type: "routh" },
 							{
 								value: "My vehicle details",
-								route: "vehicleDetails",
+								route: ROUTE.VEHICLE_DETAILS,
 								type: "routh",
 							},
-							{ value: "My address", route: "address", type: "routh" },
-							{ value: "My guarantors", route: "guarantorForm", type: "routh" },
-							{
-								value: "Payment details",
-								route:
-									userData?.bankDetails?.status === "approved" ||
-										userData?.bankDetails?.status === "in-progress"
-										? "bankDetails"
-										: "bankInfo",
-								type: "routh",
-							},
+							{ value: "My address", route: ROUTE.ADDRESS, type: "routh" },
 							{
 								value: "Password reset",
-								route: "changePassword",
+								route: ROUTE.CHANGE_PASSWORD,
 								type: "routh",
-							},
-							{
-								value: "Invite friends and earn",
-								route: "referal",
-								type: "routh",
-							},
-							{ value: "Contact support", route: "contact", type: "routh" },
-							{
-								value: "Terms and privacy",
-								type: "web",
 							},
 							{ value: "Logout", type: "log-out" },
 						].map((i, index) => (
@@ -149,12 +173,9 @@ export default function Profile({ navigation }: any) {
 								key={index}
 								onPress={async () => {
 									if (i?.type && i?.type === "routh") {
-										navigation.navigate(i?.route);
+										navigation.navigate(i?.route as any);
 									} else if (i?.type && i.type === "log-out") {
-										await clearAuthData("user-data");
-										logOut(navigation, CommonActions)
-									} else if (i?.type && i.type === "web") {
-										openBrowserAsync("https://afrilish.com/legalpage");
+										setModalOpen(!modalOpen)
 									}
 								}}
 							>
@@ -168,6 +189,16 @@ export default function Profile({ navigation }: any) {
 					</View>
 				</ScrollContainer>
 			</InnerWrapper>
+			<DeleteModal
+				deleteRef={deleteRef}
+				closeModal={() => {
+					setModalOpen(!modalOpen)
+				}}
+				modalOpen={modalOpen}
+				navigation={navigation}
+				CommonActions={CommonActions}
+				type="logout"
+			/>
 		</Container>
 	);
 }
@@ -183,63 +214,3 @@ const styles = StyleSheet.create({
 	},
 	list: {},
 });
-
-
-// const scheduleData = {
-// 	selectedWeek: null, // This will hold the selected week object
-// 	weeks: [
-// 	  {
-// 		id: 1,
-// 		name: "Week 1",
-// 		days: [
-// 		  {
-// 			id: 1,
-// 			name: "Monday",
-// 			selected: false,
-// 			meals: {
-// 			  morning: [
-// 				{ id: 1, name: "Breakfast", details: "Toast and Coffee" },
-// 				{ id: 2, name: "Snack", details: "Fruit" }
-// 			  ],
-// 			  afternoon: [
-// 				{ id: 3, name: "Lunch", details: "Salad and Sandwich" },
-// 				{ id: 4, name: "Snack", details: "Nuts" }
-// 			  ],
-// 			  evening: [
-// 				{ id: 5, name: "Dinner", details: "Steak, Vegetables, and Rice" },
-// 				{ id: 6, name: "Dessert", details: "Ice Cream" }
-// 			  ]
-// 			}
-// 		  },
-// 		  {
-// 			id: 2,
-// 			name: "Tuesday",
-// 			selected: false,
-// 			meals: {
-// 			  morning: [
-// 				{ id: 7, name: "Breakfast", details: "Yogurt and Fruit" },
-// 				{ id: 8, name: "Snack", details: "Granola Bar" }
-// 			  ],
-// 			  afternoon: [
-// 				{ id: 9, name: "Lunch", details: "Soup and Bread" },
-// 				{ id: 10, name: "Snack", details: "Smoothie" }
-// 			  ],
-// 			  evening: [
-// 				{ id: 11, name: "Dinner", details: "Pasta, Chicken, and Salad" },
-// 				{ id: 12, name: "Dessert", details: "Cake" }
-// 			  ]
-// 			}
-// 		  },
-// 		  // Repeat similar structure for remaining days of the week
-// 		]
-// 	  },
-// 	  {
-// 		id: 2,
-// 		name: "Week 2",
-// 		days: [
-// 		  // Days with meal information for Week 2
-// 		]
-// 	  },
-// 	  // Repeat similar structure for remaining weeks of the month
-// 	]
-//   };

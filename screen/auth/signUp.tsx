@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Alert, Platform, StyleSheet, View } from "react-native";
+import React from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -15,16 +15,24 @@ import {
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { useForm } from "react-hook-form";
-import { signUpTypes } from "../../types";
-import { useMutation } from "@tanstack/react-query";
-import { createUser } from "../../helpers/mutate";
-import LoadingComponent from "../../components/loading";
-import { cacheAuthData, clearAuthData } from "../../utilities/storage";
+import { RootStackParamList, signUpTypes } from "../../types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signUpSchems } from "../../utilities/schema";
-import { handleError } from "../../helpers";
+import { ROUTE } from "../../constant/route";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RouteProp } from "@react-navigation/native";
 
-export default function SignUp({ navigation }: any) {
+type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type SignUpScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: SignUpScreenNavigationProp;
+	route: SignUpScreenRouteProp;
+};
+
+
+export default function SignUp({ navigation }: Props) {
+
 	const {
 		control,
 		handleSubmit,
@@ -32,33 +40,20 @@ export default function SignUp({ navigation }: any) {
 		formState: { errors },
 	} = useForm<signUpTypes | any>({
 		resolver: yupResolver(signUpSchems),
-	});
-
-	const { isPending, mutate, error } = useMutation({
-		mutationFn: createUser,
-		onSuccess: async (data) => {
-			await cacheAuthData("user-data", {
-				token: data?.data?.data?.token,
-				status: false,
-			});
-			Alert.alert("Message", data?.data?.msg);
-			cacheAuthData("step", 1);
-			navigation.navigate("verifyRider");
-		},
-		onError: async (err: { msg: string; success: boolean }) => {
-			await clearAuthData("verify-email");
-			handleError(err);
-		},
+		defaultValues: {
+			firstName: "John",
+			lastName: "doe",
+			email: "example@gmail.com",
+			password: "Example/1225"
+		}
 	});
 
 	const onSubmit = async (data: signUpTypes) => {
-		await cacheAuthData("verify-email", watch("email"));
-		mutate(data);
+		navigation.navigate(ROUTE.VERIFY)
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ width: "100%", flex: 1 }}>
 				<KeyboardView sx={{ width: "100%", flex: 1 }}>
 					<>
@@ -101,35 +96,12 @@ export default function SignUp({ navigation }: any) {
 									name="lastName"
 								/>
 								<InputComponent
-									label="Your phone number"
-									type="phone"
-									name="phone"
-									control={control}
-									errors={errors}
-								/>
-								<InputComponent
 									label="Your email address"
 									type="text"
 									placeholder="enter your email"
 									control={control}
 									errors={errors}
 									name="email"
-								/>
-								{/* <InputComponent
-									label="Your email address"
-									type="text"
-									placeholder="enter your email"
-									control={control}
-									errors={errors}
-									name="email"
-								/> */}
-								<InputComponent
-									label="Date of birth"
-									type="date"
-									mode="date"
-									control={control}
-									errors={errors}
-									name="dateOfBirth"
 								/>
 								<InputComponent
 									label="Create your password"
@@ -158,7 +130,7 @@ export default function SignUp({ navigation }: any) {
 							Sign up
 						</Typography>
 					</CustButton>
-					<CustButton onPress={() => navigation.navigate("login")}>
+					<CustButton onPress={() => navigation.navigate(ROUTE.LOGIN)}>
 						<Typography type="text16">
 							Are you already a rider here?
 							<Typography type="text16" sx={{ color: colors.yellow }}>

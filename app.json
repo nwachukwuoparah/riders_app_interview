@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Afrilish Riders",
-    "slug": "afrilish-riders",
+    "name": "Riders interview",
+    "slug": "job-interview",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.afrilish.rider",
-      "buildNumber": "29",
+      "buildNumber": "30",
       "config": {
         "googleMapsApiKey": "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA"
       }
@@ -70,10 +70,10 @@
         }
       ]
     ],
-    "owner": "afrilish",
+    "owner": "oparah",
     "extra": {
       "eas": {
-        "projectId": "6afeb6f3-694b-4879-b719-0a673fc6977b"
+        "projectId": "44f71d65-f4c3-49ea-b34f-d0051ec1a33c"
       }
     },
     "runtimeVersion": {

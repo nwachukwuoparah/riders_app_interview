@@ -8,8 +8,6 @@ import {
 } from "@expo-google-fonts/dm-sans";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
-import Show from "./components/show";
-import Splash from "./components/splashScreen";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,23 +38,16 @@ export default function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<View style={{ flex: 1 }}>
-				<Show> 
-					<Show.When isTrue={splash}>
-						<Splash />
-					</Show.When>
-					<Show.Else>
-						<GestureHandlerRootView style={{ flex: 1 }}>
-							<NavigationContainer>
-								<UserProvider>
-									<StatusBar style="light" />
-									<BottomSheetModalProvider>
-										<MainStack />
-									</BottomSheetModalProvider>
-								</UserProvider>
-							</NavigationContainer>
-						</GestureHandlerRootView>
-					</Show.Else>
-				</Show>
+				<GestureHandlerRootView style={{ flex: 1 }}>
+					<NavigationContainer>
+						<UserProvider>
+							<StatusBar style="light" />
+							<BottomSheetModalProvider>
+								<MainStack />
+							</BottomSheetModalProvider>
+						</UserProvider>
+					</NavigationContainer>
+				</GestureHandlerRootView>
 			</View>
 		</QueryClientProvider>
 	);

@@ -14,24 +14,19 @@ import Typography from "../components/typography";
 import colors from "../constant/theme";
 import { InputComponent } from "../components/input";
 import CustButton from "../components/button";
-import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { riderOtpType } from "../types";
 import { verifySchems } from "../utilities/schema";
-import { confirmOrder } from "../helpers/mutate";
 import {
-	QueryFilters,
-	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { handleError } from "../helpers";
-import LoadingComponent from "../components/loading";
 import { KeyboardView } from "../components/container";
 import Show from "../components/show";
 import { clearAuthData } from "../utilities/storage";
+import { ROUTE } from "../constant/route";
 
-export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType, day }: any) {
+export default function ConfirmModal({ toogleConfirm, modalOpen, navigation, orderType, day }: any) {
 	const queryClient = useQueryClient();
 	const [period, setPeriod] = useState("")
 
@@ -43,20 +38,6 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 		resolver: yupResolver(verifySchems),
 	});
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: confirmOrder,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-order" as QueryFilters);
-			Alert.alert("Message", data?.data?.msg);
-			closeModal();
-			clearAuthData("destination")
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
-	});
-
-
 	return (
 		<Modal
 			visible={modalOpen}
@@ -65,7 +46,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 		>
 			<Pressable
 				style={{ flex: orderType ? 1.4 : 2.1, backgroundColor: "rgba(0, 0, 0, 0.3)" }}
-				onPress={closeModal}
+				onPress={toogleConfirm}
 			></Pressable>
 
 			<KeyboardView sx={{ flex: 1.2 }}>
@@ -76,7 +57,7 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 					<CustButton
 						type="close"
 						sx={{ color: colors.white }}
-						onPress={closeModal}
+						onPress={toogleConfirm}
 					/>
 				</View>
 				<View style={styles.body}>
@@ -115,21 +96,10 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 						<CustButton
 							type="rounded"
 							onPress={handleSubmit((data) => {
-								if (orderType) {
-									mutate({
-										id: orderID,
-										pickUpCode: data?.otp,
-										schedule: true,
-										day: day,
-										period: period
-									});
-								} else {
-									mutate({
-										id: orderID,
-										pickUpCode: data?.otp,
-										schedule: false,
-									});
-								}
+								Alert.alert("Success", "order delivered successfully")
+								clearAuthData("destination")
+								toogleConfirm()
+								navigation.navigate(ROUTE.HOME)
 							})}
 							sx={{ width: "100%" }}
 						>
@@ -140,7 +110,6 @@ export default function ConfirmModal({ closeModal, modalOpen, orderID, orderType
 					</View>
 				</View>
 			</KeyboardView>
-			<LoadingComponent display={isPending} />
 		</Modal>
 	);
 }

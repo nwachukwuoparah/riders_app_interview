@@ -3,7 +3,6 @@ import * as yup from "yup";
 export const signUpSchems = yup.object().shape({
 	firstName: yup.string().required("First name is required"),
 	lastName: yup.string().required("Last name is required"),
-	phone: yup.string().required("Phone number is required"),
 	email: yup.string().email("Invalid email").required("Email is required"),
 	password: yup
 		.string()
@@ -12,15 +11,10 @@ export const signUpSchems = yup.object().shape({
 			/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
 			"Should contain at least 8 characters, a number, upper case and special characters"
 		),
-	dateOfBirth: yup.string().required("Date of birth is required"),
 });
 
 export const verifySchems = yup.object().shape({
 	otp: yup.string().required("Otp field is required"),
-});
-
-export const deleteAccountSchems = yup.object().shape({
-	password: yup.string().required("Password field is required"),
 });
 
 export const loginSchems = yup.object().shape({
@@ -113,11 +107,3 @@ export const resetPasswordSchems = yup.object().shape({
 			"Should contain at least 8 characters, a number, upper case and special characters"
 		),
 });
-
-export const supportSchems = yup.object().shape({
-	message: yup.string().required("Message field is required"),
-});
-export const payOutSchems = yup.object().shape({
-	amount: yup.string().required("Amount field is required"),
-});
-

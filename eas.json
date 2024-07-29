@@ -1,53 +1,38 @@
 {
-    "cli": {
-        "version": ">= 7.5.0"
+  "cli": {
+    "version": ">= 10.2.0"
+  },
+  "build": {
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     },
-    "build": {
-        "development-simulator": {
-            "developmentClient": true,
-            "distribution": "internal",
-            "ios": {
-                "simulator": true
-            }
-        },
-        "development": {
-            "developmentClient": true,
-            "distribution": "internal",
-            "ios": {
-                "resourceClass": "m1-medium"
-            },
-            "env": {
-                "EXPO_PUBLIC_API": "https://aftilish-development-server-e7f09cb1463d.herokuapp.com/api/v1"
-            }
-        },
-        "preview": {
-            "channel": "preview",
-            "distribution": "internal",
-            "ios": {
-                "simulator": true,
-                "resourceClass": "m1-medium"
-            },
-            "android": {
-                "buildType": "apk"
-            },
-            "env": {
-                "EXPO_PUBLIC_API": "https://aftilish-development-server-e7f09cb1463d.herokuapp.com/api/v1"
-            }
-        },
-        "production": {
-            "autoIncrement": true,
-            "env": {
-                "EXPO_PUBLIC_API": "https://afrilish-backend-bfc3385f7bc2.herokuapp.com/api/v1"
-            }
-        }
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m1-medium"
+      }
     },
-    "submit": {
-        "production": {
-            "ios": {
-                "appleId": "omivrex@gmail.com",
-                "companyName": "Afrilish Limited",
-                "appleTeamId": "MLM76238C5"
-            }
-        }
+    "preview": {
+      "channel": "preview",
+      "distribution": "internal",
+      "ios": {
+        "simulator": true,
+        "resourceClass": "m1-medium"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true
     }
+  },
+  "submit": {
+    "production": {}
+  }
 }

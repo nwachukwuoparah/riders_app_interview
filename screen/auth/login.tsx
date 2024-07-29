@@ -1,6 +1,5 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
-	Alert,
 	Platform,
 	StyleSheet,
 	TouchableOpacity,
@@ -12,21 +11,22 @@ import { InputComponent } from "../../components/input";
 import Typography from "../../components/typography";
 import colors from "../../constant/theme";
 import { useForm } from "react-hook-form";
-import { logInTypes } from "../../types";
-import { useFocusEffect } from "@react-navigation/native";
-import {
-	cacheAuthData,
-	clearAuthData,
-	getCachedAuthData,
-} from "../../utilities/storage";
+import { logInTypes, RootStackParamList } from "../../types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchems } from "../../utilities/schema";
-import { useMutation } from "@tanstack/react-query";
-import { login } from "../../helpers/mutate";
-import LoadingComponent from "../../components/loading";
-import { handleError } from "../../helpers";
+import { ROUTE } from "../../constant/route";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RouteProp } from "@react-navigation/native";
 
-export default function Login({ navigation }: any) {
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type LoginScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: LoginScreenNavigationProp;
+	route: LoginScreenRouteProp;
+};
+
+export default function Login({ navigation }: Props) {
 
 	const {
 		control,
@@ -35,57 +35,18 @@ export default function Login({ navigation }: any) {
 		formState: { errors },
 	} = useForm<logInTypes>({
 		resolver: yupResolver(loginSchems),
-	});
-
-	useFocusEffect(
-		useCallback(() => {
-			(async () => {
-				// await clearAuthData("step");
-				try {
-					const step = await getCachedAuthData("step");
-					const reset_email = await getCachedAuthData("reset-email");
-					if (reset_email) {
-						navigation.navigate("resetPassword");
-					}
-					if (step === 1) {
-						navigation.navigate("verifyRider");
-					} else if (step === 2) {
-						navigation.navigate("verifyVehicle");
-					} else if (step === 3) {
-						navigation.navigate("verifyAddress");
-					} else if (step === 4) {
-						navigation.navigate("guarantorForm");
-					} else if (step === 5) {
-						navigation.navigate("capture");
-					}
-				} catch (err) {
-					return null;
-				}
-			})();
-		}, [])
-	);
-
-	const { isPending, mutate, error } = useMutation({
-		mutationFn: login,
-		onSuccess: async (data) => {
-			await cacheAuthData("user-data", {
-				token: data?.data?.data?.token,
-				status: true,
-			});
-			navigation.navigate("UserStack");
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
+		defaultValues: {
+			email: "example@gmail.com",
+			password: "Example/1225"
+		}
 	});
 
 	const onSubmit = (data: logInTypes) => {
-		mutate(data);
+		navigation.navigate(ROUTE.USER_STACK)
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<View style={styles.title}>
 					<Typography type="text24">Welcome back!</Typography>
@@ -99,6 +60,7 @@ export default function Login({ navigation }: any) {
 						errors={errors}
 						name="email"
 						placeholder="Email"
+						autoFocus={true}
 					/>
 					<InputComponent
 						label="Enter your password"
@@ -110,7 +72,7 @@ export default function Login({ navigation }: any) {
 						watch={watch}
 					/>
 					<TouchableOpacity
-						onPress={() => navigation.navigate("forgotPassword")}
+						onPress={() => { }}
 						style={{ alignSelf: "flex-end" }}
 					>
 						<Typography type="text14" sx={{ color: colors.white }}>
@@ -132,7 +94,7 @@ export default function Login({ navigation }: any) {
 						Log in
 					</Typography>
 				</CustButton>
-				<CustButton onPress={() => navigation.navigate("signUp")}>
+				<CustButton onPress={() => navigation.navigate(ROUTE.SIGN_UP)}>
 					<Typography type="text16">
 						Are you a new rider?{" "}
 						<Typography type="text16" sx={{ color: colors.yellow }}>

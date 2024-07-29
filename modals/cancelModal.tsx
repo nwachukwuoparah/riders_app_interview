@@ -5,13 +5,11 @@ import Typography from "../components/typography";
 import colors from "../constant/theme";
 import CustButton from "../components/button";
 import LoadingComponent from "../components/loading";
-import { handleError } from "../helpers";
 import {
 	QueryFilters,
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { rejectOrder } from "../helpers/mutate";
 import { clearAuthData } from "../utilities/storage";
 
 export default function CancelModal({
@@ -21,18 +19,6 @@ export default function CancelModal({
 	orderID,
 }: any) {
 	const queryClient = useQueryClient();
-
-	const { isPending, mutate } = useMutation({
-		mutationFn: rejectOrder,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-order" as QueryFilters);
-			Alert.alert("Message", data?.data?.data?.msg);
-			clearAuthData("destination");
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
-	});
 
 	return (
 		<>
@@ -62,7 +48,7 @@ export default function CancelModal({
 					</CustButton>
 					<CustButton
 						onPress={() => {
-							mutate({ id: orderID });
+						
 						}}
 						sx={{ paddingVertical: "3%" }}
 					>
@@ -72,7 +58,6 @@ export default function CancelModal({
 					</CustButton>
 				</View>
 			</BottomModal>
-			<LoadingComponent display={isPending} />
 		</>
 	);
 }

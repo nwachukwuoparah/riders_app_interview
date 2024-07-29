@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Platform, Alert } from "react-native";
+import React, { useContext, useRef, useState } from "react";
+import { StyleSheet, View, Platform } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -18,23 +18,24 @@ import { vehicleSchems } from "../../utilities/schema";
 import PickImage from "../../components/input/imagePicker";
 import Show from "../../components/show";
 import FilePreview from "../../components/filePreview";
-import {
-	QueryFilters,
-	useMutation,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
-import LoadingComponent from "../../components/loading";
-import { handleError } from "../../helpers";
 import PreviewModal from "../../modals/previewModal";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
+import { RouteProp } from "@react-navigation/native";
 
-export default function Vehicle_Details({ navigation }: any) {
+type VehicleDetailsScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type VehicleDetailsScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: VehicleDetailsScreenNavigationProp;
+	route: VehicleDetailsScreenRouteProp;
+};
+export default function Vehicle_Details({ navigation }: Props) {
 	const { userData } = useContext(UserContext);
-	const queryClient = useQueryClient();
 	const previewRef = useRef(null)
-	const [modalOpen, setModalOpen] = useState(false)
-	const [image, setImage] = useState()
+	const [modalOpen, setModalOpen] = useState<boolean>(false)
+	const [image, setImage] = useState<any>()
 
 	const {
 		control,
@@ -53,17 +54,6 @@ export default function Vehicle_Details({ navigation }: any) {
 		},
 	});
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: updateUser,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Message", data?.data?.msg);
-		},
-		onError: (err) => {
-			handleError(err)
-		}
-	});
-
 	const onSubmit = (data: vehicleTypes) => {
 		const formData = new FormData();
 		data?.image.forEach((image: any, index: number) => {
@@ -73,12 +63,11 @@ export default function Vehicle_Details({ navigation }: any) {
 		formData.append("vehicleBrand", data?.vehicleBrand);
 		formData.append("vehicleType", data?.vehicleType);
 		formData.append("updateType", "vehicle");
-		mutate(formData);
+		console.log(formData);
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View
@@ -279,10 +268,3 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 });
-
-
-// {
-// 	"uri": "file:///Users/oparahnkume/Library/Developer/CoreSimulator/Devices/B38FA0A3-5E26-47CB-94D4-6DEDD95633BE/data/Containers/Data/Application/30050105-85B4-4246-ADCF-73BFAC92C7B5/Library/Caches/ImagePicker/96312384-E778-419D-90A4-E6F995BE3839.jpg",
-// 	"name": "96312384-E778-419D-90A4-E6F995BE3839.jpg",
-// 	"type": "image/jpg"
-//   }

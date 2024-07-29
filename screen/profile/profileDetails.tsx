@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import React, { useContext, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -14,23 +14,25 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { updateUserTypes } from "../../types";
 import { updateUserSchems } from "../../utilities/schema";
-import {
-	QueryFilters,
-	useMutation,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { updateProfile } from "../../helpers/mutate";
-import LoadingComponent from "../../components/loading";
 import { UserContext } from "../../components/contex/userContex";
-import { handleError } from "../../helpers";
 import { CommonActions } from "@react-navigation/native";
 import DeleteModal from "../../modals/deleteModal";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
+import { RouteProp } from "@react-navigation/native";
 
-export default function Profile_Details({ navigation }: any) {
+
+type ProfileDetailScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type ProfileDetailScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: ProfileDetailScreenNavigationProp;
+	route: ProfileDetailScreenRouteProp;
+};
+export default function Profile_Details({ navigation }: Props) {
 	const { userData } = useContext(UserContext);
 	const deleteRef = useRef(null)
-	const queryClient = useQueryClient();
-	const [modalOpen, setModalOpen] = useState(false)
+	const [modalOpen, setModalOpen] = useState<boolean>(false)
 
 	const {
 		control,
@@ -47,24 +49,14 @@ export default function Profile_Details({ navigation }: any) {
 		},
 	});
 
-	const { isPending, mutate, error } = useMutation({
-		mutationFn: updateProfile,
-		onSuccess: async (data) => {
-			Alert.alert("Message", data?.data?.msg);
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
-	});
+
 
 	const onSubmit = (data: updateUserTypes) => {
-		mutate(data);
+		console.log(data);
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ flex: 6, gap: 15 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View

@@ -26,70 +26,87 @@ import {
 import Show from "../../components/show";
 import { font } from "../../utilities/loadFont";
 import RequestCard from "../../components/requestCard";
-import MapView, { PROVIDER_GOOGLE, Marker, PROVIDER_DEFAULT } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker, Region } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import Geolocation from "react-native-geolocation-service";
-import io from "socket.io-client";
-import {
-	QueryFilters,
-	useMutation,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { updateUser } from "../../helpers/mutate";
-import { UserContext } from "../../components/contex/userContex";
-import { getCurrentLocation, handleError, truncateString } from "../../helpers";
-import { useFocusEffect } from "@react-navigation/native";
+import { getCurrentLocation, truncateString } from "../../helpers";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { getCachedAuthData } from "../../utilities/storage";
-import { EXPO_PUBLIC_API } from "@env";
+import { ROUTE } from "../../constant/route";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 
-const socket = io(EXPO_PUBLIC_API, {
-	reconnectionAttempts: Infinity,
-	reconnectionDelay: 2000,
-});
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type HomeScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: HomeScreenNavigationProp;
+	route: HomeScreenRouteProp;
+};
 
 const GOOGLE_MAPS_APIKEY = "AIzaSyDvu40j-fA-lxVkxmha9hP0ToLnUv932IA";
 
-const Home = ({ navigation }: any) => {
-	// const [destination, setDestination] = useState<any>();
+// const initialRegion = {
+// 	latitude: 5.485,
+// 	longitude: 7.035,
+// 	latitudeDelta: 0.0922,
+// 	longitudeDelta: 0.0421,
+// };
+
+const initialRegion = {
+	latitude: 37.785834,
+	longitude: -122.406417,
+	latitudeDelta: 0.01, // Adjusted for a closer zoom level
+	longitudeDelta: 0.01, // Adjusted for a closer zoom level
+  };
+
+const Home = ({ navigation }: Props) => {
+	const [destination, setDestination] = useState<{ latitude: number, longitude: number }>();
 	const mapRef = useRef<MapView>(null);
 	const watchId = useRef<number | null>(null);
 	const [location, setLocation] = useState<any>();
 	const [fromLatLng, setFromLatLng] = useState<any>(null);
-	const [toLatLng, setToLatLng] = useState<any>(null);
+	const [region, setRegion] = useState<Region>(initialRegion);
+
+	const handleRegionChange = (newRegion: Region) => {
+		setRegion(newRegion);
+		console.log(newRegion);
+		// Additional logic, e.g., fetching data based on the new region
+	};
+
 
 	useFocusEffect(
 		useCallback(() => {
 			(async () => {
 				const destination = await getCachedAuthData("destination")
-				setToLatLng(destination?.to);
+				setDestination(destination?.to);
 			})();
 
 			const startWatching = async () => {
 				const requestLocationPermission = () => new Promise(async (resolve, reject) => {
 					try {
 						if (Platform.OS === 'ios') {
-							// let authorizationLevel: any = 'always'; // Default to 'always' for Android
-							// authorizationLevel = 'whenInUse'; // Use 'whenInUse' for iOS
 							const permission = await Geolocation.requestAuthorization('whenInUse');
 							if (permission === "granted") {
-								return resolve("granted")
+								return resolve("granted");
 							}
-							reject("Permission to access loction not granted")
+							reject("Permission to access loction not granted");
 						}
 					} catch (error) {
 						// console.log("Ask location error===>", error);
-						return reject(error)
+						return reject(error);
 					}
 					return PermissionsAndroid.request(
 						PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
 					).then((granted) => {
 						if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-							resolve(granted)
+							resolve(granted);
 						}
-						reject("Permission to access loction not granted")
+						reject("Permission to access loction not granted");
 					}).catch((error) => {
 						// console.log("Ask location error===>", error);
-						return reject(error)
+						return reject(error);
 					})
 				})
 
@@ -100,9 +117,11 @@ const Home = ({ navigation }: any) => {
 					async (position) => {
 						const { latitude, longitude } = position.coords;
 						const location = await getCurrentLocation(latitude, longitude);
-						setFromLatLng({ latitude, longitude });
+
 						if (location) {
+							setFromLatLng({ latitude, longitude });
 							setLocation({ ...location, latitude, longitude });
+							console.log("call",{ latitude, longitude }); 
 						}
 					},
 					(error) => {
@@ -110,9 +129,9 @@ const Home = ({ navigation }: any) => {
 					},
 					{
 						enableHighAccuracy: true,
-						distanceFilter: 0,
+						distanceFilter: 5,
 						interval: 1000,
-						fastestInterval: 500,
+						fastestInterval: 1000,
 					}
 				);
 			};
@@ -127,16 +146,6 @@ const Home = ({ navigation }: any) => {
 		}, [])
 	);
 
-	const initialRegion = useMemo(
-		() => ({
-			latitude: 5.485,
-			longitude: 7.035,
-			latitudeDelta: 0.0922,
-			longitudeDelta: 0.0421,
-		}),
-		[]
-	);
-
 	return (
 		<Container sx={{ justifyContent: "space-between" }}>
 			<MapView
@@ -144,20 +153,24 @@ const Home = ({ navigation }: any) => {
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
 				customMapStyle={darkModeStyle}
-				initialRegion={initialRegion}
-			// travelMode= 'DRIVING'
+				initialRegion={region}
+				showsUserLocation={true}  // This prop shows the user's current location on the map
+				followsUserLocation={true} // This prop keeps the map centered on the user's current location
+				onRegionChange={handleRegionChange}
 			>
-				{fromLatLng && toLatLng && (
+				{destination && fromLatLng && (
 					<>
-						<Marker coordinate={fromLatLng} >
+						{/* <Marker coordinate={fromLatLng} >
+							<LocationIcon />
+						</Marker> */}
+						<Marker coordinate={destination} >
 							<LocationIcon />
 						</Marker>
-						<Marker coordinate={toLatLng} />
 						<MapViewDirections
 							origin={fromLatLng}
-							destination={toLatLng}
+							destination={destination}
 							apikey={GOOGLE_MAPS_APIKEY}
-							strokeWidth={5}
+							strokeWidth={10}
 							strokeColor={colors.yellow_2}
 							optimizeWaypoints={true}
 							onStart={(params) => {
@@ -188,115 +201,17 @@ const Home = ({ navigation }: any) => {
 				navigation={navigation}
 				// destination={destination}
 				location={location}
-				toLatLng={toLatLng}
+				destination={destination}
 			/>
 		</Container>
 	);
 };
 
-const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any) => {
-	const queryClient = useQueryClient();
-	const { userData, setActive } = useContext(UserContext);
+const SubHome = React.memo(({ navigation, destination, location }: any) => {
 	const [rides, setRiders] = useState<any>([]);
 	const [request_rides, set_request_riders] = useState(false);
-	const [connected, setConnected] = useState(false);
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: updateUser,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Success", "Status updated successfully");
-		},
-		onError: (err: { msg: string; success: boolean }) => {
-			handleError(err);
-		},
-	});
 
-	useEffect(() => {
-		setActive(true);
-	}, []);
-
-	const handleConnect = () => {
-		// console.log("Connection successful");
-		setConnected(true);
-		set_request_riders(false);
-	};
-
-	useEffect(() => {
-		if (request_rides) {
-			// Set request_riders to false after 10 seconds if it hasn't been set to true again
-			const timeoutId = setTimeout(() => {
-				set_request_riders(false);
-			}, 10000);
-
-			return () => clearTimeout(timeoutId);
-		}
-	}, [request_rides])
-
-	useFocusEffect(
-		useCallback(() => {
-			let intervalId: any = null;
-
-			const handleAfrilishOrder = (data: any) => {
-				if (data?.msg === "No order available in your location") {
-					set_request_riders(false);
-					Alert.alert("Message", data?.msg);
-				} else {
-					setRiders(data?.data);
-					// console.log("Received order:", data);
-				}
-			};
-
-			const handleDisconnect = () => {
-				setConnected(false);
-				socket.connect();
-				// console.log("Socket disconnected. Attempting to reconnect...");
-			};
-
-			const handleError = (error: any) => {
-				console.error("Socket error:", error);
-			};
-
-			if (rides?.length > 0 && connected) {
-				intervalId = setInterval(() => {
-					// console.log('Emitting "rider" event');
-					socket.emit("rider", {
-						userId: userData?._id,
-						type: 'Rider',
-						lat: location?.latitude,
-						lng: location?.longitude
-						// lng: -1.785035,
-						// lat: 53.645792,
-					});
-				}, 40000);
-
-				setTimeout(() => {
-					clearInterval(intervalId);
-				}, 60000);
-			}
-
-			if (userData?.status === 'on-line' && userData?._id && !connected) {
-				// console.log('Starting socket connection...');
-				socket.connect();
-			}
-
-			socket.on("connect", handleConnect);
-			socket.on("rider-message", handleAfrilishOrder);
-			socket.on("error", handleError);
-			socket.on("disconnect", handleDisconnect);
-			return () => {
-				socket.off("connect", handleConnect);
-				socket.off("rider-message", handleAfrilishOrder);
-				socket.off("error", handleError);
-				socket.off("disconnect", handleDisconnect);
-				socket.disconnect();
-				if (intervalId) {
-					clearInterval(intervalId);
-					// console.log("Interval cleared on cleanup");
-				}
-			};
-		}, [userData, rides, connected])
-	);
 
 	return (
 		<>
@@ -322,37 +237,21 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 								paddingTop: "2%",
 								paddingBottom: 150,
 							}}
-							data={rides}
+							data={[{ id: 1 }]}
 							renderItem={({ item }: any) => (
 								<RequestCard
 									navigate={() => {
-										navigation.navigate("Orders");
+										navigation.navigate(ROUTE.ORDERS);
 										setRiders([]);
 									}}
 									item={item}
 								/>
 							)}
-							keyExtractor={(item) => item?._id}
 						/>
 					</Show.When>
-					<Show.When isTrue={userData === undefined || toLatLng !== undefined}>
+
+					<Show.When isTrue={destination !== undefined}>
 						<></>
-					</Show.When>
-					<Show.When isTrue={userData?.status !== "on-line"}>
-						<View style={styles.switch}>
-							<CustButton
-								onPress={() => {
-									mutate({ status: "on-line" });
-								}}
-								type="rounded"
-								sx={{ width: wp("85%"), opacity: isPending ? 0.4 : 1 }}
-							>
-								<Typography type="text16" sx={{ color: colors.black }}>
-									{isPending ? "Updating. . . . ." : "Go online"}
-								</Typography>
-							</CustButton>
-							<Typography type="text12">You’re offline</Typography>
-						</View>
 					</Show.When>
 					<Show.Else>
 						<Show>
@@ -360,39 +259,28 @@ const SubHome = React.memo(({ navigation, destination, location, toLatLng }: any
 								<View style={styles.switch}>
 									<CustButton
 										onPress={async () => {
-											if (connected && userData?._id) {
-												socket.emit("rider", {
-													userId: userData?._id,
-													lat: location?.latitude,
-													lng: location?.longitude
-												});
-												set_request_riders(!request_rides);
-											} else {
-												socket.on("connect", handleConnect);
-											}
+											setRiders({})
 										}}
 										type="rounded"
 										sx={{
 											width: wp("85%"),
-											opacity: !connected ? 0.4 : 1,
+											opacity: 1,
 										}}
 									>
 										<Typography type="text16" sx={{ color: colors.black }}>
-											{"Find new ride"}
+											Find new ride
 										</Typography>
 									</CustButton>
 									<Typography type="text12">
-										{connected ? "Connected" : "Connecting. . . ."}
+										Connected
 									</Typography>
 								</View>
 							</Show.When>
+
 							<Show.Else>
 								<View style={styles.finding}>
 									<Typography type="text16" fontfamily={font.DMSans_700Bold}>
-										{connected
-											? "Finding a nearby trip for you"
-											: "Waiting for network reconnecting"}{" "}
-										. . . . . . . .
+										Finding a nearby trip for you........
 									</Typography>
 								</View>
 							</Show.Else>

@@ -9,6 +9,28 @@ import {
 import { Ref } from "react";
 import { UseFormStateReturn } from "react-hook-form";
 
+export type RootStackParamList = {
+	LOGIN: undefined
+	OPTION: undefined,
+	SIGN_UP: undefined,
+	VERIFY: undefined,
+	Home: undefined,
+	Orders: undefined,
+	DASHBOARD: undefined,
+	ORDER_DETAILS: any,
+	Profile: undefined,
+	AUTH_STACK: undefined,
+	BOTTOM_STACK: undefined,
+	USER_STACK: undefined,
+	PROFILE_DETAILS: undefined,
+	VEHICLE_DETAILS: undefined,
+	ADDRESS: undefined,
+	CHANGE_PASSWORD: undefined,
+	NOTIFICATION: undefined,
+};
+
+
+
 export type textType = {
 	children: any;
 	type: "text24" | "text20" | "text16" | "text14" | "text12";
@@ -83,7 +105,7 @@ export interface phoneInputProps {
 	control: any;
 	errors: UseFormStateReturn<any>["errors"];
 	name: string;
-	disabled?:boolean
+	disabled?: boolean
 }
 
 export interface DropdownInputProps {
@@ -135,7 +157,6 @@ export interface signUpTypes {
 	firstName: string;
 	lastName: string;
 	email: string;
-	phone: string;
 	password: string;
 }
 
@@ -154,10 +175,6 @@ export interface verifyRiderType extends riderOtpType {
 export interface logInTypes {
 	email: string;
 	password: string;
-}
-
-export interface forgetTypes {
-	email: string;
 }
 
 export interface requestCardType {
@@ -187,18 +204,6 @@ export interface addressTypes {
 	image: any;
 }
 
-export interface guarantorTypes {
-	name: string;
-	phone: string;
-	nextOfKin: string;
-	kinPhone: string;
-	kinRelationship: string;
-}
-
-export interface captureTypes {
-	image: object;
-}
-
 export interface filePreviewType {
 	type?: string;
 	handelPreview: () => void;
@@ -210,33 +215,11 @@ export interface periodDataType {
 	[key: string]: boolean;
 }
 
-export interface workingShiftType {
-	morning: periodDataType;
-	evening: periodDataType;
-}
-
-export interface bankDetailsType { }
-
 export interface changePasswordType {
 	oldPassword: string;
 	newPassword: string;
 }
 
 export interface changePasswordWithConfirmType extends changePasswordType {
-	confirmPassword: string;
-}
-
-export interface resetPasswordType {
-	otp: string;
-	newPassword: string;
-	email: string;
-}
-
-interface resetPassword {
-	otp: string;
-	newPassword: string;
-}
-
-export interface resetPasswordWithConfirmType extends resetPassword {
 	confirmPassword: string;
 }

@@ -4,6 +4,7 @@ import BottomTab from "./bottomNav";
 import UserStack from "./userStack";
 import { getCachedAuthData } from "../utilities/storage";
 import { useEffect } from "react";
+import { ROUTE } from "../constant/route";
 
 const RootStack = createStackNavigator();
 
@@ -28,13 +29,13 @@ const MainStack = () => {
 	return (
 		<RootStack.Navigator
 			initialRouteName={
-				!userStep && userStatus && userToken ? "UserStack" : "AuthStack"
+				"UserStack" //: "AuthStack"
 			}
 			screenOptions={{ headerShown: false }}
 		>
-			<RootStack.Screen name="AuthStack" component={AuthStack} />
-			<RootStack.Screen name="UserStack" component={UserStack} />
-			<RootStack.Screen name="bottomTab" component={BottomTab} />
+			<RootStack.Screen name={ROUTE.AUTH_STACK} component={AuthStack} />
+			<RootStack.Screen name={ROUTE.USER_STACK} component={UserStack} />
+			<RootStack.Screen name={ROUTE.BOTTOM_STACK} component={BottomTab} />
 		</RootStack.Navigator>
 	);
 };

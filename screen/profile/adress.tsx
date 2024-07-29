@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Platform, Alert } from "react-native";
+import React, { useContext, useRef, useState } from "react";
+import { StyleSheet, View, Platform } from "react-native";
 import CustButton from "../../components/button";
 import {
 	Container,
@@ -18,20 +18,23 @@ import PickImage from "../../components/input/imagePicker";
 import LottieView from "lottie-react-native";
 import Show from "../../components/show";
 import FilePreview from "../../components/filePreview";
-import {
-	QueryFilters,
-	useMutation,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { updateUser } from "../../helpers/mutate";
 import { UserContext } from "../../components/contex/userContex";
-import LoadingComponent from "../../components/loading";
-import { handleError } from "../../helpers";
 import PreviewModal from "../../modals/previewModal";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
+import { RouteProp } from "@react-navigation/native";
 
-export default function Address({ navigation }: any) {
+
+type AddressScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type AddressScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: AddressScreenNavigationProp;
+	route: AddressScreenRouteProp;
+};
+
+export default function Address({ navigation }: Props) {
 	const { userData } = useContext(UserContext);
-	const queryClient = useQueryClient();
 	const previewRef = useRef(null)
 	const [modalOpen, setModalOpen] = useState(false)
 	const [image, setImage] = useState()
@@ -53,16 +56,6 @@ export default function Address({ navigation }: any) {
 		},
 	});
 
-	const { isPending, mutate } = useMutation({
-		mutationFn: updateUser,
-		onSuccess: async (data) => {
-			queryClient.invalidateQueries("get-profile" as QueryFilters);
-			Alert.alert("Message", data?.data?.msg);
-		},
-		onError: (err) => {
-			handleError(err);
-		},
-	});
 
 	const onSubmit = (data: addressTypes) => {
 		const formData = new FormData();
@@ -71,12 +64,11 @@ export default function Address({ navigation }: any) {
 		formData.append("postalCode", data?.postalCode);
 		formData.append("type", data?.type);
 		formData.append("updateType", "proofOfAddress");
-		mutate(formData);
+		// console.log(formData);
 	};
 
 	return (
 		<Container>
-			<LoadingComponent display={isPending} />
 			<InnerWrapper sx={{ gap: 50, flex: 1 }}>
 				<KeyboardView sx={{ gap: 30, flex: 1 }}>
 					<View
@@ -148,7 +140,7 @@ export default function Address({ navigation }: any) {
 								control={control}
 								errors={errors}
 								name="type"
-								defualtValue={userData?.proofOfAddress?.type} 
+								defualtValue={userData?.proofOfAddress?.type}
 								disable={
 									userData?.proofOfAddress?.status === "in-progress" ||
 									userData?.proofOfAddress?.status === "approved"

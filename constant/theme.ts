@@ -11,10 +11,10 @@ const colors = {
   grey_b: "#B4B4B4",
   grey_c: "#F0F0F0",
   grey_d: "#D7D7D7",
-  red:"#FF3A3A",
+  red: "#FF3A3A",
   tint: "#FFEFD6",
   tint_a: "#FFE0E0"
-}
+} as const;
 
 export const darkModeStyle = [
   {

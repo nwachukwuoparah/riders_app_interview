@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Container, InnerWrapper } from "../../components/container";
 import Typography from "../../components/typography";
-import { RefreshControl, SectionList, StyleSheet, View } from "react-native";
+import { RefreshControl, SectionList, StyleSheet, TouchableOpacity, View } from "react-native";
 import colors from "../../constant/theme";
 import {
 	heightPercentageToDP as hp,
@@ -12,22 +12,145 @@ import CustButton from "../../components/button";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import Show from "../../components/show";
-import LoadingComponent from "../../components/loading";
-import EmptyState from "../../components/emptyState";
 import moment from "moment";
 import { font } from "../../utilities/loadFont";
 import { BlurView } from "expo-blur";
-import { getNotification } from "../../helpers/mutate";
+import { ROUTE } from "../../constant/route";
+const date = new Date();
+const data = [
+	// Example data
+	{
+		id: 1,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: date,
+	},
+	{
+		id: 11,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: date,
+	},
+	{
+		id: 12,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: date,
+	},
+	{
+		id: 13,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: date,
+	},
+	{
+		id: 21,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: new Date(date).setDate(date.getDate() - 1),
+	},
+	{
+		id: 22,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: new Date(date).setDate(date.getDate() - 1),
+	},
+	{
+		id: 23,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: new Date(date).setDate(date.getDate() - 1),
+	},
+	{
+		id: 3,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-22T10:30:00Z',
+	},
+	{
+		id: 4,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-21T10:30:00Z',
+	},
+	{
+		id: 5,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-20T10:30:00Z',
+	},
+	{
+		id: 55,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-20T10:30:00Z',
+	},
+	{
+		id: 56,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-20T10:30:00Z',
+	},
+	{
+		id: 6,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-19T10:30:00Z',
+	},
+	{
+		id: 66,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-19T10:30:00Z',
+	},
+	{
+		id: 67,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-19T10:30:00Z',
+	},
+	{
+		id: 7,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-18T10:30:00Z',
+	},
+	{
+		id: 77,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-18T10:30:00Z',
+	},
+	{
+		id: 78,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-18T10:30:00Z',
+	},
+	{
+		id: 8,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-17T10:30:00Z',
+	},
+	{
+		id: 9,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-16T10:30:00Z',
+	},
+	{
+		id: 10,
+		title: 'Order Shipped',
+		message: 'Your order #123456 has been shipped and is on its way!',
+		createdAt: '2024-07-15T10:30:00Z',
+	},
 
-export default function Notification() {
-	const navigation = useNavigation();
+] || [];
+
+export default function Notification({navigation}:any) {
 	const [notification, setNotification] = useState<any>([]);
 
-	const { data, isFetching, error, refetch } = useQuery({
-		queryKey: ["get-notification"],
-		queryFn: getNotification,
-		staleTime: 600000,
-	});
 
 	const formatTimestamp = (timestamp: Date) => {
 		const now = moment();
@@ -52,7 +175,7 @@ export default function Notification() {
 			const yesterday = moment().subtract(1, "days").startOf("day");
 
 			// Ensure data?.data?.data is an array
-			const notifications = data?.data?.data || [];
+			const notifications = data;
 
 			const grouped = notifications.reduce(
 				(
@@ -86,7 +209,7 @@ export default function Notification() {
 
 			setNotification(result);
 		})();
-	}, [data]);
+	}, []);
 
 	return (
 		<Container>
@@ -124,9 +247,9 @@ export default function Notification() {
 					contentContainerStyle={{ paddingBottom: "20%" }}
 					refreshControl={
 						<RefreshControl
-							refreshing={isFetching}
+							refreshing={false}
 							onRefresh={() => {
-								refetch();
+
 							}}
 							colors={[colors.yellow]}
 							tintColor={colors.yellow}
@@ -165,45 +288,47 @@ export default function Notification() {
 						></View>
 					)}
 					renderItem={(item: any) => (
-						<View
-							style={{
-								flexDirection: "row",
-								alignItems: "center",
-								justifyContent: "space-between",
-								borderWidth: 0.5,
-								borderColor: colors.grey,
-								paddingVertical: 10,
-								paddingHorizontal: 10,
-								backgroundColor: colors.grey_a,
-								borderRadius: 10
-							}}
-						>
+						<TouchableOpacity onPress={() => { navigation.navigate(ROUTE.ORDERS) }}>
 							<View
 								style={{
 									flexDirection: "row",
 									alignItems: "center",
-									gap: 7,
-									paddingVertical: 3,
+									justifyContent: "space-between",
+									borderWidth: 0.5,
+									borderColor: colors.grey,
+									paddingVertical: 10,
+									paddingHorizontal: 10,
+									backgroundColor: colors.grey_a,
+									borderRadius: 10
 								}}
 							>
-								<Bell width={wp("10%")} height={hp("3.5%")} />
-								<View style={{ gap: 10, width: "85%" }}>
-									<Typography type="text14" fontfamily={font.DMSans_700Bold}>
-										{item?.item?.message}
-									</Typography>
-									<Typography
-										type="text14"
-										sx={{
-											color: colors.white,
-										}}
-									>
-										{formatTimestamp(item?.item?.createdAt)}
-									</Typography>
+								<View
+									style={{
+										flexDirection: "row",
+										alignItems: "center",
+										gap: 7,
+										paddingVertical: 3,
+									}}
+								>
+									<Bell width={wp("10%")} height={hp("3.5%")} />
+									<View style={{ gap: 10, width: "85%" }}>
+										<Typography type="text14" fontfamily={font.DMSans_700Bold}>
+											{item?.item?.message}
+										</Typography>
+										<Typography
+											type="text14"
+											sx={{
+												color: colors.white,
+											}}
+										>
+											{formatTimestamp(item?.item?.createdAt)}
+										</Typography>
+									</View>
 								</View>
 							</View>
-						</View>
+						</TouchableOpacity>
 					)}
-					keyExtractor={({ _id }) => _id
+					keyExtractor={({ id }) => id
 					}
 					ListEmptyComponent={() => (
 						<Show>
@@ -216,10 +341,6 @@ export default function Notification() {
 										marginTop: "50%",
 									}}
 								>
-									<EmptyState
-										onRefresh={() => refetch()}
-										title="No notification yet"
-									/>
 								</View>
 							</Show.Else>
 						</Show>

@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
 	FlatList,
-	RefreshControl,
 	StyleSheet,
 	TouchableOpacity,
 	View,
@@ -16,32 +15,105 @@ import {
 	widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import Ordercard from "../../components/orderCard";
-import { Ionicons } from "@expo/vector-icons";
 import CancelModal from "../../modals/cancelModal";
-import FilterModal from "../../modals/filterModal";
 import ConfirmModal from "../../modals/confirmModal";
-import { useQuery } from "@tanstack/react-query";
-import { getOrders } from "../../helpers/query";
-import { clearAuthData, getCachedAuthData } from "../../utilities/storage";
-import { handleError } from "../../helpers";
 import Show from "../../components/show";
+import { ROUTE } from "../../constant/route";
+import { RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 
-export default function Order({ navigation }: any) {
-	const [type, setType] = useState("orderStatus=ready&orderStatus=picked&orderStatus=arrived")
-	const [cancel, setCancel] = useState(false);
-	const [displayFilter, setDisplayFilter] = useState(false);
-	const [confirm, setConfirm] = useState(false);
+
+type OrderScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type OrderScreenRouteProp = RouteProp<RootStackParamList>;
+
+type Props = {
+	navigation: OrderScreenNavigationProp;
+	route: OrderScreenRouteProp;
+};
+
+const order = [
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			name: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 37.786834, longitude: -122.406417
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	},
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			nam: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 37.786834, longitude: -122.406417
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	},
+	{
+		orderId: "123456",
+		seller: {
+			name: "Seller Name",
+			address: {
+				street: "123 Seller St",
+			},
+			coordinate: {
+				latitud: 12.345678,
+				longitud: 98.765432
+			}
+		},
+		buyer: {
+			name: "Buyer Name",
+			address: {
+				street: "456 Buyer Ave",
+			},
+			coordinates: {
+				latitude: 37.786834, longitude: -122.406417
+			}
+		},
+		totalPrice: 110.00,
+		orderStatus: "Pending"
+	}
+]
+
+export default function Order({ navigation }: Props) {
+	const [type, setType] = useState<string>("orderStatus=ready&orderStatus=picked&orderStatus=arrived")
+	const [cancel, setCancel] = useState<boolean>(false);
+	const [displayFilter, setDisplayFilter] = useState<boolean>(false);
+	const [confirm, setConfirm] = useState<boolean>(false);
 	const [orderID, setOrderId] = useState<string>("");
 	const cancelRef = useRef(null);
-	const filterRef = useRef(null);
-	const [filter, setFilter] = useState(`?schedule=false&orderStatus=ready&orderStatus=picked&orderStatus=arrived`);
-	const [filterData, setFilterData] = useState({ status: false });
-
-	const { data, isFetching, error, refetch } = useQuery({
-		queryKey: ["get-order", filter],
-		queryFn: getOrders,
-		staleTime: 600000,
-	});
 
 	const cancelOrder = (id: string) => {
 		setCancel(!cancel);
@@ -50,13 +122,7 @@ export default function Order({ navigation }: any) {
 		if (id) {
 			setOrderId(id);
 		}
-	};
-
-	const toogleFilter = () => {
-		setDisplayFilter(!displayFilter);
-		setCancel(false);
-		setConfirm(false);
-	};
+	}
 
 	const toogleConfirm = (id: string) => {
 		setConfirm(!confirm);
@@ -66,31 +132,6 @@ export default function Order({ navigation }: any) {
 			setOrderId(id);
 		}
 	};
-
-	useEffect(() => {
-		if (error) {
-			handleError(error);
-		}
-		if (filterData?.status) {
-			setType("orderStatus=ready&orderStatus=picked&orderStatus=arrived")
-		}
-	}, [error, filterData]);
-
-	useEffect(() => {
-		(async () => {
-			if (!displayFilter) {
-				const data = await getCachedAuthData("filter-data");
-				setFilterData(data);
-				if (data !== undefined) {
-					setFilter(`?schedule=${data?.status}&${type}`); //&createdAt=${data?.date}
-				} else {
-					setFilter(
-						`?schedule=false&${type}` //&createdAt=${data?.date}
-					);
-				}
-			}
-		})();
-	}, [displayFilter, type]);
 
 	return (
 		<Container>
@@ -111,10 +152,9 @@ export default function Order({ navigation }: any) {
 					<CustButton
 						type="bell"
 						color={colors.white}
-						onPress={() => navigation.navigate("notification")}
+						onPress={() => navigation.navigate(ROUTE.NOTIFICATION)}
 					/>
 				</View>
-
 
 				<View style={styles.body}>
 					<TouchableOpacity
@@ -129,21 +169,6 @@ export default function Order({ navigation }: any) {
 					>
 						<Typography type="text16">Pending</Typography>
 					</TouchableOpacity>
-
-					{!filterData?.status && <TouchableOpacity
-						onPress={() => {
-							setType("orderStatus=in-transit");
-						}}
-						style={{
-							...styles.button,
-							borderBottomWidth: 1,
-							borderColor:
-								type === "orderStatus=in-transit" ? colors.yellow : colors.grey_b,
-						}}
-					>
-						<Typography type="text16">In transit</Typography>
-					</TouchableOpacity>}
-
 					<TouchableOpacity
 						onPress={() => {
 							setType("orderStatus=completed");
@@ -158,29 +183,10 @@ export default function Order({ navigation }: any) {
 					</TouchableOpacity>
 				</View>
 
-
-
-				<CustButton
-					onPress={toogleFilter}
-					type="rounded"
-					sx={{
-						width: "100%",
-						paddingVertical: "3.5%",
-						backgroundColor: colors.tint,
-						flexDirection: "row",
-						gap: 10,
-					}}
-				>
-					<Ionicons name="filter-outline" size={24} color="black" />
-					<Typography type="text14" sx={{ color: colors.black }}>
-						Filter orders
-					</Typography>
-				</CustButton>
-
 				<FlatList
 					showsVerticalScrollIndicator={false}
 					style={{
-						// flex: 1,
+						flex: 1,
 						width: "100%",
 					}}
 					contentContainerStyle={{
@@ -188,12 +194,11 @@ export default function Order({ navigation }: any) {
 						paddingTop: "2%",
 						paddingBottom: "15%",
 					}}
-					data={data?.data?.data}
+					data={order}
 					renderItem={({ item }: any) => (
 						<Ordercard
 							onPress={() => {
-								item.schedule ? navigation.navigate("scheduleOrderDetails", item) :
-									navigation.navigate("orderDetails", item)
+								navigation.navigate(ROUTE.ORDER_DETAILS, item)
 							}}
 							type={type}
 							cancel={() => cancelOrder(item?._id)}
@@ -203,17 +208,9 @@ export default function Order({ navigation }: any) {
 						/>
 					)}
 					// keyExtractor={(item) => item?._id}
-					refreshControl={
-						<RefreshControl
-							refreshing={isFetching}
-							onRefresh={refetch}
-							colors={[colors.yellow]}
-							tintColor={colors.yellow}
-						/>
-					}
 					ListEmptyComponent={() => (
 						<Show>
-							<Show.When isTrue={isFetching}>
+							<Show.When isTrue={!true}>
 								<></>
 							</Show.When>
 							<Show.Else>
@@ -242,19 +239,16 @@ export default function Order({ navigation }: any) {
 				modalOpen={cancel}
 				orderID={orderID}
 			/>
-			<FilterModal
-				filterRe={filterRef}
-				closeFilter={toogleFilter}
-				modalOpen={displayFilter}
-			/>
 			<ConfirmModal
-				closeModal={toogleConfirm}
+				toogleConfirm={toogleConfirm}
 				modalOpen={confirm}
 				orderID={orderID}
+				navigation={navigation}
 			/>
 		</Container>
 	);
 }
+
 
 const styles = StyleSheet.create({
 	title: {
